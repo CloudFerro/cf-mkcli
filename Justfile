@@ -6,9 +6,9 @@ install:
     @just hook
 
 lint:
-    uvx ruff format
-    uvx ruff check --fix
-    uvx mypy .
+    uv run ruff format
+    uv run ruff check --fix
+    uv run mypy .
 
 test *args:
     uv run --no-sync pytest {{ args }}
@@ -19,10 +19,10 @@ publish:
     uv publish --token $PYPI_TOKEN
 
 hook:
-    uvx pre-commit install --install-hooks --overwrite
+    uv run pre-commit install --install-hooks --overwrite
 
 unhook:
-    uvx pre-commit uninstall
+    uv run pre-commit uninstall
 
 docs:
     uv pip install -r docs/requirements.txt
