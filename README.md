@@ -9,7 +9,6 @@ This project provides a CLI tool for managing Kubernetes clusters, built with Py
 - `just` command-line tool installed
 
 ## Available Actions
-## Available Actions
 
 The `Justfile` defines several actions to streamline development, testing, and deployment. Below is a description of each action:
 
@@ -97,3 +96,7 @@ Run it with:
 ```bash
 just docs
 ```
+
+# mkcli docs for users
+
+[See user's documentation](docs/typer-autodoc.md)

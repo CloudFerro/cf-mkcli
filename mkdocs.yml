@@ -1,12 +1,22 @@
 site_name: "CLI App Documentation"
 site_description: "Documentation for the CLI application"
 site_author: "Your Name"
+site_dir: "docs"
 theme:
   name: material
-
+  palette:
+    scheme: gray  # Options: default, slate, aqua, etc.
+    primary: orange  # Primary color (e.g., indigo, blue, red, etc.)
+    accent: white
 nav:
-  - 'index.md'
-  - 'typer-autodoc.md'
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Guides:
+      - Installation: guides/installation.md
+      - Usage: guides/usage.md
+  - Reference:
+      - CLI: reference/cli.md
+      - API: reference/api.md
 
 markdown_extensions:
   - mkdocs-typer

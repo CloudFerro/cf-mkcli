@@ -26,5 +26,5 @@ unhook:
 
 docs:
     uv pip install -r docs/requirements.txt
-    python -m typer mkcli/main.py utils docs --output docs/typer-autodoc.md
+    python -m typer mkcli/main.py utils docs --output docs/reference/cli.md
     uv run mkdocs serve

@@ -1,5 +1,7 @@
 # CLI
 
+mkcli - A CLI for managing your Kubernetes clusters
+
 **Usage**:
 
 ```console
