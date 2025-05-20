@@ -6,6 +6,7 @@ theme:
 
 nav:
   - 'index.md'
+  - 'typer-autodoc.md'
 
 markdown_extensions:
   - mkdocs-typer

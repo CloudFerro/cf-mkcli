@@ -3,7 +3,9 @@ from mkcli.cli import auth
 from mkcli.cli import cluster
 from mkcli.cli import node_pool
 
-cli = typer.Typer(no_args_is_help=True)
+MAIN_HELP: str = "mkcli - A CLI for managing your Kubernetes clusters"
+
+cli = typer.Typer(no_args_is_help=True, help=MAIN_HELP)
 cli.add_typer(auth.app, name="auth", no_args_is_help=True)
 cli.add_typer(cluster.app, name="cluster", no_args_is_help=True)
 cli.add_typer(node_pool.app, name="node-pool", no_args_is_help=True)
