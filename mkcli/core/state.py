@@ -1,7 +1,6 @@
 import datetime
 import time
 import webbrowser
-from enum import Enum
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -10,13 +9,9 @@ from keycloak import KeycloakOpenID
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from mkcli.core.callback import CallbackServer
+from .callback import CallbackServer
 from .models import ContextData
-
-
-class Format(str, Enum):
-    table = "table"
-    json = "json"
+from .enums import Format, AuthType
 
 
 def wait_until(predicate, timeout, period=0.25, *args, **kwargs) -> bool:
@@ -26,11 +21,6 @@ def wait_until(predicate, timeout, period=0.25, *args, **kwargs) -> bool:
             return True
         time.sleep(period)
     return False
-
-
-class AuthType(Enum):
-    JWT = 1
-    APP_CREDENTIAL = 2
 
 
 class State:
