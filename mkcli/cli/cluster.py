@@ -12,8 +12,7 @@ def create():
 
 
 @app.command()
-def update():
-    ...
+def update(): ...
 
 
 @app.command()
@@ -26,7 +25,7 @@ def delete():
     ...
 
 
-@app.command(name='list')
+@app.command(name="list")
 def _list():
     """List all clusters"""
     ...
@@ -36,4 +35,3 @@ def _list():
 def show():
     """Show cluster details"""
     ...
-
