@@ -1,0 +1,14 @@
+site_name: "CLI App Documentation"
+site_description: "Documentation for the CLI application"
+site_author: "Your Name"
+theme:
+  name: material
+
+nav:
+  - 'index.md'
+
+markdown_extensions:
+  - mkdocs-typer
+
+plugins:
+  - search
