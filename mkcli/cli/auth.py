@@ -3,32 +3,34 @@ import typer
 
 from mkcli.core.state import State, Format
 
+HELP: str = "Cli auth context"
 
-auth = typer.Typer(no_args_is_help=True, help="Cli context")
+app = typer.Typer(no_args_is_help=True, help=HELP)
 
 
-@auth.command()
+@app.command()
 def clear_token():
     s = State()
     s.clear()
 
 
-@auth.command()
+@app.command()
 def refresh_token():
     s = State()
     s.renew_token()
 
 
-@auth.command()
+@app.command()
 def show_token():
     s = State()
     print(s.token)
 
 
-@auth.command()
+@app.command()
 def current(
-    auth: typer.Context,
+    app: typer.Context,
     format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
 ):
+    # TODO(EA): add formatting
     s = State()
     s.show(format.json)

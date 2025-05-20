@@ -1,0 +1,31 @@
+import typer
+
+HELP: str = "Nodepool operations"
+
+app = typer.Typer(no_args_is_help=True, help=HELP)
+
+
+@app.command()
+def create():
+    ...
+
+
+@app.command()
+def update():
+    ...
+
+
+@app.command()
+def delete():
+    ...
+
+
+@app.command(name='list')
+def _list():
+    ...
+
+
+@app.command()
+def show():
+    ...
+
