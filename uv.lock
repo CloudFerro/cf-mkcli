@@ -434,6 +434,7 @@ dependencies = [
     { name = "requests" },
     { name = "rich" },
     { name = "typer" },
+    { name = "typer-cli" },
 ]
 
 [package.metadata]
@@ -446,6 +447,7 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.3" },
     { name = "rich", specifier = ">=14.0.0" },
     { name = "typer", specifier = ">=0.15.4" },
+    { name = "typer-cli", specifier = ">=0.15.4" },
 ]
 
 [[package]]
@@ -801,6 +803,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/6c/89/c527e6c848739be8ceb5c44eb8208c52ea3515c6cf6406aa61932887bf58/typer-0.15.4.tar.gz", hash = "sha256:89507b104f9b6a0730354f27c39fae5b63ccd0c95b1ce1f1a6ba0cfd329997c3", size = 101559, upload-time = "2025-05-14T16:34:57.704Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c9/62/d4ba7afe2096d5659ec3db8b15d8665bdcb92a3c6ff0b95e99895b335a9c/typer-0.15.4-py3-none-any.whl", hash = "sha256:eb0651654dcdea706780c466cf06d8f174405a659ffff8f163cfbfee98c0e173", size = 45258, upload-time = "2025-05-14T16:34:55.583Z" },
+]
+
+[[package]]
+name = "typer-cli"
+version = "0.15.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/af/8b/6e2cbc0f32b759471b2dcc63cbea229a7a0acde74b79ca318a22d2154f55/typer_cli-0.15.4.tar.gz", hash = "sha256:cb37a6b15b4046d35bf1d6685e249c5ce0bc039f49382aea2e6626184469f1a0", size = 4195, upload-time = "2025-05-14T16:34:58.784Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/e8/470625f41d3e77fede11541f9302c9b0789bbeaf99dd9da2a95ce2f8ef0e/typer_cli-0.15.4-py3-none-any.whl", hash = "sha256:778e48abac37c4865dd206ff3ac94a3d1a80de99cd2fd3c02e5b89e583237c4a", size = 3099, upload-time = "2025-05-14T16:34:57.649Z" },
 ]
 
 [[package]]

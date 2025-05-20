@@ -13,4 +13,5 @@ dependencies = [
     "requests>=2.32.3",
     "rich>=14.0.0",
     "typer>=0.15.4",
+    "typer-cli>=0.15.4",
 ]
