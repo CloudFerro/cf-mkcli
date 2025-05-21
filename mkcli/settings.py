@@ -1,25 +1,14 @@
-from enum import Enum
-
 from pydantic_settings import BaseSettings
 
-ENV_FILE_PATH = "config/.env"
+
+class DefaultContext(BaseSettings):
+    name: str = "creodias"
+    realm: str = "Creodias-new"
+    client_id: str = "auth-portal"
+    scope: str = "openid aud-public"
+    identity_server_url: str = "https://identity.cloudferro.com/auth/"
+    token: str = None
+    public_key: str = None
 
 
-class LogLevels(str, Enum):
-    DEBUG = "DEBUG"
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    CRITICAL = "CRITICAL"
-
-
-class AppSettings(BaseSettings):
-    log_level: LogLevels
-    log_fmt_msg: str
-    # log_path: str
-    # log_retention_days: int
-    # log_file_rotation_days: str  # ex. "1 day"
-    # verify_certs: bool
-
-
-app_settings = AppSettings()
+default_context = DefaultContext()

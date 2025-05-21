@@ -3,6 +3,7 @@ import typer
 
 from mkcli.core.state import State, Format
 
+
 HELP: str = "Cli auth context"
 
 app = typer.Typer(no_args_is_help=True, help=HELP)
@@ -31,6 +32,5 @@ def current(
     app: typer.Context,
     format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
 ):
-    # TODO(EA): add formatting
     s = State()
     s.show(format.json)

@@ -1,5 +1,4 @@
 import datetime
-import time
 import webbrowser
 from pathlib import Path
 from typing import Dict, Optional
@@ -12,20 +11,16 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 from .callback import CallbackServer
 from .models import ContextData
 from .enums import Format, AuthType
+from mkcli.utils import wait_until
 
 
-def wait_until(predicate, timeout, period=0.25, *args, **kwargs) -> bool:
-    must_end = time.time() + timeout
-    while time.time() < must_end:
-        if predicate(*args, **kwargs):
-            return True
-        time.sleep(period)
-    return False
+# NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
+# TODO(EA): refactor it, move const out of here etc.
 
 
 class State:
     def __init__(self):
-        path = Path(typer.get_app_dir(".cfcli")) / "config.json"
+        path = Path(typer.get_app_dir(".mkcli")) / "config.json"
         self.ctx = ContextData(path)
         self._keycloak_openid: Optional[KeycloakOpenID] = None
 
@@ -37,7 +32,7 @@ class State:
     def clear(self) -> None:
         self.ctx.clear_token()
 
-    def _select_auth_type(self) -> AuthType:
+    def _select_auth_type(self) -> AuthType:  # TODO: implement other auth types
         return AuthType.JWT
 
     def auth_headers(self) -> Dict:

@@ -5,6 +5,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from dataclasses import dataclass
 from typing import Optional, Self
 
+# NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
+# TODO(EA): refactor it, move const out of here etc.
+
 
 @dataclass
 class CallbackState:
