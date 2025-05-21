@@ -1,9 +1,7 @@
 import datetime
 import webbrowser
-from pathlib import Path
 from typing import Dict, Optional
 
-import typer
 from keycloak import KeycloakOpenID
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -12,7 +10,7 @@ from .callback import CallbackServer
 from .models import ContextData
 from .enums import Format, AuthType
 from mkcli.utils import wait_until
-
+from mkcli.settings import APP_SETTINGS
 
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
 # TODO(EA): refactor it, move const out of here etc.
@@ -20,8 +18,7 @@ from mkcli.utils import wait_until
 
 class State:
     def __init__(self):
-        path = Path(typer.get_app_dir(".mkcli")) / "config.json"
-        self.ctx = ContextData(path)
+        self.ctx = ContextData(APP_SETTINGS.confing_path)
         self._keycloak_openid: Optional[KeycloakOpenID] = None
 
     def show(self, format: Format) -> None:

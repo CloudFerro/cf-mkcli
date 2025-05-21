@@ -5,8 +5,6 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from mkcli.settings import default_context
-
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
 # TODO(EA): refactor it, move const out of here etc.
 
@@ -23,6 +21,18 @@ class Context(BaseModel):
     refresh_token: str | None = None
     refresh_expires_in: datetime.datetime | None = None
     public_key: str | None = None
+
+
+# next use prompt to create this
+default_context = Context(
+    name="creodias",
+    realm="Creodias-new",
+    client_id="auth-portal",
+    scope="openid aud-public",
+    identity_server_url="https://identity.cloudferro.com/auth/",
+    token=None,
+    public_key=None,
+)
 
 
 class CliContext(BaseModel):

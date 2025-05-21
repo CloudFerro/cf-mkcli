@@ -1,14 +1,15 @@
+import typer
 from pydantic_settings import BaseSettings
+from pathlib import Path
 
 
-class DefaultContext(BaseSettings):
-    name: str = "creodias"
-    realm: str = "Creodias-new"
-    client_id: str = "auth-portal"
-    scope: str = "openid aud-public"
-    identity_server_url: str = "https://identity.cloudferro.com/auth/"
-    token: str = None
-    public_key: str = None
+class AppSettings(BaseSettings):
+    name: str = "mkcli"
+    state_file: Path = "config.json"
+
+    @property
+    def confing_path(self) -> Path:
+        return Path(typer.get_app_dir(self.name)) / self.state_file
 
 
-default_context = DefaultContext()
+APP_SETTINGS = AppSettings()
