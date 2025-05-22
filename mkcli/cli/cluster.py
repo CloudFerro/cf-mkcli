@@ -1,4 +1,6 @@
 import typer
+from mkcli.core.mk8s import MK8SClient
+from mkcli.utils import console
 
 HELP: str = "Cli auth context"
 
@@ -12,7 +14,9 @@ def create():
 
 
 @app.command()
-def update(): ...
+def update():
+    """Update the cluster with given id"""
+    ...
 
 
 @app.command()
@@ -28,7 +32,11 @@ def delete():
 @app.command(name="list")
 def _list():
     """List all clusters"""
-    ...
+    # s = State()
+    client = MK8SClient()
+
+    clusters = client.get_clusters()
+    console.Console().print(clusters)
 
 
 @app.command()

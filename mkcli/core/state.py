@@ -8,7 +8,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from .callback import CallbackServer
 from .models import ContextData
-from .enums import Format, AuthType
+from .enums import AuthType
 from mkcli.utils import wait_until
 from mkcli.settings import APP_SETTINGS
 
@@ -21,7 +21,7 @@ class State:
         self.ctx = ContextData(APP_SETTINGS.confing_path)
         self._keycloak_openid: Optional[KeycloakOpenID] = None
 
-    def show(self, format: Format) -> None:
+    def show(self) -> None:
         data = self.ctx.json()
         console = Console()
         console.print(data)
@@ -36,7 +36,7 @@ class State:
         auth_type = self._select_auth_type()
         match auth_type:
             case AuthType.JWT:
-                return {"Authorization": f"Bearer {self.token}"}
+                return {"authorization": f"Bearer {self.token}"}
             case _:
                 return {}
 
