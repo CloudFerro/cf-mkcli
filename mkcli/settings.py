@@ -6,6 +6,7 @@ from pathlib import Path
 class AppSettings(BaseSettings):
     name: str = "mkcli"
     state_file: Path = "config.json"
+    mk8s_api_url: str = "http://localhost:10000/api/v1"
 
     @property
     def confing_path(self) -> Path:

@@ -1,7 +1,6 @@
-from typing import Annotated
 import typer
 
-from mkcli.core.state import State, Format
+from mkcli.core.state import State
 
 
 HELP: str = "Cli auth context"
@@ -30,7 +29,7 @@ def show_token():
 @app.command()
 def current(
     app: typer.Context,
-    format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
+    # format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
 ):
     s = State()
     s.show(format.json)
