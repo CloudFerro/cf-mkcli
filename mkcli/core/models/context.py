@@ -3,8 +3,7 @@ import json
 from typing import Dict
 from pathlib import Path
 
-from pydantic import BaseModel
-
+from pydantic import BaseModel, SecretStr
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
 # TODO(EA): refactor it, move const out of here etc.
 
@@ -15,10 +14,12 @@ class Context(BaseModel):
     client_id: str
     scope: str
     identity_server_url: str
-    token: str | None = None
+
+    token: SecretStr | None = None
+    refresh_token: SecretStr | None = None
+
     expires_in: datetime.datetime | None = None
     renew_after: datetime.datetime | None = None
-    refresh_token: str | None = None
     refresh_expires_in: datetime.datetime | None = None
     public_key: str | None = None
 
