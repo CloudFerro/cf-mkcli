@@ -1,0 +1,43 @@
+{
+"kubernetes_version": {
+"id": "string"
+},
+"control_plane": {
+"preset": "string",
+"custom": {
+"size": 0,
+"machine_spec": {
+"id": "string"
+}
+}
+},
+"node_pools": [
+{
+"quantity": 0,
+"machine_spec": {
+"id": "string"
+},
+"name": "string",
+"size": 0,
+"size_min": 0,
+"size_max": 0,
+"autoscale": true,
+"shared_networks": [
+"string"
+],
+"labels": [
+{
+"key": "string",
+"value": "string"
+}
+],
+"taints": [
+{
+"key": "string",
+"value": "string",
+"effect": "NoSchedule"
+}
+]
+}
+]
+}

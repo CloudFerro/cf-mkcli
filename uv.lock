@@ -438,6 +438,7 @@ dependencies = [
     { name = "keycloak" },
     { name = "mkdocs" },
     { name = "mkdocs-typer" },
+    { name = "petname" },
     { name = "pre-commit" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -456,6 +457,7 @@ requires-dist = [
     { name = "keycloak", specifier = ">=3.1.5" },
     { name = "mkdocs", specifier = ">=1.6.1" },
     { name = "mkdocs-typer", specifier = ">=0.0.3" },
+    { name = "petname", specifier = ">=2.6" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pydantic", specifier = ">=2.11.4" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
@@ -546,6 +548,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08", size = 31191, upload-time = "2023-12-10T22:30:43.14Z" },
 ]
+
+[[package]]
+name = "petname"
+version = "2.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/a5/348c90b3fb09d7bd76f7dacf1b92e251d75bfbe715006cb9b84eb23be1b1/petname-2.6.tar.gz", hash = "sha256:981c31ef772356a373640d1bb7c67c102e0159eda14578c67a1c99d5b34c9e4c", size = 8357, upload-time = "2019-06-13T20:35:21.021Z" }
 
 [[package]]
 name = "platformdirs"

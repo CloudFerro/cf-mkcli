@@ -9,7 +9,7 @@ class APICallError(Exception):
 
     def __init__(self, status_code: int, message: str):
         _msg = f"API call failed with status code {status_code}: {message}"
-        super().__init__(message)
+        super().__init__(_msg)
 
 
 class MK8SClient:
@@ -44,7 +44,7 @@ class MK8SClient:
         # TODO: maybe floating interface would be better?
         return resp.json()
 
-    def create_cluster(self, cluster_data: dict, organisation_id=None) -> dict:
+    def create_cluster(self, cluster_data: dict | str, organisation_id=None) -> dict:
         params = {"organisationId": organisation_id}
         resp = self.api.post("/cluster", json=cluster_data, params=params)
         self._verify(resp)
