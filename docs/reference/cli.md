@@ -36,58 +36,77 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `clear-token`
-* `refresh-token`
-* `show-token`
-* `current`
+* `show`: Show current auth context
+* `token`: Token management
 
-### `auth clear-token`
+### `auth show`
+
+Show current auth context
 
 **Usage**:
 
 ```console
-$ auth clear-token [OPTIONS]
+$ auth show [OPTIONS]
 ```
 
 **Options**:
 
 * `--help`: Show this message and exit.
 
-### `auth refresh-token`
+### `auth token`
+
+Token management
 
 **Usage**:
 
 ```console
-$ auth refresh-token [OPTIONS]
+$ auth token [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
 
 * `--help`: Show this message and exit.
 
-### `auth show-token`
+**Commands**:
+
+* `clear`
+* `refresh`
+* `show`
+
+#### `auth token clear`
 
 **Usage**:
 
 ```console
-$ auth show-token [OPTIONS]
+$ auth token clear [OPTIONS]
 ```
 
 **Options**:
 
 * `--help`: Show this message and exit.
 
-### `auth current`
+#### `auth token refresh`
 
 **Usage**:
 
 ```console
-$ auth current [OPTIONS]
+$ auth token refresh [OPTIONS]
 ```
 
 **Options**:
 
-* `-o, --output-format [table|json]`: [default: table]
+* `--help`: Show this message and exit.
+
+#### `auth token show`
+
+**Usage**:
+
+```console
+$ auth token show [OPTIONS]
+```
+
+**Options**:
+
 * `--help`: Show this message and exit.
 
 ## `cluster`
@@ -107,10 +126,11 @@ $ cluster [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `create`: Create a new k8s cluster
-* `update`
+* `update`: Update the cluster with given id
 * `delete`: Delete the cluster.
 * `list`: List all clusters
 * `show`: Show cluster details
+* `kube-config`: Download kube-config.yaml
 
 ### `cluster create`
 
@@ -119,8 +139,12 @@ Create a new k8s cluster
 **Usage**:
 
 ```console
-$ cluster create [OPTIONS]
+$ cluster create [OPTIONS] CLUSTER_PAYLOAD
 ```
+
+**Arguments**:
+
+* `CLUSTER_PAYLOAD`: [required]
 
 **Options**:
 
@@ -128,30 +152,42 @@ $ cluster create [OPTIONS]
 
 ### `cluster update`
 
+Update the cluster with given id
+
 **Usage**:
 
 ```console
-$ cluster update [OPTIONS]
+$ cluster update [OPTIONS] CLUSTER_ID
 ```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
 
 **Options**:
 
+* `--payload FROM_JSON`
 * `--help`: Show this message and exit.
 
 ### `cluster delete`
 
 Delete the cluster.
 
-If --force is not used, will ask for confirmation.
+If --force is not used, will ask for confirmation.  # TODO: implement force
 
 **Usage**:
 
 ```console
-$ cluster delete [OPTIONS]
+$ cluster delete [OPTIONS] CLUSTER_ID
 ```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
 
 **Options**:
 
+* `--force TEXT`: Cluster ID  [default: False]
 * `--help`: Show this message and exit.
 
 ### `cluster list`
@@ -175,8 +211,30 @@ Show cluster details
 **Usage**:
 
 ```console
-$ cluster show [OPTIONS]
+$ cluster show [OPTIONS] CLUSTER_ID
 ```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `cluster kube-config`
+
+Download kube-config.yaml
+
+**Usage**:
+
+```console
+$ cluster kube-config [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
 
 **Options**:
 
