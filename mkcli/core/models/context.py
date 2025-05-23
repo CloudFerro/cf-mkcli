@@ -3,9 +3,42 @@ import json
 from typing import Dict
 from pathlib import Path
 
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel
+
+from mkcli.settings import APP_SETTINGS
+
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
 # TODO(EA): refactor it, move const out of here etc.
+
+
+class Context:  # Context
+    def __init__(self, name: str):
+        self.name = name
+        self.value = 0
+
+
+class ContextCatalogue:  # ContextCatalogue
+    def __init__(self):
+        self.items = {}
+
+    def add(self, item: Context):
+        self.items[item.name] = item
+
+    def __repr__(self):
+        return f"Catalogue({self.items})"
+
+
+class ContextStorage:  # ContextStorage
+    def __init__(self, cat: ContextCatalogue):
+        self.cat = cat
+
+    def write(self): ...
+
+    def read(self): ...
+
+    def sync(self): ...
+
+    def clear(self): ...
 
 
 class Context(BaseModel):
@@ -15,12 +48,12 @@ class Context(BaseModel):
     scope: str
     identity_server_url: str
 
-    token: SecretStr | None = None
-    refresh_token: SecretStr | None = None
-
+    token: str | None = None  # TODO: use SecretStr
+    refresh_token: str | None = None
     expires_in: datetime.datetime | None = None
     renew_after: datetime.datetime | None = None
     refresh_expires_in: datetime.datetime | None = None
+
     public_key: str | None = None
 
 
@@ -36,18 +69,18 @@ default_context = Context(
 )
 
 
-class CliContext(BaseModel):
+class ContextCatalogue(BaseModel):
     contexts: Dict[str, Context]
     current_context: str
 
 
-class ContextData:
-    def __init__(self, config_path: Path):
+class ContexStorage:
+    def __init__(self, config_path: Path = APP_SETTINGS.cached_context_path):
         self.config_path = config_path
         if not self.config_path.is_file():
             config_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.config_path, "w") as f:
-                c = CliContext(
+                c = ContextCatalogue(
                     contexts={
                         default_context.name: default_context,
                     },
@@ -57,9 +90,9 @@ class ContextData:
 
         with open(self.config_path, "r") as f:
             data = json.load(f)
-            self.state = CliContext.model_validate(data)
+            self.state = ContextCatalogue.model_validate(data)
 
-    def save(self, ctx: CliContext) -> None:
+    def save(self, ctx: ContextCatalogue) -> None:
         with open(self.config_path, "w") as f:
             f.write(ctx.model_dump_json())
 

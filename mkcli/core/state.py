@@ -3,14 +3,11 @@ import webbrowser
 from typing import Dict, Optional
 
 from keycloak import KeycloakOpenID
-from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from .callback import CallbackServer
-from .models import ContextData
-from .enums import AuthType
+from .models import ContexStorage
 from mkcli.utils import wait_until
-from mkcli.settings import APP_SETTINGS
 
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
 # TODO(EA): refactor it, move const out of here etc.
@@ -18,27 +15,11 @@ from mkcli.settings import APP_SETTINGS
 
 class State:
     def __init__(self):
-        self.ctx = ContextData(APP_SETTINGS.confing_path)
+        self.ctx = ContexStorage()
         self._keycloak_openid: Optional[KeycloakOpenID] = None
-
-    def show(self) -> None:
-        data = self.ctx.json()
-        console = Console()
-        console.print(data)
 
     def clear(self) -> None:
         self.ctx.clear_token()
-
-    def _select_auth_type(self) -> AuthType:  # TODO: implement other auth types
-        return AuthType.JWT
-
-    def auth_headers(self) -> Dict:
-        auth_type = self._select_auth_type()
-        match auth_type:
-            case AuthType.JWT:
-                return {"authorization": f"Bearer {self.token}"}
-            case _:
-                return {}
 
     def _maybe_refresh_token(self) -> None:
         if self.ctx.should_renew_token():
