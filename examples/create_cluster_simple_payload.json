@@ -1,0 +1,14 @@
+{
+  "control_plane": {
+    "custom": {
+      "machine_spec": {
+        "id": "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"
+      },
+      "size": 3
+    }
+  },
+  "kubernetes_version": {
+    "id": "52be568f-5875-4c92-a6ba-07c06368a6fe"
+  },
+  "node_pools": []
+}
