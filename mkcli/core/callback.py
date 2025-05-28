@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import Optional, Self
 
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
-# TODO(EA): refactor it, move const out of here etc.
 
 
 @dataclass
@@ -51,6 +50,10 @@ class HandleOpenIDCallback(BaseHTTPRequestHandler):
                 self.send_response(400)
         except Exception as e:
             self.send_response(500, f"Internal server error: {str(e)}")
+
+    def log_message(self, format, *args):
+        # Suppress all logs
+        pass
 
 
 class CallbackServer:

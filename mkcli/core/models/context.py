@@ -1,9 +1,9 @@
 from __future__ import annotations
 import datetime
 import json
-from typing import Dict
+from typing import Dict, Optional
 from pathlib import Path
-import loguru
+from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field
 
 from mkcli.settings import APP_SETTINGS
@@ -13,16 +13,25 @@ from mkcli.settings import APP_SETTINGS
 
 
 class Token(BaseModel):
-    ...  # TODO: move out of the context to separate class
-    token: str | None = None  # TODO: use SecretStr
+    access_token: str | None = None  # TODO: use SecretStr
     refresh_token: str | None = None
     expires_in: datetime.datetime | None = None
     renew_after: datetime.datetime | None = None
     refresh_expires_in: datetime.datetime | None = None
 
+    def clear(self):
+        """Clear the token and its related fields"""
+        self.access_token = None
+        self.refresh_token = None
+        self.expires_in = None
+        self.renew_after = None
+        self.refresh_expires_in = None
+
     def is_valid(self) -> bool:
         """Check if the token is valid"""
-        return self.token is not None and self.expires_in > datetime.datetime.now()
+        return (
+            self.access_token is not None and self.expires_in > datetime.datetime.now()
+        )
 
     def is_refresh_token_valid(self) -> bool:
         return self.refresh_expires_in > datetime.datetime.now()
@@ -33,6 +42,9 @@ class Token(BaseModel):
         # using the refresh token. For now, it's a placeholder.
         raise NotImplementedError("Token renewal logic is not implemented yet.")
 
+    def should_be_renew(self) -> bool:
+        return self.renew_after < datetime.datetime.now()
+
 
 class Context(BaseModel):
     name: str
@@ -42,13 +54,11 @@ class Context(BaseModel):
     identity_server_url: str
     public_key: str | None = None
 
-    token: Token | None = None
-
-    # token: str | None = None  # TODO: use SecretStr
-    # refresh_token: str | None = None
-    # expires_in: datetime.datetime | None = None
-    # renew_after: datetime.datetime | None = None
-    # refresh_expires_in: datetime.datetime | None = None
+    # TODO: use Enum to annotate auth_type,
+    # TODO: add managing different auth types, which should inherit from some abc abstract class or
+    #  Protocol and have consistent interface
+    # auth_type: str = Field(default="token", exclude=True)
+    token: Optional[Token] = None
 
 
 # next use prompt to create this
@@ -79,13 +89,15 @@ class ContextStorage:
         """Write the context data catalogue to the storage"""
         with open(self.path, "w") as f:
             f.write(cat.model_dump_json())
-        loguru.logger.info(f"Data saved to {self.path}")
+        logger.info(f"Data saved to {self.path}")
 
     def load_all(self) -> ContextCatalogue:
         """Read the context data catalogue from the storage"""
         with open(self.path, "r") as f:
             data = json.load(f)
-            return ContextCatalogue.model_validate(data)
+            cat = ContextCatalogue.model_validate(data)
+            logger.info(f"Loaded context catalogue from {ContextStorage.PATH_PATTERN}")
+        return cat
 
     def clear(self) -> None:
         """Clear the context data catalogue"""
@@ -113,12 +125,16 @@ class ContextCatalogue(BaseModel):
             )
         self.current = value
         self.save()
-        loguru.logger.info(f"Current context set to '{value}'.")
+        logger.info(f"Current context set to '{value}'.")
+
+    @property
+    def current_context(self) -> Context:
+        return self.cat[self.current]  # TODO: maybe setter
 
     def add(self, item: Context):
         self.cat[item.name] = item
         self.save()
-        loguru.logger.info(f"Context '{item.name}' added to the catalogue.")
+        logger.info(f"Context '{item.name}' added to the catalogue.")
 
     def list_all(self) -> list[Context]:
         """List all contexts in the catalogue"""
@@ -135,70 +151,8 @@ class ContextCatalogue(BaseModel):
     @classmethod
     def from_storage(cls) -> "ContextCatalogue":
         """Load the context catalogue from the storage"""
-        return ContextStorage().load_all()
+        cat = ContextStorage().load_all()
+        return cat
 
     def __repr__(self):
         return f"Current context: {self.cat.get(self.current)}\nCatalogue: {self.list_available()}"
-
-
-class ContexStorage_Old:
-    def __init__(self, config_path: Path = APP_SETTINGS.cached_context_path):
-        self.config_path = config_path
-        if not self.config_path.is_file():
-            config_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.config_path, "w") as f:
-                c = ContextCatalogue(
-                    contexts={
-                        default_context.name: default_context,
-                    },
-                    current_context=default_context.name,
-                )
-                f.write(c.model_dump_json())
-
-        with open(self.config_path, "r") as f:
-            data = json.load(f)
-            self.state = ContextCatalogue.model_validate(data)
-
-    def save(self, ctx: ContextCatalogue) -> None: ...
-
-    def json(self):
-        return self.state.model_dump_json()
-
-    def current_context_name(self) -> str:
-        return self.state.current_context
-
-    def current_context(self) -> Context:
-        return self.state.contexts[self.current_context_name()]
-
-    @property
-    def token(self):
-        return self.state.contexts[self.state.current_context].token
-
-    def refresh_token(self):
-        return self.state.contexts[self.state.current_context].refresh_token
-
-    def save_token(
-        self, token, expires_in, renew_after, refresh_token, refresh_expires_in
-    ):
-        name = self.current_context_name()
-        self.state.contexts[name].token = token
-        self.state.contexts[name].expires_in = expires_in
-        self.state.contexts[name].renew_after = renew_after
-        self.state.contexts[name].refresh_token = refresh_token
-        self.state.contexts[name].refresh_expires_in = refresh_expires_in
-        self.save(self.state)
-
-    def clear_token(self):
-        name = self.current_context_name()
-        self.state.contexts[name].token = None
-        self.state.contexts[name].refresh_token = None
-        self.state.contexts[name].expires_in = None
-        self.state.contexts[name].renew_after = None
-        self.state.contexts[name].refresh_expires_in = None
-        self.save(self.state)
-
-    def should_renew_token(self) -> bool:
-        return self.current_context().renew_after < datetime.datetime.now()
-
-    def is_refresh_token_valid(self) -> bool:
-        return self.current_context().refresh_expires_in > datetime.datetime.now()

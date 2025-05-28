@@ -2,6 +2,12 @@ import typer
 from mkcli.cli import auth
 from mkcli.cli import cluster
 from mkcli.cli import node_pool
+from loguru import logger
+import logging
+
+# Suppress all logging
+logger.remove()
+logging.getLogger("mkcli").setLevel(logging.ERROR)
 
 MAIN_HELP: str = "mkcli - A CLI for managing your Kubernetes clusters"
 
