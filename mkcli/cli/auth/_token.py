@@ -5,7 +5,7 @@ from mkcli.utils import console
 
 HELP: str = "Cli token management"
 
-app = typer.Typer(no_args_is_help=True, help="Token management")
+app = typer.Typer(no_args_is_help=True, help=HELP)
 
 
 # Token subcommands
@@ -24,6 +24,7 @@ def refresh():
     s = State(cat.current_context)
 
     s.renew_token()
+    cat.save()
 
 
 @app.command()

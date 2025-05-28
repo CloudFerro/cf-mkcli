@@ -1,8 +1,5 @@
 import typer
 
-from mkcli.core.state import State
-from mkcli.utils import console
-
 
 HELP: str = "Cli auth context management"
 
@@ -15,6 +12,4 @@ def show(
     # format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
 ):
     """Show current auth context"""
-    s = State()
-    data = s.ctx.json()
-    console.Console().print(data)
+    print(1)
