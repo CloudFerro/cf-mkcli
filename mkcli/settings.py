@@ -14,4 +14,13 @@ class AppSettings(BaseSettings):
         return Path(typer.get_app_dir(self.name)) / self.state_file
 
 
+class DefaultContextSettings(BaseSettings):
+    name: str = "creodias"
+    realm: str = "Creodias-new"
+    client_id: str = "auth-portal"
+    scope: str = "openid aud-public"
+    identity_server_url: str = "https://identity.cloudferro.com/auth/"
+
+
 APP_SETTINGS = AppSettings()
+DEFAULT_CTX_SETTINGS = DefaultContextSettings()

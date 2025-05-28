@@ -3,10 +3,8 @@ from typing import (
     Optional,
 )
 
-from rich import (
-    box,
-    print,
-)
+import rich.rule
+from rich import box, print, json
 from rich.console import Console
 from rich.table import Table
 
@@ -38,3 +36,25 @@ def display(_str: str) -> None:
 
 def status_frame(_str: str) -> ContextManager:
     return Console().status(_str)
+
+
+def display_json(_data: str) -> None:
+    """
+    Print the given data as JSON.
+    """
+    print(json.JSON(_data))
+
+
+def draw_rule(title: str = None) -> None:
+    """
+    Draw a horizontal rule.
+    """
+    if title is None:
+        title = ""
+
+    print(
+        rich.rule.Rule(
+            title=title,
+            style="bold blue",
+        )
+    )

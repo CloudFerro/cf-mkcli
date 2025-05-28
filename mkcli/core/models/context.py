@@ -6,7 +6,8 @@ from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field
 
-from mkcli.settings import APP_SETTINGS
+from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS
+
 
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
 # TODO(EA): refactor it, move const out of here etc.
@@ -36,12 +37,6 @@ class Token(BaseModel):
     def is_refresh_token_valid(self) -> bool:
         return self.refresh_expires_in > datetime.datetime.now()
 
-    def refresh(self):
-        """Renew the token using the refresh token"""
-        # This method should implement the logic to renew the token
-        # using the refresh token. For now, it's a placeholder.
-        raise NotImplementedError("Token renewal logic is not implemented yet.")
-
     def should_be_renew(self) -> bool:
         return self.renew_after < datetime.datetime.now()
 
@@ -61,16 +56,8 @@ class Context(BaseModel):
     token: Optional[Token] = None
 
 
-# next use prompt to create this
-default_context = Context(
-    name="creodias",
-    realm="Creodias-new",
-    client_id="auth-portal",
-    scope="openid aud-public",
-    identity_server_url="https://identity.cloudferro.com/auth/",
-    token=None,
-    public_key=None,
-)
+# TODO: next use prompt to create this
+default_context = Context(**DEFAULT_CTX_SETTINGS.dict())
 
 
 class ContextStorage:
