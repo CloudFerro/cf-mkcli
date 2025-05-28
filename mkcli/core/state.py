@@ -49,7 +49,7 @@ class State:
 
     def _renew_token_with_refresh_token(self) -> None:
         logger.info("Renewing token with refresh token for context: {}", self.ctx.name)
-        token = self.keycloak_openid.refresh_token(self.ctx.refresh_token())
+        token = self.keycloak_openid.refresh_token(self.ctx.token.refresh_token)
         self._save_token(token)
 
     def renew_token(self) -> None:

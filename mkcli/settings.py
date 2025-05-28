@@ -17,8 +17,8 @@ class AppSettings(BaseSettings):
 class DefaultContextSettings(BaseSettings):
     name: str = "creodias"
     realm: str = "Creodias-new"
-    client_id: str = "auth-portal"
-    scope: str = "openid aud-public"
+    client_id: str = "managed-kubernetes"
+    scope: str = "email profile openid"
     identity_server_url: str = "https://identity.cloudferro.com/auth/"
 
 

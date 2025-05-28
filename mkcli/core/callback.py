@@ -52,12 +52,12 @@ class HandleOpenIDCallback(BaseHTTPRequestHandler):
             self.send_response(500, f"Internal server error: {str(e)}")
 
     def log_message(self, format, *args):
-        # Suppress all logs
+        """Supress logging of requests to the console"""
         pass
 
 
 class CallbackServer:
-    def __init__(self, host: str = "127.0.0.1", port: int = 20000):
+    def __init__(self, host: str = "localhost", port: int = 3333):
         self.host = host
         self.port = port
         self.handler = HandleOpenIDCallback
@@ -77,7 +77,7 @@ class CallbackServer:
 
     @property
     def base_url(self) -> str:
-        return "http://localhost:20000"
+        return f"http://{self.host}:{self.port}"
 
     def ready(self) -> bool:
         try:

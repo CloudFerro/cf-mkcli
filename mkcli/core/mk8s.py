@@ -1,6 +1,5 @@
-import os
 import httpx
-
+from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 
 
@@ -15,13 +14,13 @@ class APICallError(Exception):
 class MK8SClient:
     _API_URL = APP_SETTINGS.mk8s_api_url
 
-    def __init__(self):
-        # self.state = State()  # TODO: FIX this to use JT's state class
+    def __init__(self, state: State):
+        self.state = state  # TODO: FIX this to use JT's state class
         self.api = httpx.Client(base_url=self._API_URL, headers=self.headers)
 
     @property
     def headers(self) -> dict:
-        token = os.environ["TOKEN"]  # TODO: fix it to use state class
+        token = self.state.token
         return {
             "authorization": f"Bearer {token}",
         }
@@ -40,8 +39,6 @@ class MK8SClient:
         }
         resp = self.api.get("/cluster", headers=self.headers, params=params)
         self._verify(resp)
-        # TODO: Think about if calling it everywhere is worth it. Maybe we can do it in upper layers
-        # TODO: maybe floating interface would be better?
         return resp.json()
 
     def create_cluster(self, cluster_data: dict | str, organisation_id=None) -> dict:

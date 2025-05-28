@@ -1,7 +1,8 @@
 import typer
 from typing_extensions import Annotated
 from mkcli.core.mk8s import MK8SClient
-from mkcli.core.models import ClusterPayload
+from mkcli.core.models import ClusterPayload, ContextCatalogue
+from mkcli.core.state import State
 from mkcli.utils import console
 
 HELP: str = "Cli auth context"
@@ -19,8 +20,10 @@ def create(
     console.Console().print(
         f"Creating cluster {cluster_payload.name} with specification:\n{cluster_payload}"
     )
+    cat = ContextCatalogue.from_storage()
+    state = State(cat.current_context)
 
-    client = MK8SClient()
+    client = MK8SClient(state)
     _out = client.create_cluster(cluster_data=cluster_payload.dict())
     console.Console().print(_out)
 
@@ -34,8 +37,10 @@ def update(
 ):
     """Update the cluster with given id"""
     console.Console().print(f"Updating cluster {cluster_id}\nwith {payload}")
+    cat = ContextCatalogue.from_storage()
+    state = State(cat.current_context)
 
-    client = MK8SClient()
+    client = MK8SClient(state)
     _out = client.update_cluster(cluster_id, cluster_data=payload.dict())
     console.Console().print(_out)
 
@@ -50,7 +55,10 @@ def delete(
 
     If --force is not used, will ask for confirmation.  # TODO: implement force
     """
-    client = MK8SClient()
+    cat = ContextCatalogue.from_storage()
+    state = State(cat.current_context)
+
+    client = MK8SClient(state)
     confirmed = typer.confirm(f"Are you sure you want to delete cluster {cluster_id}?")
     if confirmed:
         client.delete_cluster(cluster_id)
@@ -62,8 +70,10 @@ def delete(
 @app.command(name="list")
 def _list():
     """List all clusters"""
-    # s = State()
-    client = MK8SClient()
+    cat = ContextCatalogue.from_storage()
+    state = State(cat.current_context)
+
+    client = MK8SClient(state)
 
     clusters = client.get_clusters()
     console.Console().print_json(data=clusters)
@@ -72,7 +82,9 @@ def _list():
 @app.command()
 def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
     """Show cluster details"""
-    client = MK8SClient()
+    cat = ContextCatalogue.from_storage()
+    state = State(cat.current_context)
+    client = MK8SClient(state)
 
     _out = client.get_cluster(cluster_id)
     console.Console().print_json(data=_out)

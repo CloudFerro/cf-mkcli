@@ -34,3 +34,4 @@ def show():
 
     console.display("[bold green]Current access token:[/bold green]")
     console.display(s.token)
+    cat.save()
