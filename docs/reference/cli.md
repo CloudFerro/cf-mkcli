@@ -16,13 +16,13 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `auth`: Cli auth context
+* `auth`: Cli auth management
 * `cluster`: Cli auth context
 * `node-pool`: Nodepool operations
 
 ## `auth`
 
-Cli auth context
+Cli auth management
 
 **Usage**:
 
@@ -36,26 +36,12 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `show`: Show current auth context
-* `token`: Token management
-
-### `auth show`
-
-Show current auth context
-
-**Usage**:
-
-```console
-$ auth show [OPTIONS]
-```
-
-**Options**:
-
-* `--help`: Show this message and exit.
+* `token`: Cli token management
+* `context`: Cli auth context management
 
 ### `auth token`
 
-Token management
+Cli token management
 
 **Usage**:
 
@@ -103,6 +89,83 @@ $ auth token refresh [OPTIONS]
 
 ```console
 $ auth token show [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `auth context`
+
+Cli auth context management
+
+**Usage**:
+
+```console
+$ auth context [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `show`: Show current auth context
+* `list`: Remove given auth context from the catalogue
+* `add`: Prompt for new auth context and add it to...
+* `delete`: Remove given auth context from the catalogue
+
+#### `auth context show`
+
+Show current auth context
+
+**Usage**:
+
+```console
+$ auth context show [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth context list`
+
+Remove given auth context from the catalogue
+
+**Usage**:
+
+```console
+$ auth context list [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth context add`
+
+Prompt for new auth context and add it to the catalogue
+
+**Usage**:
+
+```console
+$ auth context add [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth context delete`
+
+Remove given auth context from the catalogue
+
+**Usage**:
+
+```console
+$ auth context delete [OPTIONS]
 ```
 
 **Options**:
