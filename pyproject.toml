@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "keycloak>=3.1.5",
+    "loguru>=0.7.3",
     "mkdocs>=1.6.1",
     "mkdocs-typer>=0.0.3",
     "petname>=2.6",

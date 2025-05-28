@@ -5,7 +5,7 @@ from pathlib import Path
 
 class AppSettings(BaseSettings):
     name: str = "mkcli"
-    state_file: Path = "config.json"
+    state_file: Path = "contexts.json"
     # mk8s_api_url: str = "http://localhost:10000/api/v1"
     mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1"
 

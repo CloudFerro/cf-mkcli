@@ -12,7 +12,7 @@ app = typer.Typer(no_args_is_help=True, help="Token management")
 @app.command()
 def clear():
     s = State()
-    s.clear()
+    print(s)
 
 
 @app.command()

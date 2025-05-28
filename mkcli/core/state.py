@@ -6,7 +6,7 @@ from keycloak import KeycloakOpenID
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from .callback import CallbackServer
-from .models import ContexStorage
+from .models import ContextCatalogue
 from mkcli.utils import wait_until
 
 # NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
@@ -15,7 +15,7 @@ from mkcli.utils import wait_until
 
 class State:
     def __init__(self):
-        self.ctx = ContexStorage()
+        self.cat = ContextCatalogue()
         self._keycloak_openid: Optional[KeycloakOpenID] = None
 
     def clear(self) -> None:
