@@ -95,7 +95,7 @@ class ContextCatalogue(BaseModel):
     """Catalogue of contexts, used to store and manage multiple connection contexts."""
 
     cat: Dict[str, Context] = {default_context.name: default_context}
-    current: str = default_context.name  # TODO: rename to "active"
+    current: str = default_context.name
 
     storage: ContextStorage = Field(default_factory=ContextStorage, exclude=True)
 

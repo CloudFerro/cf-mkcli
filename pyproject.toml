@@ -1,10 +1,11 @@
 [project]
-name = "mk8s-cli"
+name = "mkcli"
 version = "0.1.0"
-description = "Add your description here"
+description = "CLI for managing Kubernetes clusters"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "asciinema>=2.4.0",
     "keycloak>=3.1.5",
     "loguru>=0.7.3",
     "mkdocs>=1.6.1",

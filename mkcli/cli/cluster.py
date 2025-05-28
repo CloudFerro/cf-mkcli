@@ -27,6 +27,8 @@ def create(
     _out = client.create_cluster(cluster_data=cluster_payload.dict())
     console.Console().print(_out)
 
+    cat.save()
+
 
 @app.command()
 def update(
@@ -77,6 +79,8 @@ def _list():
 
     clusters = client.get_clusters()
     console.Console().print_json(data=clusters)
+
+    cat.save()
 
 
 @app.command()
