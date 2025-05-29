@@ -250,7 +250,6 @@ $ cluster delete [OPTIONS] CLUSTER_ID
 
 **Options**:
 
-* `--force TEXT`: Cluster ID  [default: False]
 * `--help`: Show this message and exit.
 
 ### `cluster list`
@@ -319,19 +318,48 @@ $ node-pool [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `create`
+* `create`: Create a new node pool
+* `list`: List all node pools in the cluster
 * `update`
-* `delete`
-* `list`
-* `show`
+* `delete`: Delete a node pool
 
 ### `node-pool create`
+
+Create a new node pool
 
 **Usage**:
 
 ```console
-$ node-pool create [OPTIONS]
+$ node-pool create [OPTIONS] CLUSTER_ID
 ```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--name TEXT`: Node pool name, if None, generate with petname
+* `--node-count INTEGER`: Number of nodes in the pool  [default: 1]
+* `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 1]
+* `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 10]
+* `--autoscale / --no-autoscale`: Enable autoscaling for the node pool  [default: no-autoscale]
+* `--flavor-id TEXT`: Machine flavor ID for the node pool, if None, use default flavor  [default: b003e1cf-fd40-4ad1-827c-cc20c2ddd519]
+* `--help`: Show this message and exit.
+
+### `node-pool list`
+
+List all node pools in the cluster
+
+**Usage**:
+
+```console
+$ node-pool list [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
 
 **Options**:
 
@@ -351,35 +379,18 @@ $ node-pool update [OPTIONS]
 
 ### `node-pool delete`
 
-**Usage**:
-
-```console
-$ node-pool delete [OPTIONS]
-```
-
-**Options**:
-
-* `--help`: Show this message and exit.
-
-### `node-pool list`
+Delete a node pool
 
 **Usage**:
 
 ```console
-$ node-pool list [OPTIONS]
+$ node-pool delete [OPTIONS] CLUSTER_ID NODE_POOL_ID
 ```
 
-**Options**:
+**Arguments**:
 
-* `--help`: Show this message and exit.
-
-### `node-pool show`
-
-**Usage**:
-
-```console
-$ node-pool show [OPTIONS]
-```
+* `CLUSTER_ID`: Cluster ID  [required]
+* `NODE_POOL_ID`: Node pool ID to delete  [required]
 
 **Options**:
 

@@ -15,7 +15,7 @@ class MK8SClient:
     _API_URL = APP_SETTINGS.mk8s_api_url
 
     def __init__(self, state: State):
-        self.state = state  # TODO: FIX this to use JT's state class
+        self.state = state
         self.api = httpx.Client(base_url=self._API_URL, headers=self.headers)
 
     @property
@@ -66,7 +66,7 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()
 
-    def list_node_pools(self, cluster_id: str) -> list:
+    def list_node_pools(self, cluster_id: str) -> dict:
         resp = self.api.get(f"/cluster/{cluster_id}/node-pool")
         self._verify(resp)
         return resp.json()

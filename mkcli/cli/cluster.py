@@ -50,7 +50,7 @@ def update(
 @app.command()
 def delete(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
-    force: Annotated[str, typer.Option(help="Cluster ID")] = False,
+    # force: Annotated[str, typer.Option(help="Cluster ID")] = False,
 ):
     """
     Delete the cluster.
