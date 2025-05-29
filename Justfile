@@ -1,30 +1,32 @@
-default: install lint test
+poetry := "poetry"
+poetry_run := poetry + " run"
 
-install:
-    uv lock --upgrade
-    uv sync --all-extras --frozen
-    @just hook
+default:
+    just --list --unsorted
+
+setup:
+    {{ poetry }} check
+    {{ poetry }} install
 
 lint:
-    uv run ruff format
-    uv run ruff check --fix
-    uv run mypy .
+    {{ poetry_run }} ruff format
+    {{ poetry_run }} ruff check --fix
+    {{ poetry_run }} run mypy .
 
 test *args:
-    uv run --no-sync pytest {{ args }}
+    {{ poetry_run }} pytest {{ args }}
 
-publish:
+build:
     rm -rf dist
-    uv build
-    uv publish --token $PYPI_TOKEN
+    {{ poetry_run }} build
 
 hook:
-    uv run pre-commit install --install-hooks --overwrite
+    {{ poetry_run }} pre-commit install --install-hooks --overwrite
 
 unhook:
-    uv run pre-commit uninstall
+    {{ poetry_run }} pre-commit uninstall
 
 docs:
-    uv pip install -r docs/requirements.txt
+    {{ poetry }} install --with dev
     python -m typer mkcli/main.py utils docs --output docs/reference/cli.md
-    uv run mkdocs serve
+    {{ poetry_run }} mkdocs serve

@@ -1,25 +1,28 @@
-[project]
+[tool.poetry]
 name = "mkcli"
 version = "0.1.0"
-description = "CLI for managing Kubernetes clusters"
+description = ""
+authors = ["Ewa Adamska <eadamska@cloudferro.com>"]
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "asciinema>=2.4.0",
-    "keycloak>=3.1.5",
-    "loguru>=0.7.3",
-    "mkdocs>=1.6.1",
-    "mkdocs-typer>=0.0.3",
-    "petname>=2.6",
-    "pre-commit>=4.2.0",
-    "pydantic>=2.11.4",
-    "pydantic-settings>=2.9.1",
-    "pymdown-extensions>=10.15",
-    "pytest>=8.3.5",
-    "python-keycloak>=5.5.0",
-    "requests>=2.32.3",
-    "rich>=14.0.0",
-    "rust-just>=1.40.0",
-    "typer>=0.15.4",
-    "typer-cli>=0.15.4",
-]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-keycloak = "^5.5.1"
+typer = "^0.16.0"
+loguru = "^0.7.3"
+pydantic = "^2.11.5"
+pydantic-settings = "^2.9.1"
+petname = "^2.6"
+ruff = "^0.11.11"
+pytest = "^8.3.5"
+
+
+[tool.poetry.group.dev.dependencies]
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.6.14"
+markdown-include = "^0.8.1"
+mkdocs-typer = "^0.0.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
