@@ -22,5 +22,22 @@ class DefaultContextSettings(BaseSettings):
     identity_server_url: str = "https://identity.cloudferro.com/auth/"
 
 
+class DefaultNodePoolSettings(BaseSettings):
+    name: str | None = None
+    node_count: int = 1
+    min_nodes: int = 1
+    max_nodes: int = 10
+    autoscale: bool = False
+    flavor_id: str = "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"  # Example default flavor ID
+
+
+class DefaultClusterSettings(BaseSettings):
+    kubernetes_version: str | None = "52be568f-5875-4c92-a6ba-07c06368a6fe"
+    master_count: int = 3
+    master_flavor_id: str = (
+        "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"  # Example default flavor ID
+    )
+
+
 APP_SETTINGS = AppSettings()
 DEFAULT_CTX_SETTINGS = DefaultContextSettings()

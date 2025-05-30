@@ -2,6 +2,7 @@ import typer
 
 from mkcli.core.models import ContextCatalogue, NodePoolPayload
 from mkcli.core.state import State
+from mkcli.settings import DefaultNodePoolSettings
 from mkcli.utils import console
 from mkcli.core.mk8s import MK8SClient
 from mkcli.utils import names
@@ -10,7 +11,7 @@ HELP: str = "Nodepool operations"
 
 app = typer.Typer(no_args_is_help=True, help=HELP)
 
-DEFAULT_FLAVOR_ID: str = "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"  # Example default flavor ID, replace with actual
+DEFAULT_NODEPOOL = DefaultNodePoolSettings()
 
 
 @app.command()
@@ -19,12 +20,20 @@ def create(
     name: str = typer.Option(
         None, help="Node pool name, if None, generate with petname"
     ),
-    node_count: int = typer.Option(1, help="Number of nodes in the pool"),
-    min_nodes: int = typer.Option(1, help="Minimum number of nodes in the pool"),
-    max_nodes: int = typer.Option(10, help="Maximum number of nodes in the pool"),
-    autoscale: bool = typer.Option(False, help="Enable autoscaling for the node pool"),
+    node_count: int = typer.Option(
+        DEFAULT_NODEPOOL.node_count, help="Number of nodes in the pool"
+    ),
+    min_nodes: int = typer.Option(
+        DEFAULT_NODEPOOL.min_nodes, help="Minimum number of nodes in the pool"
+    ),
+    max_nodes: int = typer.Option(
+        DEFAULT_NODEPOOL.max_nodes, help="Maximum number of nodes in the pool"
+    ),
+    autoscale: bool = typer.Option(
+        DEFAULT_NODEPOOL.autoscale, help="Enable autoscaling for the node pool"
+    ),
     flavor_id: str = typer.Option(
-        DEFAULT_FLAVOR_ID,
+        DEFAULT_NODEPOOL.flavor_id,
         help="Machine flavor ID for the node pool, if None, use default flavor",
     ),
 ):
