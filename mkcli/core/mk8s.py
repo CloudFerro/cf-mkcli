@@ -66,6 +66,11 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()
 
+    def download_kubeconfig(self, cluster_id: str) -> str:
+        resp = self.api.get(f"cluster/{cluster_id}/files", headers=self.headers)
+        self._verify(resp)
+        return resp.json()["kubeconfig"]
+
     def list_node_pools(self, cluster_id: str) -> dict:
         resp = self.api.get(f"/cluster/{cluster_id}/node-pool")
         self._verify(resp)

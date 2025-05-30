@@ -22,6 +22,7 @@ _HELP: dict = {
     "master_count": "Number of master nodes, if None, use default",
     "master_flavor_id": "Master node flavor ID, if None, use default",
     "from_json": "Cluster payload in JSON format, if None, use provided options",
+    "dry_run": "If True, do not perform any actions, just print the payload",
 }
 
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
@@ -46,9 +47,11 @@ def create(
     from_json: Annotated[
         ClusterPayload,
         typer.Option(
-            parser=ClusterPayload.from_json, help="Cluster payload in JSON format"
+            parser=ClusterPayload.from_json,
+            help=_HELP["from_json"],
         ),
     ] = None,
+    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
 ):
     """Create a new k8s cluster"""
 
@@ -66,6 +69,10 @@ def create(
     new_cluster = from_json or ClusterPayload(**_payload)
 
     console.display(f"Creating new cluster: {new_cluster}")
+
+    if dry_run:
+        return
+
     cat = ContextCatalogue.from_storage()
     state = State(cat.current_context)
 
@@ -81,12 +88,20 @@ def update(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
     from_json: Annotated[
         ClusterPayload,
-        typer.Argument(
-            parser=ClusterPayload.from_json, help="Cluster payload in JSON format"
+        typer.Option(
+            parser=ClusterPayload.from_json,
+            help=_HELP["from_json"],
         ),
     ] = None,
+    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
 ):
     """Update the cluster with given id"""
+
+    console.display(f"Updating cluster {cluster_id} with data: {from_json}")
+
+    if dry_run:
+        return
+
     console.Console().print(f"Updating cluster {cluster_id}\nwith {from_json}")
     cat = ContextCatalogue.from_storage()
     state = State(cat.current_context)
@@ -95,19 +110,29 @@ def update(
     _out = client.update_cluster(cluster_id, cluster_data=from_json.dict())
     console.Console().print(_out)
 
+    cat.save()
+
 
 @app.command()
 def delete(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
+    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
 ):
     """
     Delete the cluster with given id
     """
+    # TODO(EA): consider adding to the question more info about cluster, like name?
+    confirmed = typer.confirm(f"Are you sure you want to delete cluster {cluster_id}?")
+
+    if dry_run:
+        console.Console().print(f"Dry run: would delete cluster {cluster_id}")
+        return
+
     cat = ContextCatalogue.from_storage()
     state = State(cat.current_context)
 
     client = MK8SClient(state)
-    confirmed = typer.confirm(f"Are you sure you want to delete cluster {cluster_id}?")
+
     if confirmed:
         client.delete_cluster(cluster_id)
         console.Console().print(f"Cluster {cluster_id} deleted.")
@@ -138,9 +163,33 @@ def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
 
     _out = client.get_cluster(cluster_id)
     console.Console().print_json(data=_out)
+    cat.save()
 
 
 @app.command()
-def get_kubeconfig(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
+def get_kubeconfig(
+    cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
+    output: str = typer.Option(
+        default="kube-config.yaml",
+        help="Output file for kube-config, default is 'kube-config.yaml'",
+    ),
+    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
+):
     """Download kube-config.yaml"""
-    raise NotImplementedError
+    if dry_run:
+        console.Console().print(
+            f"Dry run: would download kube-config for cluster {cluster_id}"
+        )
+        return
+
+    cat = ContextCatalogue.from_storage()
+    state = State(cat.current_context)
+    client = MK8SClient(state)
+
+    _out = client.download_kubeconfig(cluster_id)
+    with open(output, "w") as f:
+        f.write(_out)
+
+    console.display(f"Downloaded kube-config for cluster {cluster_id}")
+    console.display(f"Kubeconfig file saved to [blue]{output}[/blue]")
+    cat.save()

@@ -17,7 +17,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `auth`: Cli auth management
-* `cluster`: Cli auth context
+* `cluster`: Manage Kubernetes clusters
 * `node-pool`: Nodepool operations
 
 ## `auth`
@@ -174,7 +174,7 @@ $ auth context delete [OPTIONS]
 
 ## `cluster`
 
-Cli auth context
+Manage Kubernetes clusters
 
 **Usage**:
 
@@ -190,10 +190,10 @@ $ cluster [OPTIONS] COMMAND [ARGS]...
 
 * `create`: Create a new k8s cluster
 * `update`: Update the cluster with given id
-* `delete`: Delete the cluster.
+* `delete`: Delete the cluster with given id
 * `list`: List all clusters
 * `show`: Show cluster details
-* `kube-config`: Download kube-config.yaml
+* `get-kubeconfig`: Download kube-config.yaml
 
 ### `cluster create`
 
@@ -202,15 +202,17 @@ Create a new k8s cluster
 **Usage**:
 
 ```console
-$ cluster create [OPTIONS] CLUSTER_PAYLOAD
+$ cluster create [OPTIONS]
 ```
-
-**Arguments**:
-
-* `CLUSTER_PAYLOAD`: [required]
 
 **Options**:
 
+* `--name TEXT`: Cluster name, if None, generate with petname
+* `--kubernetes-version TEXT`: Kubernetes version ID, if None, use default  [default: 52be568f-5875-4c92-a6ba-07c06368a6fe]
+* `--master-count INTEGER`: Number of master nodes, if None, use default  [default: 3]
+* `--master-flavor-id TEXT`: Master node flavor ID, if None, use default  [default: b003e1cf-fd40-4ad1-827c-cc20c2ddd519]
+* `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
 * `--help`: Show this message and exit.
 
 ### `cluster update`
@@ -229,14 +231,13 @@ $ cluster update [OPTIONS] CLUSTER_ID
 
 **Options**:
 
-* `--payload FROM_JSON`
+* `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
 * `--help`: Show this message and exit.
 
 ### `cluster delete`
 
-Delete the cluster.
-
-If --force is not used, will ask for confirmation.  # TODO: implement force
+Delete the cluster with given id
 
 **Usage**:
 
@@ -250,6 +251,7 @@ $ cluster delete [OPTIONS] CLUSTER_ID
 
 **Options**:
 
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
 * `--help`: Show this message and exit.
 
 ### `cluster list`
@@ -284,14 +286,14 @@ $ cluster show [OPTIONS] CLUSTER_ID
 
 * `--help`: Show this message and exit.
 
-### `cluster kube-config`
+### `cluster get-kubeconfig`
 
 Download kube-config.yaml
 
 **Usage**:
 
 ```console
-$ cluster kube-config [OPTIONS] CLUSTER_ID
+$ cluster get-kubeconfig [OPTIONS] CLUSTER_ID
 ```
 
 **Arguments**:
@@ -300,6 +302,8 @@ $ cluster kube-config [OPTIONS] CLUSTER_ID
 
 **Options**:
 
+* `--output TEXT`: Output file for kube-config, default is &#x27;kube-config.yaml&#x27;  [default: kube-config.yaml]
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
 * `--help`: Show this message and exit.
 
 ## `node-pool`
