@@ -1,11 +1,11 @@
 import typer
 
-from mkcli.core.models import ContextCatalogue, NodePoolPayload
+from mkcli.core.models import NodePoolPayload
 from mkcli.core.state import State
 from mkcli.settings import DefaultNodePoolSettings
-from mkcli.utils import console
+from mkcli.utils import console, names
 from mkcli.core.mk8s import MK8SClient
-from mkcli.utils import names
+from mkcli.core.session import open_context_catalogue
 
 HELP: str = "Nodepool operations"
 
@@ -45,10 +45,6 @@ def create(
     if name is None:
         name = names.generate()
 
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
-    client = MK8SClient(state)
-
     node_pool_data = {
         "name": name,
         "node_count": node_count,
@@ -57,16 +53,15 @@ def create(
         "autoscale": autoscale,
         "machine_spec": {"id": flavor_id},
     }
-    # Convert to ClusterPayload if needed
     node_pool_data = NodePoolPayload.model_validate(node_pool_data)
-    # Create the node pool using the client
 
-    response = client.create_node_pool(
-        cluster_id=cluster_id, node_pool_data=node_pool_data.dict()
-    )
-    console.display(f"[bold green]Node Pool created:[/bold green] {response}")
-
-    cat.save()
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        response = client.create_node_pool(
+            cluster_id=cluster_id, node_pool_data=node_pool_data.dict()
+        )
+        console.display(f"[bold green]Node Pool created:[/bold green] {response}")
 
 
 @app.command(name="list")
@@ -75,15 +70,14 @@ def _list(
 ):
     """List all node pools in the cluster"""
     console.display(f"Listing node pools for cluster ID: {cluster_id}")
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
-    client = MK8SClient(state)
 
-    node_pools = client.list_node_pools(cluster_id)
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        node_pools = client.list_node_pools(cluster_id)
+
     console.display("[bold green]Node Pools:[/bold green]")
     console.display(node_pools)  # TODO: format output nicely
-
-    cat.save()
 
 
 @app.command()
@@ -105,10 +99,9 @@ def delete(
         console.display("Aborted.")
         return
 
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
-    client = MK8SClient(state)
-    client.delete_node_pool(cluster_id=cluster_id, node_pool_id=node_pool_id)
-    console.display(f"Node pool {node_pool_id} deleted from cluster {cluster_id}.")
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        client.delete_node_pool(cluster_id=cluster_id, node_pool_id=node_pool_id)
 
-    cat.save()
+    console.display(f"Node pool {node_pool_id} deleted from cluster {cluster_id}.")

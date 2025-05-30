@@ -1,7 +1,8 @@
 import typer
 from typing_extensions import Annotated
 from mkcli.core.mk8s import MK8SClient
-from mkcli.core.models import ClusterPayload, ContextCatalogue
+from mkcli.core.models import ClusterPayload
+from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.utils import console
 from mkcli.settings import DefaultClusterSettings
@@ -67,20 +68,17 @@ def create(
         "node_pools": [],
     }
     new_cluster = from_json or ClusterPayload(**_payload)
-
     console.display(f"Creating new cluster: {new_cluster}")
 
     if dry_run:
         return
 
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        _out = client.create_cluster(cluster_data=new_cluster.dict())
 
-    client = MK8SClient(state)
-    _out = client.create_cluster(cluster_data=new_cluster.dict())
-    console.Console().print(_out)
-
-    cat.save()
+    console.display(_out)
 
 
 @app.command()
@@ -102,15 +100,14 @@ def update(
     if dry_run:
         return
 
-    console.Console().print(f"Updating cluster {cluster_id}\nwith {from_json}")
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
+    console.display(f"Updating cluster {cluster_id}\nwith {from_json}")
 
-    client = MK8SClient(state)
-    _out = client.update_cluster(cluster_id, cluster_data=from_json.dict())
-    console.Console().print(_out)
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        _out = client.update_cluster(cluster_id, cluster_data=from_json.dict())
 
-    cat.save()
+    console.print(_out)
 
 
 @app.command()
@@ -124,46 +121,41 @@ def delete(
     # TODO(EA): consider adding to the question more info about cluster, like name?
     confirmed = typer.confirm(f"Are you sure you want to delete cluster {cluster_id}?")
 
+    if confirmed is False:
+        console.Console().print("Aborted.")
+        return
+
     if dry_run:
         console.Console().print(f"Dry run: would delete cluster {cluster_id}")
         return
 
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
 
-    client = MK8SClient(state)
-
-    if confirmed:
         client.delete_cluster(cluster_id)
         console.Console().print(f"Cluster {cluster_id} deleted.")
-    else:
-        console.Console().print("Aborted.")
 
 
 @app.command(name="list")
 def _list():
     """List all clusters"""
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
-
-    client = MK8SClient(state)
-
-    clusters = client.get_clusters()
-    console.Console().print_json(data=clusters)
-
-    cat.save()
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        clusters = client.get_clusters()
+        console.Console().print_json(data=clusters)
 
 
 @app.command()
 def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
     """Show cluster details"""
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
-    client = MK8SClient(state)
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        _out = client.get_cluster(cluster_id)
 
-    _out = client.get_cluster(cluster_id)
     console.Console().print_json(data=_out)
-    cat.save()
 
 
 @app.command()
@@ -182,11 +174,11 @@ def get_kubeconfig(
         )
         return
 
-    cat = ContextCatalogue.from_storage()
-    state = State(cat.current_context)
-    client = MK8SClient(state)
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        _out = client.download_kubeconfig(cluster_id)
 
-    _out = client.download_kubeconfig(cluster_id)
     with open(output, "w") as f:
         f.write(_out)
 

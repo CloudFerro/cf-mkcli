@@ -14,7 +14,7 @@ from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS
 
 
 class Token(BaseModel):
-    access_token: str | None = None  # TODO: use SecretStr
+    access_token: str | None = None
     refresh_token: str | None = None
     expires_in: datetime.datetime | None = None
     renew_after: datetime.datetime | None = None
