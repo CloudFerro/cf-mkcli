@@ -1,102 +1,401 @@
-# Project Overview
+# CLI
 
-This project provides a CLI tool for managing Kubernetes clusters, built with Python and Typer. Below are the actions defined in the `Justfile` to help with development, testing, and deployment.
+mkcli - A CLI for managing your Kubernetes clusters
 
-## Prerequisites
+**Usage**:
 
-- Python installed
-- `pip` for managing Python packages
-- `just` command-line tool installed
-
-## Available Actions
-
-The `Justfile` defines several actions to streamline development, testing, and deployment. Below is a description of each action:
-
-### Default Action
-The default action runs the following tasks in sequence:
-- `install`
-- `lint`
-- `test`
-
-Run it with:
-```bash
-just
+```console
+$ [OPTIONS] COMMAND [ARGS]...
 ```
 
-### Actions
+**Options**:
 
-#### `install`
-Installs and synchronizes project dependencies:
-- Updates the dependency lock file.
-- Installs all dependencies with extras in a frozen state.
-- Installs pre-commit hooks.
+* `--install-completion`: Install completion for the current shell.
+* `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
+* `--help`: Show this message and exit.
 
-Run it with:
-```bash
-just install
+**Commands**:
+
+* `auth`: Cli auth management
+* `cluster`: Manage Kubernetes clusters
+* `node-pool`: Nodepool operations
+
+## `auth`
+
+Cli auth management
+
+**Usage**:
+
+```console
+$ auth [OPTIONS] COMMAND [ARGS]...
 ```
 
-#### `lint`
-Formats and lints the codebase:
-- Formats the code using `ruff`.
-- Checks for linting issues and fixes them automatically.
-- Runs type checking with `mypy`.
+**Options**:
 
-Run it with:
-```bash
-just lint
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `token`: Cli token management
+* `context`: Cli auth context management
+
+### `auth token`
+
+Cli token management
+
+**Usage**:
+
+```console
+$ auth token [OPTIONS] COMMAND [ARGS]...
 ```
 
-#### `test`
-Runs the test suite using `pytest`. You can pass additional arguments to `pytest` if needed.
+**Options**:
 
-Run it with:
-```bash
-just test
-```
-Example with additional arguments:
-```bash
-just test -- -k "test_example"
-```
+* `--help`: Show this message and exit.
 
-#### `publish`
-Builds and publishes the project to PyPI:
-- Cleans the `dist` directory.
-- Builds the project.
-- Publishes the package using the provided PyPI token.
+**Commands**:
 
-Run it with:
-```bash
-just publish
+* `clear`
+* `refresh`
+* `show`
+
+#### `auth token clear`
+
+**Usage**:
+
+```console
+$ auth token clear [OPTIONS]
 ```
 
-#### `hook`
-Installs or updates pre-commit hooks.
+**Options**:
 
-Run it with:
-```bash
-just hook
+* `--help`: Show this message and exit.
+
+#### `auth token refresh`
+
+**Usage**:
+
+```console
+$ auth token refresh [OPTIONS]
 ```
 
-#### `unhook`
-Uninstalls pre-commit hooks.
+**Options**:
 
-Run it with:
-```bash
-just unhook
+* `--help`: Show this message and exit.
+
+#### `auth token show`
+
+**Usage**:
+
+```console
+$ auth token show [OPTIONS]
 ```
 
-#### `docs`
-Generates and serves the project documentation:
-- Installs documentation dependencies.
-- Generates CLI documentation using `typer`.
-- Serves the documentation locally using `mkdocs`.
+**Options**:
 
-Run it with:
-```bash
-just docs
+* `--help`: Show this message and exit.
+
+### `auth context`
+
+Cli auth context management
+
+**Usage**:
+
+```console
+$ auth context [OPTIONS] COMMAND [ARGS]...
 ```
 
-# mkcli docs for users
+**Options**:
 
-[See user's documentation](docs/typer-autodoc.md)
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `show`: Show current auth context
+* `list`: Remove given auth context from the catalogue
+* `add`: Prompt for new auth context and add it to...
+* `delete`: Remove given auth context from the catalogue
+
+#### `auth context show`
+
+Show current auth context
+
+**Usage**:
+
+```console
+$ auth context show [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth context list`
+
+Remove given auth context from the catalogue
+
+**Usage**:
+
+```console
+$ auth context list [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth context add`
+
+Prompt for new auth context and add it to the catalogue
+
+**Usage**:
+
+```console
+$ auth context add [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth context delete`
+
+Remove given auth context from the catalogue
+
+**Usage**:
+
+```console
+$ auth context delete [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+## `cluster`
+
+Manage Kubernetes clusters
+
+**Usage**:
+
+```console
+$ cluster [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `create`: Create a new k8s cluster
+* `update`: Update the cluster with given id
+* `delete`: Delete the cluster with given id
+* `list`: List all clusters
+* `show`: Show cluster details
+* `get-kubeconfig`: Download kube-config.yaml
+
+### `cluster create`
+
+Create a new k8s cluster
+
+**Usage**:
+
+```console
+$ cluster create [OPTIONS]
+```
+
+**Options**:
+
+* `--name TEXT`: Cluster name, if None, generate with petname
+* `--kubernetes-version TEXT`: Kubernetes version ID, if None, use default  [default: 52be568f-5875-4c92-a6ba-07c06368a6fe]
+* `--master-count INTEGER`: Number of master nodes, if None, use default  [default: 3]
+* `--master-flavor-id TEXT`: Master node flavor ID, if None, use default  [default: b003e1cf-fd40-4ad1-827c-cc20c2ddd519]
+* `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--help`: Show this message and exit.
+
+### `cluster update`
+
+Update the cluster with given id
+
+**Usage**:
+
+```console
+$ cluster update [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--help`: Show this message and exit.
+
+### `cluster delete`
+
+Delete the cluster with given id
+
+**Usage**:
+
+```console
+$ cluster delete [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--help`: Show this message and exit.
+
+### `cluster list`
+
+List all clusters
+
+**Usage**:
+
+```console
+$ cluster list [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `cluster show`
+
+Show cluster details
+
+**Usage**:
+
+```console
+$ cluster show [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `cluster get-kubeconfig`
+
+Download kube-config.yaml
+
+**Usage**:
+
+```console
+$ cluster get-kubeconfig [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--output TEXT`: Output file for kube-config, default is &#x27;kube-config.yaml&#x27;  [default: kube-config.yaml]
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--help`: Show this message and exit.
+
+## `node-pool`
+
+Nodepool operations
+
+**Usage**:
+
+```console
+$ node-pool [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `create`: Create a new node pool
+* `list`: List all node pools in the cluster
+* `update`
+* `delete`: Delete a node pool
+
+### `node-pool create`
+
+Create a new node pool
+
+**Usage**:
+
+```console
+$ node-pool create [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--name TEXT`: Node pool name, if None, generate with petname
+* `--node-count INTEGER`: Number of nodes in the pool  [default: 1]
+* `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 1]
+* `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 10]
+* `--autoscale / --no-autoscale`: Enable autoscaling for the node pool  [default: no-autoscale]
+* `--flavor-id TEXT`: Machine flavor ID for the node pool, if None, use default flavor  [default: b003e1cf-fd40-4ad1-827c-cc20c2ddd519]
+* `--help`: Show this message and exit.
+
+### `node-pool list`
+
+List all node pools in the cluster
+
+**Usage**:
+
+```console
+$ node-pool list [OPTIONS] CLUSTER_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `node-pool update`
+
+**Usage**:
+
+```console
+$ node-pool update [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `node-pool delete`
+
+Delete a node pool
+
+**Usage**:
+
+```console
+$ node-pool delete [OPTIONS] CLUSTER_ID NODE_POOL_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+* `NODE_POOL_ID`: Node pool ID to delete  [required]
+
+**Options**:
+
+* `--help`: Show this message and exit.
