@@ -80,10 +80,15 @@ class ContextStorage:
 
     def load_all(self) -> ContextCatalogue:
         """Read the context data catalogue from the storage"""
-        with open(self.path, "r") as f:
-            data = json.load(f)
-            cat = ContextCatalogue.model_validate(data)
-            logger.info(f"Loaded context catalogue from {ContextStorage.PATH_PATTERN}")
+        try:
+            with open(self.path, "r") as f:
+                data = json.load(f)
+                cat = ContextCatalogue.model_validate(data)
+        except FileNotFoundError:
+            logger.warning(
+                f"Context file {self.path} not found, creating new catalogue."
+            )
+            cat = ContextCatalogue()
         return cat
 
     def clear(self) -> None:

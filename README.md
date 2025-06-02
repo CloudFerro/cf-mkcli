@@ -1,3 +1,27 @@
+# Introduction
+mkcli is a command-line interface (CLI) tool designed to manage CF Kubernetes clusters and their associated resources. It provides a user-friendly way to interact with Kubernetes clusters, allowing users to perform operations such as creating, updating, and deleting clusters, managing node pools, and handling authentication contexts.
+
+# Prerequisites
+1. Python 3.12 or higher
+2. Poetry
+
+# Installation
+mkcli can be installed using pip. To install mkcli, run the following command:
+
+```bash
+python3.12 -m venv venv && source venv/bin/activate && venv/bin/python -m pip install git+ssh://git@gitlab.cloudferro.com/k8s/mk-cli
+```
+
+# Usage
+Now you can run it just with:
+```bash
+mkcli
+```
+or
+```bash
+python -m mkcli
+```
+
 # CLI
 
 mkcli - A CLI for managing your Kubernetes clusters
