@@ -1,3 +1,4 @@
+from platformdirs import user_cache_dir
 import typer
 from pydantic_settings import BaseSettings
 from pathlib import Path
@@ -11,6 +12,10 @@ class AppSettings(BaseSettings):
     @property
     def cached_context_path(self) -> Path:
         return Path(typer.get_app_dir(self.name)) / self.state_file
+
+    @property
+    def cache_dir(self) -> Path:
+        return Path(user_cache_dir(self.name))
 
 
 class DefaultContextSettings(BaseSettings):

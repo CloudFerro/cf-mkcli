@@ -123,3 +123,6 @@ class MK8SClient:
         if not resp.json()["items"]:
             raise ValueError(f"Region '{name}' not found.")
         return resp.json()["items"].pop()
+
+    def __str__(self):
+        return "MK8SClient()"  # TODO: fill it with useful information

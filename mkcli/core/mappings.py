@@ -1,6 +1,7 @@
 from typing_extensions import TypedDict
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.models import MachineSpec, KubernetesVersion
+from mkcli.utils.cache import cache
 
 
 class KubernetesVersionMapping(TypedDict):
@@ -16,6 +17,7 @@ class MachineSpecMapping(TypedDict):
     name: MachineSpec
 
 
+@cache(ttl=3600)
 def get_kubernetes_versions_mapping(client: MK8SClient) -> KubernetesVersionMapping:
     versions = client.list_kubernetes_versions()
     return {
