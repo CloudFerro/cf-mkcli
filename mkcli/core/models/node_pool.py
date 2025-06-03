@@ -4,7 +4,7 @@ from mkcli.utils import names
 from .request import RequestPayload
 
 
-class MachineSpec(BaseModel):
+class ShortSpec(BaseModel):
     id: str
 
 
@@ -12,7 +12,7 @@ class NodePoolPayload(RequestPayload):
     name: Optional[str] = names.generate()
 
     size: int = 3
-    machine_spec: MachineSpec
+    machine_spec: ShortSpec
 
     autoscale: bool = False
 

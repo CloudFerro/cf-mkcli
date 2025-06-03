@@ -8,13 +8,13 @@ class KubernetesVersion(BaseModel):
     id: str
 
 
-class MachineSpec(BaseModel):
+class ShortSpec(BaseModel):
     id: str
 
 
 class ControlPlaneCustom(BaseModel):
     size: int
-    machine_spec: MachineSpec
+    machine_spec: ShortSpec
 
 
 class ControlPlane(BaseModel):
@@ -35,7 +35,7 @@ class Taint(BaseModel):
 
 class NodePool(BaseModel):
     quantity: int
-    machine_spec: MachineSpec
+    machine_spec: ShortSpec
     name: str
     size: int
     size_min: int

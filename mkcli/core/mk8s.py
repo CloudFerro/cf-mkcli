@@ -99,7 +99,27 @@ class MK8SClient:
         resp = self.api.delete(f"/cluster/{cluster_id}/node-pool/{node_pool_id}")
         self._verify(resp)
 
-    def list_kubernetes_versions(self) -> list:
+    def list_kubernetes_versions(self) -> list:  # TODO: add region filter
         resp = self.api.get("/kubernetes-version", headers=self.headers)
         self._verify(resp)
-        return resp.json()
+        return resp.json()["items"]
+
+    def list_machine_specs(
+        self, region_id: str | None
+    ) -> list:  # TODO: add region filter
+        resp = self.api.get(f"/region/{region_id}/machine-spec", headers=self.headers)
+        self._verify(resp)
+        return resp.json()["items"]
+
+    def list_regions(self) -> list:
+        resp = self.api.get("/region", headers=self.headers)
+        self._verify(resp)
+        return resp.json()["items"]
+
+    def get_region(self, name) -> dict:
+        params = {"name": name} if name else {}
+        resp = self.api.get("/region", headers=self.headers, params=params)
+        self._verify(resp)
+        if not resp.json()["items"]:
+            raise ValueError(f"Region '{name}' not found.")
+        return resp.json()["items"].pop()
