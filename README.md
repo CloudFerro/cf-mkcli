@@ -1,27 +1,79 @@
-# Introduction
+[[_TOC_]]
+# About mkcli
+
 mkcli is a command-line interface (CLI) tool designed to manage CF Kubernetes clusters and their associated resources. It provides a user-friendly way to interact with Kubernetes clusters, allowing users to perform operations such as creating, updating, and deleting clusters, managing node pools, and handling authentication contexts.
 
-# Prerequisites
+![Usage example](./docs/demo/help.gif)
+
+![contexts](docs/demo/context.gif)
+
+# Installation
+### Prerequisites
 1. Python 3.12 or higher
 2. Poetry
 
-# Installation
+### Installation
 mkcli can be installed using pip. To install mkcli, run the following command:
 
 ```bash
 python3.12 -m venv venv && source venv/bin/activate && venv/bin/python -m pip install git+ssh://git@gitlab.cloudferro.com/k8s/mk-cli
 ```
 
-# Usage
 Now you can run it just with:
 ```bash
 mkcli
 ```
 or
 ```bash
-python -m mkcli
+python -m mkcl
 ```
 
+# mkcli Usage Guide
+Have a look and commandline help:
+```commandline
+python -m mkcli --help
+```
+
+
+# Simple usage examples just for starting up
+Here you can find a several examples of how to use the mkcli tool.
+These examples cover common tasks and operations that can be performed with mkcli, providing a quick reference for users to get started.
+In the examples directory you can find some ready-to-use json payloads for mkcli commands.
+
+### Refresh token
+```commandline
+python -m mkcli auth token refresh
+```
+
+### Create cluster
+
+```commandline
+python -m mkcli cluster create "$(cat examples/create_cluster_payload.json)"
+```
+
+```commandline
+python -m mkcli cluster create --from-json "$(cat examples/create_cluster_simple_payload.json)" --dry-run
+```
+
+```commandline
+ python -m mkcli cluster create --from-json $(cat examples/create_cluster_simple_payload.json) --dry-run
+```
+
+```commandline
+python -m mkcli cluster create --name named-cluster --dry-run
+```
+
+```commandline
+python -m mkcli cluster get-kubeconfig {cluster_io}
+```
+
+### List clusters briefly
+
+```commandline
+python -m mkcli cluster list | jq '.items[] | {id, name, status}'
+```
+
+# CLI Reference
 # CLI
 
 mkcli - A CLI for managing your Kubernetes clusters

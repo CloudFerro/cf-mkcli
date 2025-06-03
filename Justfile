@@ -27,6 +27,18 @@ unhook:
     {{ poetry_run }} pre-commit uninstall
 
 docs:
-    {{ poetry }} install --with dev
-    python -m typer mkcli/main.py utils docs --output docs/reference/cli.md
+    python -m typer mkcli/main.py utils docs --output docs/reference/cli.md  # Update CLI documentation
+    echo '[[_TOC_]]' > README.md  # clear README.md
+    cat docs/intro.md >> README.md  # add intro
+    echo '' >> README.md  # add a newline
+    cat docs/guides/installation.md >> README.md  # add installation
+    echo '' >> README.md  # add a newline
+    cat docs/guides/usage.md >> README.md
+    echo '' >> README.md  # add a newline
+    echo '# CLI Reference' >> README.md  # add CLI reference header
+    cat docs/reference/cli.md >> README.md  # add CLI reference
+    echo '' >> README.md  # add a newline
+
+docs-run-server:
+    {{ poetry_run }} mkdocs build
     {{ poetry_run }} mkdocs serve
