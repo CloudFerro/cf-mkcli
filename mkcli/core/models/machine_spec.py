@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
-class MachineSpec(BaseModel):
+class MachineSpec(BaseModel):  # Flavor
     id: str
     region_name: str
     name: str = Field(..., description="Name of the machine specification")
@@ -18,3 +18,17 @@ class MachineSpec(BaseModel):
     )
     created_at: datetime = Field(..., description="Creation time")
     updated_at: datetime = Field(..., description="Last update time")
+
+    def as_table_row(self):
+        return [
+            self.id,
+            self.region_name,
+            self.name,
+            self.cpu,
+            self.memory,
+            self.local_disc_size,
+            "Yes" if self.is_active else "No",
+            ", ".join(self.tags) if self.tags else "None",
+            self.created_at.isoformat(),
+            self.updated_at.isoformat(),
+        ]

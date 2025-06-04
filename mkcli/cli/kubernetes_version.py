@@ -12,7 +12,6 @@ from mkcli.core.enums import Format
 _HELP: dict = {
     "general": "Manage Kubernetes versions",
     "list": "List all Kubernetes versions",
-    "show": "Show Kubernetes version details",
     "format": "Output format, either 'table' or 'json'",
 }
 
