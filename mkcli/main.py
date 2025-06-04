@@ -1,5 +1,5 @@
 import typer
-from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors
+from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors, regions
 
 from loguru import logger
 import logging
@@ -22,6 +22,7 @@ cli.add_typer(cluster.app, name="cluster", no_args_is_help=True)
 cli.add_typer(node_pool.app, name="node-pool", no_args_is_help=True)
 cli.add_typer(kubernetes_version.app, name="kubernetes-version", no_args_is_help=True)
 cli.add_typer(flavors.app, name="flavors", no_args_is_help=True)
+cli.add_typer(regions.app, name="regions", no_args_is_help=True)
 
 
 if __name__ == "__main__":
