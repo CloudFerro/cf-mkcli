@@ -6,6 +6,7 @@ from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.utils import console
 from mkcli.settings import DefaultClusterSettings
+from mkcli.core import mappings
 
 
 default_cluster = DefaultClusterSettings()
@@ -19,9 +20,9 @@ _HELP: dict = {
     "show": "Show cluster details",
     "name": "Cluster name, if None, generate with petname",
     "get_kubeconfig": "Download kube-config.yaml for the cluster",
-    "kubernetes_version": "Kubernetes version ID, if None, use default",
+    "kubernetes_version": "Kubernetes version, if None, use default",
     "master_count": "Number of master nodes, if None, use default",
-    "master_flavor_id": "Master node flavor ID, if None, use default",
+    "master_flavor": "Master node flavor name, if None, use default",
     "from_json": "Cluster payload in JSON format, if None, use provided options",
     "dry_run": "If True, do not perform any actions, just print the payload",
 }
@@ -42,8 +43,8 @@ def create(
     master_count: int = typer.Option(
         default=default_cluster.master_count, help=_HELP["master_count"]
     ),
-    master_flavor_id: str = typer.Option(
-        default=default_cluster.master_flavor_id, help=_HELP["master_flavor_id"]
+    master_flavor: str = typer.Option(
+        default=default_cluster.master_flavor, help=_HELP["master_flavor"]
     ),
     from_json: Annotated[
         ClusterPayload,
@@ -56,18 +57,28 @@ def create(
 ):
     """Create a new k8s cluster"""
 
-    _payload = {
-        "name": name or None,
-        "kubernetes_version": {"id": kubernetes_version},
-        "control_plane": {
-            "custom": {
-                "size": master_count,
-                "machine_spec": {"id": master_flavor_id},
-            }
-        },
-        "node_pools": [],
-    }
-    new_cluster = from_json or ClusterPayload(**_payload)
+    if from_json is not None:
+        console.display(
+            "Using provided cluster payload from JSON, ignoring other options."
+        )
+        new_cluster = from_json
+    else:
+        with open_context_catalogue() as cat:
+            state = State(cat.current_context)
+            client = MK8SClient(state)
+            k8sv_map = mappings.get_kubernetes_versions_mapping(client)
+            region_map = mappings.get_regions_mapping(client)
+            region = region_map[state.ctx.region]
+            flavor_map = mappings.get_machine_spec_mapping(client, region.id)
+            flavor = flavor_map[master_flavor]
+
+        new_cluster = ClusterPayload.from_cli_args(
+            name=name,
+            k8s_version_id=k8sv_map[kubernetes_version].id,
+            master_count=master_count,
+            master_flavor=flavor.id,
+        )
+
     console.display(f"Creating new cluster: {new_cluster}")
 
     if dry_run:

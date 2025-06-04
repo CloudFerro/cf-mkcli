@@ -23,6 +23,7 @@ class DefaultContextSettings(BaseSettings):
     realm: str = "Creodias-new"
     client_id: str = "managed-kubernetes"
     scope: str = "email profile openid"
+    region: str = "WAW4-1"
     identity_server_url: str = "https://identity.cloudferro.com/auth/"
 
 
@@ -36,11 +37,9 @@ class DefaultNodePoolSettings(BaseSettings):
 
 
 class DefaultClusterSettings(BaseSettings):
-    kubernetes_version: str | None = "52be568f-5875-4c92-a6ba-07c06368a6fe"
+    kubernetes_version: str = "1.30.10"
     master_count: int = 3
-    master_flavor_id: str = (
-        "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"  # Example default flavor ID
-    )
+    master_flavor: str = "hma.2xlarge"
 
 
 APP_SETTINGS = AppSettings()

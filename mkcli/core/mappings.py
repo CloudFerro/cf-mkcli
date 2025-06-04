@@ -1,23 +1,20 @@
-from typing_extensions import TypedDict
 from mkcli.core.mk8s import MK8SClient
-from mkcli.core.models import MachineSpec, KubernetesVersion
+from typing import Dict
+from mkcli.core.models import MachineSpec, KubernetesVersion, Region
 from mkcli.utils.cache import cache
 
-
-class KubernetesVersionMapping(TypedDict):
-    name: KubernetesVersion
+type seconds = int
 
 
-class RegionNameIdMapping(TypedDict):
-    name: str
-    id: str
+type KubernetesVersionMapping = Dict[str, KubernetesVersion]
+type RegionNameIdMapping = Dict[str, Region]
+type MachineSpecMapping = Dict[str, MachineSpec]
 
 
-class MachineSpecMapping(TypedDict):
-    name: MachineSpec
+CACHE_TTL: seconds = 3600
 
 
-@cache(ttl=3600)
+@cache(ttl=CACHE_TTL)
 def get_kubernetes_versions_mapping(client: MK8SClient) -> KubernetesVersionMapping:
     versions = client.list_kubernetes_versions()
     return {
@@ -32,11 +29,18 @@ def get_kubernetes_versions_mapping(client: MK8SClient) -> KubernetesVersionMapp
     }
 
 
+@cache(CACHE_TTL)
 def get_regions_mapping(client: MK8SClient) -> RegionNameIdMapping:
     regions = client.list_regions()
-    return {region["name"]: region["id"] for region in regions}
+    return {
+        region["name"]: Region(
+            name=region["name"], id=region["id"], is_active=region["isActive"]
+        )
+        for region in regions
+    }
 
 
+@cache(CACHE_TTL)
 def get_machine_spec_mapping(client: MK8SClient, region_id: str) -> MachineSpecMapping:
     machine_specs = client.list_machine_specs(region_id)
     return {

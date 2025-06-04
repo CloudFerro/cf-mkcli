@@ -46,6 +46,7 @@ class Context(BaseModel):
     client_id: str
     realm: str
     scope: str
+    region: str
     identity_server_url: str
     public_key: str | None = None
 

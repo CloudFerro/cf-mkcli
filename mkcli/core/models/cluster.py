@@ -51,3 +51,24 @@ class ClusterPayload(RequestPayload):
     kubernetes_version: Optional[KubernetesVersion] = None
     control_plane: Optional[ControlPlane]
     node_pools: List[NodePool] = []
+
+    @classmethod
+    def from_cli_args(
+        cls,
+        name: str,
+        k8s_version_id: str,
+        master_count: int,
+        master_flavor: str,
+    ):
+        _payload = {
+            "name": name or None,
+            "kubernetes_version": {"id": k8s_version_id},
+            "control_plane": {
+                "custom": {
+                    "size": master_count,
+                    "machine_spec": {"id": master_flavor},
+                }
+            },
+            "node_pools": [],
+        }
+        return cls(**_payload)

@@ -5,6 +5,7 @@ from pathlib import Path
 from mkcli.settings import APP_SETTINGS
 from loguru import logger
 
+
 CACHE_STORAGE_PATH = Path(
     f"{APP_SETTINGS.cache_dir}/shelve"
 )  # TODO: move it to app settings
@@ -25,15 +26,17 @@ def save(key: str, _object: Any) -> None:
 def load(key: str) -> Any:
     """Load data from a shelve file."""
     logger.info(f"Loading object with key '{key}' to cache.")
-    # ensure_path_exists(CACHE_STORAGE_PATH.parent)
     with shelve.open(str(CACHE_STORAGE_PATH)) as _dict:
         return _dict[key] if key in _dict else None
 
 
-def cache(ttl: int = 60):  # TODO: add cache auto cleanup logic
+def cache(ttl: int = 60, enabled: bool = False):  # TODO: add cache auto cleanup logic
     """Decorator to cache the result of a function for a specified time."""
 
     def decorator(func):
+        if not enabled:
+            return func
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             # Implement caching logic here
