@@ -95,6 +95,9 @@ $ [OPTIONS] COMMAND [ARGS]...
 * `auth`: Cli auth management
 * `cluster`: Manage Kubernetes clusters
 * `node-pool`: Manage Kubernetes cluster&#x27;s node pools
+* `kubernetes-version`: Manage Kubernetes versions
+* `flavors`: Manage Kubernetes machine specs (flavors)
+* `regions`: Manage regions
 
 ## `auth`
 
@@ -269,7 +272,7 @@ $ cluster [OPTIONS] COMMAND [ARGS]...
 * `delete`: Delete the cluster with given id
 * `list`: List all clusters
 * `show`: Show cluster details
-* `get-kubeconfig`: Download kube-config.yaml
+* `get-kubeconfig`: Download kube-config.yaml for the cluster
 
 ### `cluster create`
 
@@ -364,7 +367,7 @@ $ cluster show [OPTIONS] CLUSTER_ID
 
 ### `cluster get-kubeconfig`
 
-Download kube-config.yaml
+Download kube-config.yaml for the cluster
 
 **Usage**:
 
@@ -440,7 +443,7 @@ $ node-pool list [OPTIONS] CLUSTER_ID
 
 **Arguments**:
 
-* `CLUSTER_ID`: Cluster ID  [required]
+* `CLUSTER_ID`: Cluster ID to operate on  [required]
 
 **Options**:
 
@@ -470,9 +473,108 @@ $ node-pool delete [OPTIONS] CLUSTER_ID NODE_POOL_ID
 
 **Arguments**:
 
-* `CLUSTER_ID`: Cluster ID  [required]
-* `NODE_POOL_ID`: Node pool ID to delete  [required]
+* `CLUSTER_ID`: Cluster ID to operate on  [required]
+* `NODE_POOL_ID`: Node pool ID to operate on  [required]
 
 **Options**:
 
+* `--help`: Show this message and exit.
+
+## `kubernetes-version`
+
+Manage Kubernetes versions
+
+**Usage**:
+
+```console
+$ kubernetes-version [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `list`: List all Kubernetes versions
+
+### `kubernetes-version list`
+
+List all Kubernetes versions
+
+**Usage**:
+
+```console
+$ kubernetes-version list [OPTIONS]
+```
+
+**Options**:
+
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
+* `--help`: Show this message and exit.
+
+## `flavors`
+
+Manage Kubernetes machine specs (flavors)
+
+**Usage**:
+
+```console
+$ flavors [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `list`: List all available flavors
+
+### `flavors list`
+
+List all available flavors
+
+**Usage**:
+
+```console
+$ flavors list [OPTIONS]
+```
+
+**Options**:
+
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
+* `--help`: Show this message and exit.
+
+## `regions`
+
+Manage regions
+
+**Usage**:
+
+```console
+$ regions [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `list`: List all available regions
+
+### `regions list`
+
+List all available regions
+
+**Usage**:
+
+```console
+$ regions list [OPTIONS]
+```
+
+**Options**:
+
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
