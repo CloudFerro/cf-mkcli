@@ -1,5 +1,6 @@
 import typer
 
+from mkcli.core import mappings
 from mkcli.core.models import NodePoolPayload
 from mkcli.core.state import State
 from mkcli.settings import DefaultNodePoolSettings
@@ -7,9 +8,23 @@ from mkcli.utils import console, names
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.session import open_context_catalogue
 
-HELP: str = "Nodepool operations"
+_HELP: dict = {
+    "general": "Manage Kubernetes cluster's node pools",
+    "create": "Create a new node pool",
+    "update": "Update the node pool with given id",
+    "delete": "Delete the node pool with given id",
+    "list": "List all node pools in the cluster",
+    "cluster_id": "Cluster ID to operate on",
+    "name": "Node pool name, if None, generate with petname",
+    "node_count": "Number of nodes in the pool",
+    "min_nodes": "Minimum number of nodes in the pool",
+    "max_nodes": "Maximum number of nodes in the pool",
+    "autoscale": "Enable autoscaling for the node pool",
+    "flavor": "Machine flavor for the node pool, if None, use the default flavor",
+    "dry_run": "If True, do not perform any actions, just print the payload",
+}
 
-app = typer.Typer(no_args_is_help=True, help=HELP)
+app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 DEFAULT_NODEPOOL = DefaultNodePoolSettings()
 
@@ -21,27 +36,27 @@ def create(
         None, help="Node pool name, if None, generate with petname"
     ),
     node_count: int = typer.Option(
-        DEFAULT_NODEPOOL.node_count, help="Number of nodes in the pool"
+        DEFAULT_NODEPOOL.node_count, help=_HELP["node_count"]
     ),
-    min_nodes: int = typer.Option(
-        DEFAULT_NODEPOOL.min_nodes, help="Minimum number of nodes in the pool"
+    min_nodes: int = typer.Option(DEFAULT_NODEPOOL.min_nodes, help=_HELP["min_nodes"]),
+    max_nodes: int = typer.Option(DEFAULT_NODEPOOL.max_nodes, help=_HELP["max_nodes"]),
+    autoscale: bool = typer.Option(DEFAULT_NODEPOOL.autoscale, help=_HELP["autoscale"]),
+    flavor: str = typer.Option(
+        DEFAULT_NODEPOOL.flavor,
+        help=_HELP["flavor"],
     ),
-    max_nodes: int = typer.Option(
-        DEFAULT_NODEPOOL.max_nodes, help="Maximum number of nodes in the pool"
-    ),
-    autoscale: bool = typer.Option(
-        DEFAULT_NODEPOOL.autoscale, help="Enable autoscaling for the node pool"
-    ),
-    flavor_id: str = typer.Option(
-        DEFAULT_NODEPOOL.flavor_id,
-        help="Machine flavor ID for the node pool, if None, use default flavor",
-    ),
+    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
 ):
     """Create a new node pool"""
-    console.display(
-        f"Creating node pool '{name}' in cluster ID: {cluster_id} with "
-        f"{node_count} nodes (min: {min_nodes}, max: {max_nodes}, autoscale: {autoscale})"
-    )
+    with open_context_catalogue() as cat:  # TODO: move mappings to callback
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        region_map = mappings.get_regions_mapping(client)
+        flavor_map = mappings.get_machine_spec_mapping(
+            client, region_map[state.ctx.region].id
+        )
+        flavor = flavor_map.get(flavor)
+
     if name is None:
         name = names.generate()
 
@@ -51,10 +66,13 @@ def create(
         "min_nodes": min_nodes,
         "max_nodes": max_nodes,
         "autoscale": autoscale,
-        "machine_spec": {"id": flavor_id},
+        "machine_spec": {"id": flavor.id},
     }
-    node_pool_data = NodePoolPayload.model_validate(node_pool_data)
 
+    node_pool_data = NodePoolPayload.model_validate(node_pool_data)
+    if dry_run:
+        console.display(f"[bold yellow]Dry run mode:[/bold yellow] {node_pool_data}")
+        return
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)

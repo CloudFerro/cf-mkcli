@@ -33,13 +33,13 @@ class DefaultNodePoolSettings(BaseSettings):
     min_nodes: int = 1
     max_nodes: int = 10
     autoscale: bool = False
-    flavor_id: str = "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"  # Example default flavor ID
+    flavor: str = "hmad.medium"  # Example default flavor ID
 
 
 class DefaultClusterSettings(BaseSettings):
     kubernetes_version: str = "1.30.10"
     master_count: int = 3
-    master_flavor: str = "hma.2xlarge"
+    master_flavor: str = "eo2a.medium"
 
 
 APP_SETTINGS = AppSettings()

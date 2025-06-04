@@ -149,7 +149,7 @@ def delete(
 
 
 @app.command(name="list")
-def _list():
+def _list():  # TODO: add resource mappings
     """List all clusters"""
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
