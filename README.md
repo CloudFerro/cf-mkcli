@@ -94,7 +94,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 * `auth`: Cli auth management
 * `cluster`: Manage Kubernetes clusters
-* `node-pool`: Nodepool operations
+* `node-pool`: Manage Kubernetes cluster&#x27;s node pools
 
 ## `auth`
 
@@ -284,9 +284,9 @@ $ cluster create [OPTIONS]
 **Options**:
 
 * `--name TEXT`: Cluster name, if None, generate with petname
-* `--kubernetes-version TEXT`: Kubernetes version ID, if None, use default  [default: 52be568f-5875-4c92-a6ba-07c06368a6fe]
+* `--kubernetes-version TEXT`: Kubernetes version, if None, use default  [default: 1.30.10]
 * `--master-count INTEGER`: Number of master nodes, if None, use default  [default: 3]
-* `--master-flavor-id TEXT`: Master node flavor ID, if None, use default  [default: b003e1cf-fd40-4ad1-827c-cc20c2ddd519]
+* `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: eo2a.medium]
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
 * `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
 * `--help`: Show this message and exit.
@@ -384,7 +384,7 @@ $ cluster get-kubeconfig [OPTIONS] CLUSTER_ID
 
 ## `node-pool`
 
-Nodepool operations
+Manage Kubernetes cluster&#x27;s node pools
 
 **Usage**:
 
@@ -424,7 +424,8 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 * `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 1]
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 10]
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool  [default: no-autoscale]
-* `--flavor-id TEXT`: Machine flavor ID for the node pool, if None, use default flavor  [default: b003e1cf-fd40-4ad1-827c-cc20c2ddd519]
+* `--flavor TEXT`: Machine flavor for the node pool, if None, use the default flavor  [default: hmad.medium]
+* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
 * `--help`: Show this message and exit.
 
 ### `node-pool list`
