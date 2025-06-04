@@ -15,6 +15,7 @@ _HELP: dict = {
     "delete": "Delete the node pool with given id",
     "list": "List all node pools in the cluster",
     "cluster_id": "Cluster ID to operate on",
+    "node_pool_id": "Node pool ID to operate on",
     "name": "Node pool name, if None, generate with petname",
     "node_count": "Number of nodes in the pool",
     "min_nodes": "Minimum number of nodes in the pool",
@@ -84,7 +85,7 @@ def create(
 
 @app.command(name="list")
 def _list(
-    cluster_id: str = typer.Argument(..., help="Cluster ID"),
+    cluster_id: str = typer.Argument(..., help=_HELP["cluster_id"]),
 ):
     """List all node pools in the cluster"""
     console.display(f"Listing node pools for cluster ID: {cluster_id}")
@@ -105,8 +106,8 @@ def update():
 
 @app.command()
 def delete(
-    cluster_id: str = typer.Argument(..., help="Cluster ID"),
-    node_pool_id: str = typer.Argument(..., help="Node pool ID to delete"),
+    cluster_id: str = typer.Argument(..., help=_HELP["cluster_id"]),
+    node_pool_id: str = typer.Argument(..., help=_HELP["node_pool_id"]),
 ):
     """Delete a node pool"""
     console.display(f"Listing node pools for cluster ID: {cluster_id}")

@@ -1,6 +1,7 @@
 from typing import (
     ContextManager,
     Optional,
+    Any,
 )
 
 import rich.rule
@@ -19,7 +20,7 @@ def exc(msg: Optional[str] = None) -> None:
         print(msg)
 
 
-def display_table(columns: list[str], rows: set[str], title: str):
+def display_table(columns: list[str], rows: list[str], title: str):
     console = Console()
     table = Table(title=title, box=box.ASCII2)
     for col in columns:
@@ -30,7 +31,7 @@ def display_table(columns: list[str], rows: set[str], title: str):
     console.print(table)
 
 
-def display(_str: str) -> None:
+def display(_str: Any) -> None:
     print(_str)
 
 

@@ -2,8 +2,8 @@ from enum import Enum, auto
 
 
 class Format(str, Enum):
-    table = "table"
-    json = "json"
+    TABLE = "table"
+    JSON = "json"
 
 
 class AuthType(Enum):

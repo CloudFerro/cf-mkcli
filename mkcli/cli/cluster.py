@@ -30,7 +30,7 @@ _HELP: dict = {
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 
-@app.command()
+@app.command(help=_HELP["create"])
 def create(
     name: str = typer.Option(
         None,
@@ -92,7 +92,7 @@ def create(
     console.display(_out)
 
 
-@app.command()
+@app.command(help=_HELP["update"])
 def update(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
     from_json: Annotated[
@@ -121,7 +121,7 @@ def update(
     console.print(_out)
 
 
-@app.command()
+@app.command(help=_HELP["delete"])
 def delete(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
     dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
@@ -148,7 +148,7 @@ def delete(
         console.Console().print(f"Cluster {cluster_id} deleted.")
 
 
-@app.command(name="list")
+@app.command(name="list", help=_HELP["list"])
 def _list():  # TODO: add resource mappings
     """List all clusters"""
     with open_context_catalogue() as cat:
@@ -158,7 +158,7 @@ def _list():  # TODO: add resource mappings
         console.Console().print_json(data=clusters)
 
 
-@app.command()
+@app.command(help=_HELP["show"])
 def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
     """Show cluster details"""
     with open_context_catalogue() as cat:
@@ -169,7 +169,7 @@ def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
     console.Console().print_json(data=_out)
 
 
-@app.command()
+@app.command(help=_HELP["get_kubeconfig"])
 def get_kubeconfig(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
     output: str = typer.Option(

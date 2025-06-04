@@ -13,5 +13,15 @@ class KubernetesVersion(BaseModel):
         ..., description="Timestamp when the Kubernetes version was created"
     )
     updated_at: datetime = Field(
-        ..., description="Timestamp when the Kubernetes version was last updated"
+        ...,
+        description="Timestamp when the Kubernetes version was last updated",
     )
+
+    def as_table_row(self):
+        return [
+            self.id,
+            self.version,
+            self.created_at.isoformat(),
+            self.updated_at.isoformat(),
+            "Yes" if self.is_active else "No",
+        ]
