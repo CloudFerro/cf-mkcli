@@ -36,6 +36,12 @@ class State:
 
         return self.ctx.token.access_token
 
+    @token.setter
+    def token(self, value: str) -> None:
+        if self.ctx.token is None:
+            self.ctx.token = Token()
+        self.ctx.token.access_token = value
+
     @property
     def keycloak_openid(self) -> KeycloakOpenID:
         if self._keycloak_openid:

@@ -49,12 +49,19 @@ class Context(BaseModel):
     region: str
     identity_server_url: str
     public_key: str | None = None
-
-    # TODO: use Enum to annotate auth_type,
-    # TODO: add managing different auth types, which should inherit from some abc abstract class or
-    #  Protocol and have consistent interface
-    # auth_type: str = Field(default="token", exclude=True)
     token: Optional[Token] = None
+
+    def as_table_row(self):
+        """Return a list of values to be used in a table row"""
+        return [
+            self.name,
+            self.client_id,
+            self.realm,
+            self.scope,
+            self.region,
+            self.identity_server_url,
+            "Yes" if self.token and self.token.is_valid() else "No",
+        ]
 
 
 # TODO: next use prompt to create this
@@ -128,6 +135,10 @@ class ContextCatalogue(BaseModel):
         self.cat[item.name] = item
         self.save()
         logger.info(f"Context '{item.name}' added to the catalogue.")
+
+    def remove(self, name: str):
+        """Remove a context from the catalogue by name"""
+        raise NotImplementedError
 
     def list_all(self) -> list[Context]:
         """List all contexts in the catalogue"""
