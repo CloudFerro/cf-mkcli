@@ -1,5 +1,6 @@
 import typer
 from typing_extensions import Annotated
+
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.models import ClusterPayload
 from mkcli.core.session import open_context_catalogue
@@ -25,6 +26,7 @@ _HELP: dict = {
     "master_flavor": "Master node flavor name, if None, use default",
     "from_json": "Cluster payload in JSON format, if None, use provided options",
     "dry_run": "If True, do not perform any actions, just print the payload",
+    "format": "Output format, either 'table' or 'json'",
 }
 
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
@@ -53,7 +55,7 @@ def create(
             help=_HELP["from_json"],
         ),
     ] = None,
-    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
+    dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Create a new k8s cluster"""
 
@@ -82,6 +84,9 @@ def create(
     console.display(f"Creating new cluster: {new_cluster}")
 
     if dry_run:
+        console.display(
+            f"[bold yellow]Dry run mode:[/bold yellow] would create cluster with data: {new_cluster}"
+        )
         return
 
     with open_context_catalogue() as cat:
@@ -102,13 +107,16 @@ def update(
             help=_HELP["from_json"],
         ),
     ] = None,
-    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
+    dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Update the cluster with given id"""
 
     console.display(f"Updating cluster {cluster_id} with data: {from_json}")
 
     if dry_run:
+        console.display(
+            f"[bold yellow]Dry run mode:[/bold yellow] would update cluster {cluster_id} with data: {from_json}"
+        )
         return
 
     console.display(f"Updating cluster {cluster_id}\nwith {from_json}")
@@ -124,13 +132,15 @@ def update(
 @app.command(help=_HELP["delete"])
 def delete(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
-    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
+    auto_confirm: Annotated[bool, typer.Option("--confirm", "-y")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """
     Delete the cluster with given id
     """
-    # TODO(EA): consider adding to the question more info about cluster, like name?
-    confirmed = typer.confirm(f"Are you sure you want to delete cluster {cluster_id}?")
+    confirmed = auto_confirm or typer.confirm(
+        f"Are you sure you want to delete cluster {cluster_id}?"
+    )
 
     if confirmed is False:
         console.Console().print("Aborted.")
@@ -155,7 +165,8 @@ def _list():  # TODO: add resource mappings
         state = State(cat.current_context)
         client = MK8SClient(state)
         clusters = client.get_clusters()
-        console.Console().print_json(data=clusters)
+
+    console.display(clusters)
 
 
 @app.command(help=_HELP["show"])
@@ -176,7 +187,7 @@ def get_kubeconfig(
         default="kube-config.yaml",
         help="Output file for kube-config, default is 'kube-config.yaml'",
     ),
-    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
+    dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Download kube-config.yaml"""
     if dry_run:

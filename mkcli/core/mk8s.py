@@ -39,7 +39,7 @@ class MK8SClient:
         }
         resp = self.api.get("/cluster", headers=self.headers, params=params)
         self._verify(resp)
-        return resp.json()
+        return resp.json()["items"]
 
     def create_cluster(self, cluster_data: dict | str, organisation_id=None) -> dict:
         params = {"organisationId": organisation_id}

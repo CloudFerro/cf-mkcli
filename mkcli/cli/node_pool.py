@@ -1,3 +1,5 @@
+from typing import Annotated
+
 import typer
 
 from mkcli.core import mappings
@@ -46,7 +48,7 @@ def create(
         DEFAULT_NODEPOOL.flavor,
         help=_HELP["flavor"],
     ),
-    dry_run: bool = typer.Option(default=False, help=_HELP["dry_run"]),
+    dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Create a new node pool"""
     with open_context_catalogue() as cat:  # TODO: move mappings to callback
@@ -96,7 +98,8 @@ def _list(
         node_pools = client.list_node_pools(cluster_id)
 
     console.display("[bold green]Node Pools:[/bold green]")
-    console.display(node_pools)  # TODO: format output nicely
+    console.display(node_pools)  # TODO: format outp
+    # ut nicely
 
 
 @app.command()
@@ -108,14 +111,22 @@ def update():
 def delete(
     cluster_id: str = typer.Argument(..., help=_HELP["cluster_id"]),
     node_pool_id: str = typer.Argument(..., help=_HELP["node_pool_id"]),
+    auto_confirm: Annotated[bool, typer.Option("--confirm", "-y")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Delete a node pool"""
     console.display(f"Listing node pools for cluster ID: {cluster_id}")
-    confirmed = typer.confirm(
+    confirmed = auto_confirm or typer.confirm(
         f"Are you sure you want to delete node pool {node_pool_id} in cluster {cluster_id}?"
     )
     if not confirmed:
         console.display("Aborted.")
+        return
+
+    if dry_run:
+        console.display(
+            f"[bold yellow]Dry run mode:[/bold yellow] would delete node pool {node_pool_id} from cluster {cluster_id}"
+        )
         return
 
     with open_context_catalogue() as cat:

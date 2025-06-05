@@ -22,7 +22,7 @@ def exc(msg: Optional[str] = None) -> None:
 
 def display_table(columns: list[str], rows: list[str], title: str):
     console = Console()
-    table = Table(title=title, box=box.ASCII2)
+    table = Table(title=title, box=box.HEAVY_HEAD)
     for col in columns:
         table.add_column(col)
     for row in rows:
