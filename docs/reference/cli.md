@@ -215,7 +215,7 @@ $ cluster create [OPTIONS]
 * `--master-count INTEGER`: Number of master nodes, if None, use default  [default: 3]
 * `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: eo2a.medium]
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
-* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ### `cluster update`
@@ -235,7 +235,7 @@ $ cluster update [OPTIONS] CLUSTER_ID
 **Options**:
 
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
-* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ### `cluster delete`
@@ -254,7 +254,8 @@ $ cluster delete [OPTIONS] CLUSTER_ID
 
 **Options**:
 
-* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `-y, --confirm`
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ### `cluster list`
@@ -306,7 +307,7 @@ $ cluster get-kubeconfig [OPTIONS] CLUSTER_ID
 **Options**:
 
 * `--output TEXT`: Output file for kube-config, default is &#x27;kube-config.yaml&#x27;  [default: kube-config.yaml]
-* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ## `node-pool`
@@ -352,7 +353,7 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 10]
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool  [default: no-autoscale]
 * `--flavor TEXT`: Machine flavor for the node pool, if None, use the default flavor  [default: hmad.medium]
-* `--dry-run / --no-dry-run`: If True, do not perform any actions, just print the payload  [default: no-dry-run]
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ### `node-pool list`
@@ -402,6 +403,8 @@ $ node-pool delete [OPTIONS] CLUSTER_ID NODE_POOL_ID
 
 **Options**:
 
+* `-y, --confirm`
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ## `kubernetes-version`
