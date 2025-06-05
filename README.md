@@ -92,7 +92,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `auth`: Cli auth management
+* `auth`: Cli auth context
 * `cluster`: Manage Kubernetes clusters
 * `node-pool`: Manage Kubernetes cluster&#x27;s node pools
 * `kubernetes-version`: Manage Kubernetes versions
@@ -101,7 +101,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 ## `auth`
 
-Cli auth management
+Cli auth context
 
 **Usage**:
 
@@ -115,8 +115,23 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
+* `init`: Initialize a first auth context
 * `token`: Cli token management
-* `context`: Cli auth context management
+* `context`: Manage authentication contexts
+
+### `auth init`
+
+Initialize a first auth context
+
+**Usage**:
+
+```console
+$ auth init [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
 
 ### `auth token`
 
@@ -176,7 +191,7 @@ $ auth token show [OPTIONS]
 
 ### `auth context`
 
-Cli auth context management
+Manage authentication contexts
 
 **Usage**:
 
@@ -221,6 +236,7 @@ $ auth context list [OPTIONS]
 
 **Options**:
 
+* `-f, --format [table|json]`: [default: table]
 * `--help`: Show this message and exit.
 
 #### `auth context add`
@@ -230,11 +246,20 @@ Prompt for new auth context and add it to the catalogue
 **Usage**:
 
 ```console
-$ auth context add [OPTIONS]
+$ auth context add [OPTIONS] NAME
 ```
+
+**Arguments**:
+
+* `NAME`: [required]
 
 **Options**:
 
+* `--client-id TEXT`: Client ID for the new auth context  [default: managed-kubernetes]
+* `--realm TEXT`: Realm for the new auth context  [default: Creodias-new]
+* `--scope TEXT`: Scope for the new auth context  [default: email profile openid]
+* `--region TEXT`: Region for the new auth context  [default: WAW4-1]
+* `--identity-server TEXT`: Identity server URL for the new auth context  [default: https://identity.cloudferro.com/auth/]
 * `--help`: Show this message and exit.
 
 #### `auth context delete`
@@ -244,11 +269,16 @@ Remove given auth context from the catalogue
 **Usage**:
 
 ```console
-$ auth context delete [OPTIONS]
+$ auth context delete [OPTIONS] NAME
 ```
+
+**Arguments**:
+
+* `NAME`: Name of the auth context to delete  [required]
 
 **Options**:
 
+* `-y, --confirm`
 * `--help`: Show this message and exit.
 
 ## `cluster`

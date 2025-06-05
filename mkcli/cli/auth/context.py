@@ -4,6 +4,7 @@ import typer
 
 from mkcli.core.enums import Format
 from mkcli.core.models import ContextCatalogue
+from mkcli.core.models.context import default_context, Context
 from mkcli.core.session import open_context_catalogue
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console
@@ -64,10 +65,45 @@ def _list(
 
 @app.command()
 def add(
-    # format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
+    name: str,
+    client_id: Annotated[
+        str, typer.Option(prompt=True, help="Client ID for the new auth context")
+    ] = default_context.client_id,
+    realm: Annotated[
+        str, typer.Option(prompt=True, help="Realm for the new auth context")
+    ] = default_context.realm,
+    scope: Annotated[
+        str, typer.Option(prompt=True, help="Scope for the new auth context")
+    ] = default_context.scope,
+    region: Annotated[
+        str, typer.Option(prompt=True, help="Region for the new auth context")
+    ] = default_context.region,
+    identity_server: Annotated[
+        str,
+        typer.Option(prompt=True, help="Identity server URL for the new auth context"),
+    ] = default_context.identity_server_url,
 ):
     """Prompt for new auth context and add it to the catalogue"""
-    raise NotImplementedError
+
+    console.display("[bold green]Creating a new auth context...[/bold green]")
+    new_ctx = Context(
+        name=name,
+        client_id=client_id,
+        realm=realm,
+        scope=scope,
+        region=region,
+        identity_server_url=identity_server,
+        public_key=None,
+    )
+    console.display_json(new_ctx.json())
+
+    with open_context_catalogue() as cat:
+        if name in cat.list_available():
+            console.display(
+                f"[bold red]Auth context named '{name}' already exists![/bold red]. Aborting."
+            )
+            typer.Abort()
+        cat.add(new_ctx)
 
 
 @app.command()
