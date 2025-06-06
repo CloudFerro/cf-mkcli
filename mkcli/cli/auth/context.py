@@ -108,24 +108,56 @@ def add(
 
 @app.command()
 def delete(
-    name: Annotated[str, typer.Argument(help="Name of the auth context to delete")],
+    names: Annotated[
+        list[str], typer.Argument(help="Names of the auth context to delete")
+    ],
     auto_confirm: Annotated[bool, typer.Option("--confirm", "-y")] = False,
 ):
     """Remove given auth context from the catalogue"""
-    confirmed = auto_confirm or typer.confirm(
-        f"Are you sure you want to delete auth context '{name}'?"
-    )
-
     with open_context_catalogue() as cat:
-        if name not in cat.list_available():
-            console.display(f"[bold red]Auth context '{name}' not found![/bold red]")
-            return
+        for name in names:
+            confirmed = auto_confirm or typer.confirm(
+                f"Are you sure you want to delete auth context '{name}'?"
+            )
+            if name not in cat.list_available():
+                console.display(
+                    f"[bold red]Auth context '{name}' not found![/bold red]"
+                )
+                return
 
-        if confirmed is False:
-            console.display("Aborted.")
-            return
-        cat.remove(name)
+            if confirmed is False:
+                console.display("Aborted.")
+                return
+            cat.delete(name)
 
-    console.display(
-        f"[bold green]Auth context '{name}' deleted successfully![/bold green]"
-    )
+        console.display(
+            f"[bold green]Auth context '{name}' deleted successfully![/bold green]"
+        )
+
+
+@app.command()
+def duplicate(
+    ctx: Annotated[str, typer.Argument(help="Name of the auth context to duplicate")],
+    name: Annotated[
+        str,
+        typer.Option("--name", "-n", prompt=True, help="Name for the new auth context"),
+    ],
+):
+    """Remove given auth context from the catalogue"""
+    with open_context_catalogue() as cat:
+        if ctx not in cat.list_available():
+            console.display(f"[bold red]Auth context '{ctx}' not found![/bold red]")
+            return
+        if name in cat.list_available():
+            console.display(
+                f"[bold red]Auth context named '{name}' already exists![/bold red]. Aborting."
+            )
+            typer.Abort()
+
+        copy = cat.get(ctx)
+        copy.name = name
+        cat.add(copy)
+
+        console.display(
+            f"[bold green]Duplicated auth context '{ctx}' into {name}![/bold green]"
+        )

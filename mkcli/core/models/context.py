@@ -60,7 +60,6 @@ class Context(BaseModel):
             self.scope,
             self.region,
             self.identity_server_url,
-            "Yes" if self.token and self.token.is_valid() else "No",
         ]
 
 
@@ -136,9 +135,18 @@ class ContextCatalogue(BaseModel):
         self.save()
         logger.info(f"Context '{item.name}' added to the catalogue.")
 
-    def remove(self, name: str):
+    def get(self, name: str) -> Context:
+        """Returns the context copy"""
+        return self.cat[name].model_copy(deep=True)
+
+    def delete(self, name: str):
         """Remove a context from the catalogue by name"""
-        raise NotImplementedError
+        if self.current == name:
+            raise ValueError(
+                f"Cannot remove the current context '{name}'. Switch to another context first."
+            )
+        del self.cat[name]
+        self.save()
 
     def list_all(self) -> list[Context]:
         """List all contexts in the catalogue"""

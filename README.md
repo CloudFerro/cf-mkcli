@@ -209,6 +209,7 @@ $ auth context [OPTIONS] COMMAND [ARGS]...
 * `list`: Remove given auth context from the catalogue
 * `add`: Prompt for new auth context and add it to...
 * `delete`: Remove given auth context from the catalogue
+* `duplicate`: Remove given auth context from the catalogue
 
 #### `auth context show`
 
@@ -269,16 +270,35 @@ Remove given auth context from the catalogue
 **Usage**:
 
 ```console
-$ auth context delete [OPTIONS] NAME
+$ auth context delete [OPTIONS] NAMES...
 ```
 
 **Arguments**:
 
-* `NAME`: Name of the auth context to delete  [required]
+* `NAMES...`: Names of the auth context to delete  [required]
 
 **Options**:
 
 * `-y, --confirm`
+* `--help`: Show this message and exit.
+
+#### `auth context duplicate`
+
+Remove given auth context from the catalogue
+
+**Usage**:
+
+```console
+$ auth context duplicate [OPTIONS] CTX
+```
+
+**Arguments**:
+
+* `CTX`: Name of the auth context to duplicate  [required]
+
+**Options**:
+
+* `-n, --name TEXT`: Name for the new auth context  [required]
 * `--help`: Show this message and exit.
 
 ## `cluster`
