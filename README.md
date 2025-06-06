@@ -208,8 +208,9 @@ $ auth context [OPTIONS] COMMAND [ARGS]...
 * `show`: Show current auth context
 * `list`: Remove given auth context from the catalogue
 * `add`: Prompt for new auth context and add it to...
-* `delete`: Remove given auth context from the catalogue
-* `duplicate`: Remove given auth context from the catalogue
+* `delete`: emove given auth context from the catalogue
+* `duplicate`: Duplicate given auth context with a new name
+* `edit`: Update given auth context
 
 #### `auth context show`
 
@@ -265,7 +266,7 @@ $ auth context add [OPTIONS] NAME
 
 #### `auth context delete`
 
-Remove given auth context from the catalogue
+emove given auth context from the catalogue
 
 **Usage**:
 
@@ -284,7 +285,7 @@ $ auth context delete [OPTIONS] NAMES...
 
 #### `auth context duplicate`
 
-Remove given auth context from the catalogue
+Duplicate given auth context with a new name
 
 **Usage**:
 
@@ -299,6 +300,30 @@ $ auth context duplicate [OPTIONS] CTX
 **Options**:
 
 * `-n, --name TEXT`: Name for the new auth context  [required]
+* `--help`: Show this message and exit.
+
+#### `auth context edit`
+
+Update given auth context
+
+**Usage**:
+
+```console
+$ auth context edit [OPTIONS] CTX
+```
+
+**Arguments**:
+
+* `CTX`: Name of the auth context to update  [required]
+
+**Options**:
+
+* `-n, --name TEXT`: Name for the new auth context
+* `--client_id TEXT`: Client ID for the new auth context
+* `--realm TEXT`: Realm for the new auth context
+* `--scope TEXT`: Scope for the new auth context
+* `--region TEXT`: Region for the new auth context
+* `--identity_server TEXT`: Identity server URL for the new auth context
 * `--help`: Show this message and exit.
 
 ## `cluster`

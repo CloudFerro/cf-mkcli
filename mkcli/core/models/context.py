@@ -135,8 +135,19 @@ class ContextCatalogue(BaseModel):
         self.save()
         logger.info(f"Context '{item.name}' added to the catalogue.")
 
+    def pop(self, name):
+        """Get and remove a context from the catalogue by name"""
+        if name not in self.cat:
+            raise ValueError(f"Context '{name}' does not exist in the catalogue.")
+        if self.current == name:
+            raise ValueError(
+                f"Cannot remove the current context '{name}'. Switch to another context first."
+            )
+        item = self.cat.pop(name)
+        return item
+
     def get(self, name: str) -> Context:
-        """Returns the context copy"""
+        """Returns the context deep copy"""
         return self.cat[name].model_copy(deep=True)
 
     def delete(self, name: str):

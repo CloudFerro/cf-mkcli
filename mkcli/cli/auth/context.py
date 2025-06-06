@@ -113,7 +113,7 @@ def delete(
     ],
     auto_confirm: Annotated[bool, typer.Option("--confirm", "-y")] = False,
 ):
-    """Remove given auth context from the catalogue"""
+    """emove given auth context from the catalogue"""
     with open_context_catalogue() as cat:
         for name in names:
             confirmed = auto_confirm or typer.confirm(
@@ -143,7 +143,7 @@ def duplicate(
         typer.Option("--name", "-n", prompt=True, help="Name for the new auth context"),
     ],
 ):
-    """Remove given auth context from the catalogue"""
+    """Duplicate given auth context with a new name"""
     with open_context_catalogue() as cat:
         if ctx not in cat.list_available():
             console.display(f"[bold red]Auth context '{ctx}' not found![/bold red]")
@@ -161,3 +161,57 @@ def duplicate(
         console.display(
             f"[bold green]Duplicated auth context '{ctx}' into {name}![/bold green]"
         )
+
+
+@app.command()
+def edit(
+    ctx: Annotated[str, typer.Argument(help="Name of the auth context to update")],
+    name: Annotated[
+        str,
+        typer.Option("--name", "-n", help="Name for the new auth context"),
+    ] = None,
+    client_id: Annotated[
+        str, typer.Option("--client_id", help="Client ID for the new auth context")
+    ] = None,
+    realm: Annotated[
+        str, typer.Option("--realm", help="Realm for the new auth context")
+    ] = None,
+    scope: Annotated[
+        str, typer.Option("--scope", help="Scope for the new auth context")
+    ] = None,
+    region: Annotated[
+        str, typer.Option("--region", help="Region for the new auth context")
+    ] = None,
+    identity_server: Annotated[
+        str,
+        typer.Option(
+            "--identity_server", help="Identity server URL for the new auth context"
+        ),
+    ] = None,
+):
+    """Update given auth context"""
+    with open_context_catalogue() as cat:
+        if ctx not in cat.list_available():
+            console.display(f"[bold red]Auth context '{ctx}' not found![/bold red]")
+            typer.Abort()
+
+        context = cat.pop(ctx)
+
+        if name in cat.list_available():
+            console.display(
+                f"[bold red]Auth context named '{name}' already exists![/bold red]. Aborting."
+            )
+            typer.Abort()
+
+        context.name = name or context.name
+        context.client_id = client_id or context.client_id
+        context.realm = realm or context.realm
+        context.scope = scope or context.scope
+        context.region = region or context.region
+        context.identity_server_url = identity_server or context.identity_server_url
+
+        cat.add(context)
+
+        console.display(f"[bold green]Edited auth context '{ctx}'![/bold green]")
+        console.display("New context data:")
+        console.display_json(context.json())
