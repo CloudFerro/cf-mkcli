@@ -10,12 +10,18 @@ _HELP: dict = {
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 
+# TODO: consider throwing it out since we have `mkli auth context add`
 @app.command(name="init")
 def init(
     # format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
 ):
-    """Initialize a first auth context"""
-    """This command will prompt you for the necessary information to create a new auth context."""
+    """
+    Initialize a first auth context.
+
+    This command is used to set up the initial authentication context for the CLI.
+    It will prompt you for the necessary information to create a new auth context (just like `mkli auth context add`).
+
+    """
     with open_context_catalogue() as cat:
         if cat.current_context is not None:
             console.display(

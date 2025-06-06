@@ -3,7 +3,6 @@ from typing import Annotated
 import typer
 
 from mkcli.core.enums import Format
-from mkcli.core.models import ContextCatalogue
 from mkcli.core.models.context import default_context, Context
 from mkcli.core.session import open_context_catalogue
 from mkcli.settings import APP_SETTINGS
@@ -20,20 +19,39 @@ app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 @app.command()
 def show(
-    # format: Annotated[Format, typer.Option("--output-format", "-o")] = Format.table,
+    format: Annotated[
+        Format, typer.Option("--format", "-f")
+    ] = APP_SETTINGS.default_format,
 ):
     """Show current auth context"""
-    cat = ContextCatalogue.from_storage()
+    with open_context_catalogue() as cat:
+        ctx = cat.current_context
 
-    console.display(
-        "[bold green]Current auth context:[/bold green]"
-    )  # TODO: show only with verbose
-    console.display_json(cat.current_context.json())
-    console.draw_rule("Summary:")
-    console.display(
-        f"Current auth context is:[bold green] {cat.current_context.name}[/bold green]"
-    )
-    console.draw_rule()
+    if ctx is None:
+        console.display(
+            "[bold red]No current auth context is set! Use 'mk auth context switch' to set one.[/bold red]"
+        )
+        typer.Abort()
+
+    match format:
+        case Format.TABLE:
+            console.display_table(
+                title="Current Auth Context",
+                columns=[
+                    "Name",
+                    "Client ID",
+                    "Realm",
+                    "Scope",
+                    "Region",
+                    "Identity Server",
+                ],
+                rows=[ctx.as_table_row()],
+            )
+            console.display(
+                f"Current auth context is:[bold green] {cat.current_context.name}[/bold green]"
+            )
+        case Format.JSON:
+            console.display_json(cat.current_context.json())
 
 
 @app.command(name="list")
@@ -215,3 +233,21 @@ def edit(
         console.display(f"[bold green]Edited auth context '{ctx}'![/bold green]")
         console.display("New context data:")
         console.display_json(context.json())
+
+
+@app.command()
+def switch(
+    ctx: Annotated[
+        str, typer.Argument(help="Name of the auth context to set as current")
+    ],
+):
+    """Switch to a different auth context"""
+    with open_context_catalogue() as cat:
+        if ctx not in cat.list_available():
+            console.display(f"[bold red]Auth context '{ctx}' not found![/bold red]")
+            typer.Abort()
+
+        cat.switch(ctx)
+        console.display(
+            f"[bold green]Set auth context '{ctx}' as current![/bold green]"
+        )
