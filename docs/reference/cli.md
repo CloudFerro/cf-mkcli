@@ -1,4 +1,4 @@
-# CLI
+# mkcli reference documentation
 
 mkcli - A CLI for managing your Kubernetes clusters
 
@@ -308,7 +308,7 @@ $ cluster create [OPTIONS]
 * `--name TEXT`: Cluster name, if None, generate with petname
 * `--kubernetes-version TEXT`: Kubernetes version, if None, use default  [default: 1.30.10]
 * `--master-count INTEGER`: Number of master nodes, if None, use default  [default: 3]
-* `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: eo2a.medium]
+* `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: hma.medium]
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.

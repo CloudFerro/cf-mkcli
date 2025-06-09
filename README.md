@@ -27,13 +27,13 @@ python -m mkcl
 ```
 
 # Usage Guide
-Have a look and commandline help:
+Remember, that you can always have a look at commandline help:
 ```commandline
 mkcli --help
 ```
 
 ### Authorization
-To start using `mkcli`, you need to authorize it with your credentials. This is done by running the following command:
+To start using `mkcli`, you need to authorize it with your credentials. In the simplest way this can be done by running the following command:
 ```commandline
 mkcli auth init
 ```
@@ -62,26 +62,34 @@ If you want, you can also list, edit, duplicate or delete contexts (see help for
 
 ![Contexts preview](docs/demo/context.gif)
 
-# Simple usage examples just for starting up
+### Simple usage examples just for starting up
 Here you can find a several examples of how to use the mkcli tool.
-These examples cover common tasks and operations that can be performed with mkcli, providing a quick reference for users to get started.
-In the examples directory you can find some ready-to-use json payloads for mkcli commands.
 
-### Managing tokens
-You can refresh your access token at any time by running the following command:
+### List all clusters
+You can list all your clusters by running:
 ```commandline
-mkcli auth token refresh
+mkcli cluster list
 ```
-You can also have a look on it (including all important information like expiration time) by:
+To increase readability you can easily filter the output by using `jq` command. For example, to list only cluster IDs, names and statuses, you can run:
 ```commandline
-mkcli auth token show
+mkcli cluster list | jq '.items[] | {id, name, status}'
 ```
-Have a look on all available commands for `mkcli auth token --help`:
 
-## Create cluster
+### List all available flavors
+```commandline
+mkcli flavor list
+```
+You should see a list of all available flavors in your region.
+By default, you should see an output formatted as table. If you want to see it in JSON format,
+you can use the `--format` option:
+```commandline
+mkcli flavors list --format json
+```
+
+### Create a new cluster
 
 # CLI Reference
-# CLI
+# mkcli reference documentation
 
 mkcli - A CLI for managing your Kubernetes clusters
 
@@ -391,7 +399,7 @@ $ cluster create [OPTIONS]
 * `--name TEXT`: Cluster name, if None, generate with petname
 * `--kubernetes-version TEXT`: Kubernetes version, if None, use default  [default: 1.30.10]
 * `--master-count INTEGER`: Number of master nodes, if None, use default  [default: 3]
-* `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: eo2a.medium]
+* `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: hma.medium]
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.

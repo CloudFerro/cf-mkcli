@@ -40,7 +40,7 @@ class DefaultNodePoolSettings(BaseSettings):
 class DefaultClusterSettings(BaseSettings):
     kubernetes_version: str = "1.30.10"
     master_count: int = 3
-    master_flavor: str = "eo2a.medium"
+    master_flavor: str = "hma.medium"
 
 
 APP_SETTINGS = AppSettings()
