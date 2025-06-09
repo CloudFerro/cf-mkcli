@@ -1,5 +1,3 @@
-import datetime
-
 from pydantic import BaseModel
 from typing import List, Optional
 from mkcli.utils import names
@@ -46,38 +44,6 @@ class NodePool(BaseModel):
     shared_networks: List[str]
     labels: List[Label]
     taints: List[Taint]
-
-
-class Cluster(BaseModel):
-    id: str
-    name: str
-    kubernetes_version: KubernetesVersion
-    control_plane: ControlPlane
-    node_pools: List[NodePool]
-    region_id: str
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
-    is_active: bool = True
-
-    @classmethod
-    def from_request(cls, _data: dict):
-        _data["kubernetes_version"] = KubernetesVersion(**_data["kubernetes_version"])
-        _data["control_plane"] = ControlPlane(**_data["control_plane"])
-        _data["node_pools"] = [NodePool(**np) for np in _data.get("node_pools", [])]
-        return cls(**_data)
-
-    def as_table_row(self):
-        return [
-            self.id,
-            self.name,
-            self.kubernetes_version.id,
-            self.control_plane.preset or "Custom",
-            len(self.node_pools),
-            self.region_id,
-            "Yes" if self.is_active else "No",
-            self.created_at.isoformat(),
-            self.updated_at.isoformat(),
-        ]
 
 
 class ClusterPayload(RequestPayload):
