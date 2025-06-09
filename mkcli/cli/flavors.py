@@ -38,11 +38,13 @@ def _list(
                 title="Available Kubernetes Versions",
                 columns=[
                     "ID",
+                    "Region",
                     "Name",
                     "CPU",
                     "Memory",
                     "Local Disk Size",
                     "Is Active",
+                    "Tags",
                     "Created At",
                     "Updated At",
                 ],

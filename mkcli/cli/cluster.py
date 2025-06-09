@@ -1,3 +1,5 @@
+import json
+
 import typer
 from typing_extensions import Annotated
 
@@ -88,6 +90,7 @@ def create(
             f"[bold yellow]Dry run mode:[/bold yellow] would create cluster with data: {new_cluster}"
         )
         return
+    breakpoint()
 
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
@@ -166,7 +169,7 @@ def _list():  # TODO: add resource mappings
         client = MK8SClient(state)
         clusters = client.get_clusters()
 
-    console.display(clusters)
+    console.display(json.dumps(clusters, indent=2))
 
 
 @app.command(help=_HELP["show"])
@@ -177,7 +180,7 @@ def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
         client = MK8SClient(state)
         _out = client.get_cluster(cluster_id)
 
-    console.Console().print_json(data=_out)
+    console.display_json(_out)
 
 
 @app.command(help=_HELP["get_kubeconfig"])
