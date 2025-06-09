@@ -2,6 +2,7 @@ from __future__ import annotations
 import json
 from typing import Dict, Optional
 from pathlib import Path
+
 from loguru import logger
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -35,7 +36,6 @@ class Context(BaseModel):
         ]
 
 
-# TODO: next use prompt to create this
 default_context = Context(**DEFAULT_CTX_SETTINGS.dict())
 
 
@@ -67,7 +67,10 @@ class ContextStorage:
             logger.warning(
                 f"Context file {self.path} not found, creating new catalogue."
             )
-            cat = ContextCatalogue()
+            raise FileNotFoundError(
+                f"Context file {self.path} not found. Please create a context first. With `mkcli auth init`"
+            )
+            # cat = ContextCatalogue()
         return cat
 
     def clear(self) -> None:

@@ -5,8 +5,6 @@ mkcli is a command-line interface (CLI) tool designed to manage CF Kubernetes cl
 
 ![Usage example](./docs/demo/help.gif)
 
-![contexts](docs/demo/context.gif)
-
 # Installation
 ### Prerequisites
 1. Python 3.12 or higher
@@ -16,7 +14,7 @@ mkcli is a command-line interface (CLI) tool designed to manage CF Kubernetes cl
 mkcli can be installed using pip. To install mkcli, run the following command:
 
 ```bash
-python3.12 -m venv venv && source venv/bin/activate && venv/bin/python -m pip install git+ssh://git@gitlab.cloudferro.com/k8s/mk-cli
+pip install git+ssh://git@gitlab.cloudferro.com/k8s/mk-cli
 ```
 
 Now you can run it just with:
@@ -28,50 +26,59 @@ or
 python -m mkcl
 ```
 
-# mkcli Usage Guide
+# Usage Guide
 Have a look and commandline help:
 ```commandline
-python -m mkcli --help
+mkcli --help
 ```
 
+### Authorization
+To start using `mkcli`, you need to authorize it with your credentials. This is done by running the following command:
+```commandline
+mkcli auth init
+```
+and then,
+```commandline
+mkcli auth token refresh
+```
+First command creates so-called "login context" which remembers your credentials,
+and the second command retrieves an access token that is used for subsequent API calls. It will open web browser window
+and ask you to log in to your account. After successful logging in, `mkcli` will "remember" your credentials and you
+can use it without logging in again for certain amount of time.
+
+_*Optionally_: If you want to use `mkcli` with different credentials or in different realm, you can run the following command to
+create a new login context:
+```commandline
+mkcli auth context add {context-name}
+```
+This command will prompt you to add all needed information, for creating a new context (e.g., realm, client ID, client secret, etc.).
+But don't worry if you are not familiar with all of them, since mkcli provides default values for most of the fields.
+
+To switch between contexts, you can use:
+```commandline
+mkcli auth context switch {context-name}
+```
+If you want, you can also list, edit, duplicate or delete contexts (see help for `mkcli auth context` command).
+
+![Contexts preview](docs/demo/context.gif)
 
 # Simple usage examples just for starting up
 Here you can find a several examples of how to use the mkcli tool.
 These examples cover common tasks and operations that can be performed with mkcli, providing a quick reference for users to get started.
 In the examples directory you can find some ready-to-use json payloads for mkcli commands.
 
-### Refresh token
+### Managing tokens
+You can refresh your access token at any time by running the following command:
 ```commandline
-python -m mkcli auth token refresh
+mkcli auth token refresh
 ```
-
-### Create cluster
-
+You can also have a look on it (including all important information like expiration time) by:
 ```commandline
-python -m mkcli cluster create "$(cat examples/create_cluster_payload.json)"
+mkcli auth token show
 ```
+Have a look on all available commands for `mkcli auth token --help`:
 
-```commandline
-python -m mkcli cluster create --from-json "$(cat examples/create_cluster_simple_payload.json)" --dry-run
-```
-
-```commandline
- python -m mkcli cluster create --from-json $(cat examples/create_cluster_simple_payload.json) --dry-run
-```
-
-```commandline
-python -m mkcli cluster create --name named-cluster --dry-run
-```
-
-```commandline
-python -m mkcli cluster get-kubeconfig {cluster_io}
-```
-
-### List clusters briefly
-
-```commandline
-python -m mkcli cluster list | jq '.items[] | {id, name, status}'
-```
+## Create cluster
 
 # CLI Reference
 # CLI
@@ -92,7 +99,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `auth`: Cli auth context
+* `auth`: mkcli authorization and authentication...
 * `cluster`: Manage Kubernetes clusters
 * `node-pool`: Manage Kubernetes cluster&#x27;s node pools
 * `kubernetes-version`: Manage Kubernetes versions
@@ -101,7 +108,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 ## `auth`
 
-Cli auth context
+mkcli authorization and authentication management
 
 **Usage**:
 
@@ -115,16 +122,13 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `init`: Initialize a first auth context.
+* `init`: Initialize your first auth context (with...
 * `token`: Cli token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
 
-Initialize a first auth context.
-
-This command is used to set up the initial authentication context for the CLI.
-It will prompt you for the necessary information to create a new auth context (just like `mkli auth context add`).
+Initialize your first auth context (with default attribute values).
 
 **Usage**:
 

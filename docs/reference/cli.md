@@ -16,7 +16,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `auth`: Cli auth context
+* `auth`: mkcli authorization and authentication...
 * `cluster`: Manage Kubernetes clusters
 * `node-pool`: Manage Kubernetes cluster&#x27;s node pools
 * `kubernetes-version`: Manage Kubernetes versions
@@ -25,7 +25,7 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 ## `auth`
 
-Cli auth context
+mkcli authorization and authentication management
 
 **Usage**:
 
@@ -39,16 +39,13 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `init`: Initialize a first auth context.
+* `init`: Initialize your first auth context (with...
 * `token`: Cli token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
 
-Initialize a first auth context.
-
-This command is used to set up the initial authentication context for the CLI.
-It will prompt you for the necessary information to create a new auth context (just like `mkli auth context add`).
+Initialize your first auth context (with default attribute values).
 
 **Usage**:
 

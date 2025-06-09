@@ -68,33 +68,19 @@ Set Height 600
 Type "mkcli auth context list"
 Enter
 Sleep 2s
-Type "mkcli auth context duplicate --name ctx-demo creodias"
+Type "mkcli auth context show"
 Enter
 Sleep 2s
-Type "mkcli auth context list"
+Type "mkcli cluster list"
 Enter
 Sleep 2s
-Type "mkcli auth context delete ctx-demo -y"
+Type "mkcli cluster list | jq '.items[] | {id, name, status}'"
+Enter
+
+Sleep 2s
+Type "mkcli cluster create --name DEMO-cluster"
 Enter
 Sleep 2s
-Type "mkcli auth context add new-demo"
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Sleep 2s
-Enter
-Sleep 500ms
-Sleep 2s
-Enter
-Sleep 500ms
-Sleep 2s
-Type "mkcli auth context list"
+Type "mkcli cluster list | jq '.items[] | {id, name, status}'"
 Enter
 Sleep 2s
