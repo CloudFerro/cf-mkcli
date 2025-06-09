@@ -3,12 +3,13 @@ import json
 import typer
 from typing_extensions import Annotated
 
+from mkcli.core.enums import Format
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.models import ClusterPayload
 from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.utils import console
-from mkcli.settings import DefaultClusterSettings
+from mkcli.settings import DefaultClusterSettings, APP_SETTINGS
 from mkcli.core import mappings
 
 
@@ -162,14 +163,31 @@ def delete(
 
 
 @app.command(name="list", help=_HELP["list"])
-def _list():  # TODO: add resource mappings
+def _list(
+    format: Format = typer.Option(
+        default=APP_SETTINGS.default_format, help=_HELP["format"]
+    ),
+):  # TODO: add resource mappings
     """List all clusters"""
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)
         clusters = client.get_clusters()
 
-    console.display(json.dumps(clusters, indent=2))
+        match format:
+            case Format.TABLE:
+                # region_map = mappings.get_regions_mapping(client)
+                # region = region_map[state.ctx.region]
+                # flavor_map = mappings.get_machine_spec_mapping(client, region.id)
+                #
+                # clusters = clusters.get(
+                #     "items", []
+                # )  # TODO: move operating on 'items' to client
+                raise NotImplementedError(
+                    "Table output not implemented yet. try json output."
+                )
+            case Format.JSON:
+                console.display(json.dumps(clusters, indent=2))
 
 
 @app.command(help=_HELP["show"])
