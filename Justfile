@@ -27,7 +27,7 @@ unhook:
     {{ poetry_run }} pre-commit uninstall
 
 docs:
-    python -m typer mkcli/main.py utils docs --output docs/reference/cli.md  # Update CLI documentation
+    python -m typer mkcli/main.py utils docs --title "mkcli reference documentation" --output docs/reference/cli.md  # Update CLI documentation
     echo '[[_TOC_]]' > README.md  # clear README.md
     cat docs/intro.md >> README.md  # add intro
     echo '' >> README.md  # add a newline
@@ -35,7 +35,6 @@ docs:
     echo '' >> README.md  # add a newline
     cat docs/guides/usage.md >> README.md
     echo '' >> README.md  # add a newline
-    echo '# CLI Reference' >> README.md  # add CLI reference header
     cat docs/reference/cli.md >> README.md  # add CLI reference
     echo '' >> README.md  # add a newline
 

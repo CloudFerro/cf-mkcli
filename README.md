@@ -88,7 +88,6 @@ mkcli flavors list --format json
 
 ### Create a new cluster
 
-# CLI Reference
 # mkcli reference documentation
 
 mkcli - A CLI for managing your Kubernetes clusters
