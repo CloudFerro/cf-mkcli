@@ -39,13 +39,16 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `init`: Initialize a first auth context
+* `init`: Initialize a first auth context.
 * `token`: Cli token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
 
-Initialize a first auth context
+Initialize a first auth context.
+
+This command is used to set up the initial authentication context for the CLI.
+It will prompt you for the necessary information to create a new auth context (just like `mkli auth context add`).
 
 **Usage**:
 
@@ -135,6 +138,7 @@ $ auth context [OPTIONS] COMMAND [ARGS]...
 * `delete`: emove given auth context from the catalogue
 * `duplicate`: Duplicate given auth context with a new name
 * `edit`: Update given auth context
+* `switch`: Switch to a different auth context
 
 #### `auth context show`
 
@@ -148,6 +152,7 @@ $ auth context show [OPTIONS]
 
 **Options**:
 
+* `-f, --format [table|json]`: [default: table]
 * `--help`: Show this message and exit.
 
 #### `auth context list`
@@ -248,6 +253,24 @@ $ auth context edit [OPTIONS] CTX
 * `--scope TEXT`: Scope for the new auth context
 * `--region TEXT`: Region for the new auth context
 * `--identity_server TEXT`: Identity server URL for the new auth context
+* `--help`: Show this message and exit.
+
+#### `auth context switch`
+
+Switch to a different auth context
+
+**Usage**:
+
+```console
+$ auth context switch [OPTIONS] CTX
+```
+
+**Arguments**:
+
+* `CTX`: Name of the auth context to set as current  [required]
+
+**Options**:
+
 * `--help`: Show this message and exit.
 
 ## `cluster`
