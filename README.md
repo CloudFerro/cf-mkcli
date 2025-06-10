@@ -14,7 +14,7 @@ mkcli is a command-line interface (CLI) tool designed to manage CF Kubernetes cl
 mkcli can be installed using pip. To install mkcli, run the following command:
 
 ```bash
-pip install git+ssh://git@gitlab.cloudferro.com/k8s/mk-cli
+python -m pip install git+https://github.com/CloudFerro/cf-mkcli.git
 ```
 
 Now you can run it just with:
@@ -455,6 +455,7 @@ $ cluster list [OPTIONS]
 
 **Options**:
 
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `cluster show`

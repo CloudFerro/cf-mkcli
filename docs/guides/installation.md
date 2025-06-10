@@ -7,7 +7,7 @@
 mkcli can be installed using pip. To install mkcli, run the following command:
 
 ```bash
-pip install git+ssh://git@gitlab.cloudferro.com/k8s/mk-cli
+python -m pip install git+https://github.com/CloudFerro/cf-mkcli.git
 ```
 
 Now you can run it just with:

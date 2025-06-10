@@ -365,6 +365,7 @@ $ cluster list [OPTIONS]
 
 **Options**:
 
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `cluster show`
