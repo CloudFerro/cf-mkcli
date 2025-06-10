@@ -28,16 +28,14 @@ and it will purge all saved credentials and tokens, so you will need to run `mkc
 
 ### *Advanced: Auth contexts (you can skip this part of docs if you are not interested in advanced usage)*
 _*Optionally_: If you want to use `mkcli` simultaneously for different accounts, or in different realms,
-you can use "login session contexts" feature. This allows you to create multiple contexts, each with its own credentials and settings,
-create a new login context.
-First command creates so-called "login context" which remembers your credentials,
-and the second command retrieves an access token that is used for subsequent API calls.
+you can use "login session contexts" feature.
+This allows you to create multiple contexts, each with its own credentials and settings.
 ```commandline
 mkcli auth context add {context-name}
 ```
-
 This command will prompt you to add all needed information, for creating a new context (e.g., realm, client ID, client secret, etc.).
 But don't worry if you are not familiar with all of them, since mkcli provides default values for most of the fields.
+You can always list, edit, duplicate or delete contexts (see help for `mkcli auth context` command).
 
 To switch between contexts, you can use:
 ```commandline
@@ -57,9 +55,8 @@ mkcli cluster list
 ```
 To increase readability you can easily filter the output by using `jq` command. For example, to list only cluster IDs, names and statuses, you can run:
 ```commandline
-mkcli cluster list | jq '.items[] | {id, name, status}'
+mkcli cluster list --format json | jq '.items[] | {id, name, status}'```
 ```
-
 ### List all available flavors
 ```commandline
 mkcli flavor list
