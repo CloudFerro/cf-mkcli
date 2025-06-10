@@ -176,16 +176,32 @@ def _list(
 
         match format:
             case Format.TABLE:
-                # region_map = mappings.get_regions_mapping(client)
-                # region = region_map[state.ctx.region]
-                # flavor_map = mappings.get_machine_spec_mapping(client, region.id)
-                #
-                # clusters = clusters.get(
-                #     "items", []
-                # )  # TODO: move operating on 'items' to client
-                raise NotImplementedError(
-                    "Table output not implemented yet. try json output."
+                # TODO: add info about region and machine spec using mapping
+                clusters = clusters.get(
+                    "items", []
+                )  # TODO: move operating on 'items' to client
+                # )
+                console.display_table(
+                    title="Kubernetes Clusters",
+                    columns=[
+                        "ID",
+                        "Name",
+                        "Status",
+                        "Created At",
+                        "Updated At",
+                    ],
+                    rows=[
+                        [
+                            cluster["id"],
+                            cluster["name"],
+                            cluster["status"],
+                            cluster["created_at"],
+                            cluster["updated_at"],
+                        ]
+                        for cluster in clusters
+                    ],
                 )
+                console.display("See more details with json output format.")
             case Format.JSON:
                 console.display(json.dumps(clusters, indent=2))
 

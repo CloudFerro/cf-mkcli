@@ -20,7 +20,7 @@ def exc(msg: Optional[str] = None) -> None:
         print(msg)
 
 
-def display_table(columns: list[str], rows: list[str], title: str):
+def display_table(columns: list[str], rows: list[list[Any]], title: str):
     console = Console()
     table = Table(title=title, box=box.HEAVY_HEAD)
     for col in columns:
