@@ -91,7 +91,6 @@ def create(
             f"[bold yellow]Dry run mode:[/bold yellow] would create cluster with data: {new_cluster}"
         )
         return
-    breakpoint()
 
     with open_context_catalogue() as cat:
         state = State(cat.current_context)

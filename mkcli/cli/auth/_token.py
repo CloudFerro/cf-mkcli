@@ -3,7 +3,7 @@ from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.utils import console
 
-HELP: str = "Cli token management"
+HELP: str = "Auth token management"
 
 app = typer.Typer(no_args_is_help=True, help=HELP)
 

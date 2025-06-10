@@ -74,7 +74,6 @@ class State:
             ) as progress:
                 progress.add_task("waiting for callback...")
                 wait_until(s.called, 60, 0.05)
-
             access_token = self.keycloak_openid.token(
                 grant_type="authorization_code",
                 code=s.access_code,

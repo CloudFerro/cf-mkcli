@@ -39,13 +39,14 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `init`: Initialize your first auth context (with...
-* `token`: Cli token management
+* `init`: Initialize authentication session
+* `end`: End authentication session and clear saved...
+* `token`: Auth token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
 
-Initialize your first auth context (with default attribute values).
+Initialize authentication session
 
 **Usage**:
 
@@ -55,11 +56,27 @@ $ auth init [OPTIONS]
 
 **Options**:
 
+* `--realm TEXT`: Realm name  [default: Creodias-new]
+* `--region TEXT`: Region name  [default: WAW4-1]
+* `--help`: Show this message and exit.
+
+### `auth end`
+
+End authentication session and clear saved tokens
+
+**Usage**:
+
+```console
+$ auth end [OPTIONS]
+```
+
+**Options**:
+
 * `--help`: Show this message and exit.
 
 ### `auth token`
 
-Cli token management
+Auth token management
 
 **Usage**:
 

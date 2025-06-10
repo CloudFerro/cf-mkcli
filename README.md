@@ -32,25 +32,38 @@ Remember, that you can always have a look at commandline help:
 mkcli --help
 ```
 
-### Authorization
+## Authorization
 To start using `mkcli`, you need to authorize it with your credentials. In the simplest way this can be done by running the following command:
 ```commandline
 mkcli auth init
 ```
-and then,
+`mkcli` will prompt you to enter `realm` and `region` names, which are required to connect to your account.
+and then you can check if you are logged in by running:,
 ```commandline
-mkcli auth token refresh
+mkcli auth token show
 ```
-First command creates so-called "login context" which remembers your credentials,
-and the second command retrieves an access token that is used for subsequent API calls. It will open web browser window
-and ask you to log in to your account. After successful logging in, `mkcli` will "remember" your credentials and you
-can use it without logging in again for certain amount of time.
+How does it work? `mkcli` will open web browser window and ask you to log in to your account.
+After successful logging in, `mkcli` will "remember" your credentials and you can use it without logging in again
+for certain amount of time.
 
-_*Optionally_: If you want to use `mkcli` with different credentials or in different realm, you can run the following command to
-create a new login context:
+If you want to log out, anc clear all saved auth session data, you can run:
+```commandline
+mkcli auth end
+```
+and it will purge all saved credentials and tokens, so you will need to run `mkcli auth init` again to log in.
+
+![Auth init preview](docs/demo/auth_init.gif)
+
+### *Advanced: Auth contexts (you can skip this part of docs if you are not interested in advanced usage)*
+_*Optionally_: If you want to use `mkcli` simultaneously for different accounts, or in different realms,
+you can use "login session contexts" feature. This allows you to create multiple contexts, each with its own credentials and settings,
+create a new login context.
+First command creates so-called "login context" which remembers your credentials,
+and the second command retrieves an access token that is used for subsequent API calls.
 ```commandline
 mkcli auth context add {context-name}
 ```
+
 This command will prompt you to add all needed information, for creating a new context (e.g., realm, client ID, client secret, etc.).
 But don't worry if you are not familiar with all of them, since mkcli provides default values for most of the fields.
 
@@ -129,13 +142,14 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `init`: Initialize your first auth context (with...
-* `token`: Cli token management
+* `init`: Initialize authentication session
+* `end`: End authentication session and clear saved...
+* `token`: Auth token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
 
-Initialize your first auth context (with default attribute values).
+Initialize authentication session
 
 **Usage**:
 
@@ -145,11 +159,27 @@ $ auth init [OPTIONS]
 
 **Options**:
 
+* `--realm TEXT`: Realm name  [default: Creodias-new]
+* `--region TEXT`: Region name  [default: WAW4-1]
+* `--help`: Show this message and exit.
+
+### `auth end`
+
+End authentication session and clear saved tokens
+
+**Usage**:
+
+```console
+$ auth end [OPTIONS]
+```
+
+**Options**:
+
 * `--help`: Show this message and exit.
 
 ### `auth token`
 
-Cli token management
+Auth token management
 
 **Usage**:
 

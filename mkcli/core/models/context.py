@@ -70,12 +70,17 @@ class ContextStorage:
             raise FileNotFoundError(
                 f"Context file {self.path} not found. Please create a context first. With `mkcli auth init`"
             )
-            # cat = ContextCatalogue()
         return cat
 
     def clear(self) -> None:
         """Clear the context data catalogue"""
-        self.save_all(ContextCatalogue())
+        if self.path.is_file():
+            self.path.unlink()
+            logger.info(f"Context file {self.path} cleared.")
+        else:
+            logger.warning(
+                f"Context file {self.path} does not exist, nothing to clear."
+            )
 
 
 class ContextCatalogue(BaseModel):
