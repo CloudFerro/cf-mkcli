@@ -61,6 +61,7 @@ class ContextStorage:
         """Read the context data catalogue from the storage"""
         try:
             with open(self.path, "r") as f:
+                logger.info(f"Data loaded from {self.path}")
                 data = json.load(f)
                 cat = ContextCatalogue.model_validate(data)
         except FileNotFoundError:
@@ -131,6 +132,7 @@ class ContextCatalogue(BaseModel):
         return self.cat[name].model_copy(deep=True)
 
     def delete(self, name: str):
+        logger.info(f"Removing context '{name}' from the catalogue.")
         """Remove a context from the catalogue by name"""
         if self.current == name:
             raise ValueError(
