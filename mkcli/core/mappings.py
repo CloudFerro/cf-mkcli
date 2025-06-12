@@ -34,7 +34,7 @@ def get_regions_mapping(client: MK8SClient) -> RegionNameIdMapping:
     regions = client.list_regions()
     return {
         region["name"]: Region(
-            name=region["name"], id=region["id"], is_active=region["isActive"]
+            name=region["name"], id=region["id"], is_active=region["is_active"]
         )
         for region in regions
     }
