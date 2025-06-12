@@ -77,6 +77,11 @@ def _list(
                 ],
                 rows=[ctx.as_table_row() for ctx in contexts],
             )
+            console.draw_rule()
+            console.display(
+                f"Current context: [bold yellow]{cat.current}[/bold yellow]"
+            )
+            console.draw_rule()
         case Format.JSON:
             console.display([ctx.model_dump() for ctx in contexts])
 

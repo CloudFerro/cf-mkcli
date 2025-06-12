@@ -20,15 +20,13 @@ class State:
         self._keycloak_openid: Optional[KeycloakOpenID] = None
 
     def clear(self) -> None:  # maybe clear creds
-        self.ctx.token.clear()
+        self.ctx.token = None
 
     @property
-    def token(self) -> str:
-        if (
-            self.ctx.token is None or self.ctx.token.access_token is None
-        ):  # TODO: refactor this ugliness (!)
-            self.renew_token()
-        if self.ctx.token.should_be_renew():
+    def token(self) -> str | None:
+        if self.ctx.token is None:
+            return None
+        if self.ctx.token.access_token is None or self.ctx.token.should_be_renew():
             if self.ctx.token.is_refresh_token_valid():
                 self._renew_token_with_refresh_token()
             else:

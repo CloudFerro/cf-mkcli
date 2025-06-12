@@ -8,6 +8,7 @@ class APICallError(Exception):
 
     def __init__(self, status_code: int, message: str):
         _msg = f"API call failed with status code {status_code}: {message}"
+        self.code = status_code
         super().__init__(_msg)
 
 

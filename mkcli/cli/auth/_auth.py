@@ -60,7 +60,7 @@ def init(
     finally:
         # Validate token or log in browser
         state = State(cat.current_context)
-        _ = state.token
+        state.renew_token()
         console.display(
             f"[bold green]Successfully refreshed token in `{cat.current_context.name}` context.[/bold green]"
         )

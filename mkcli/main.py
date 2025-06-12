@@ -1,8 +1,11 @@
 import typer
 from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors, regions
-
+from keycloak import KeycloakPostError
 from loguru import logger
 import logging
+
+from mkcli.core.mk8s import APICallError
+from mkcli.utils.console import display
 
 state = {"verbose": False}
 
@@ -35,5 +38,20 @@ cli.add_typer(flavors.app, name="flavors", no_args_is_help=True)
 cli.add_typer(regions.app, name="regions", no_args_is_help=True)
 
 
-if __name__ == "__main__":
-    cli()
+def run():
+    try:
+        cli()
+    except APICallError as err:
+        display(f"[red]API Call Error: {err}[/red]")
+        if err.code in [401, 403]:
+            display(
+                "[bold red]Please check your authentication token or login credentials.[/bold red]\n"
+                "You might want to mkake `mkcli auth token refresh call`."
+            )
+
+    except KeycloakPostError:
+        logger.exception(
+            "Keycloak Post Error occurred. Please check your auth configuration."
+            "Ensure that you successfully logged in the browser during `mkcli auth token refresh`."
+        )
+    # TODO(EA): add handling general exception

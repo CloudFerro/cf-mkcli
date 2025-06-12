@@ -6,9 +6,7 @@ from mkcli.settings import APP_SETTINGS
 from loguru import logger
 
 
-CACHE_STORAGE_PATH = Path(
-    f"{APP_SETTINGS.cache_dir}/shelve"
-)  # TODO: move it to app settings
+CACHE_STORAGE_PATH = Path(f"{APP_SETTINGS.cache_dir}/shelve")
 
 
 def ensure_path_exists(path: Path) -> None:

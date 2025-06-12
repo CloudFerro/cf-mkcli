@@ -146,7 +146,7 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 * `init`: Initialize authentication session
 * `end`: End authentication session and clear saved...
-* `token`: Auth token management
+* `token`: Authorization token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
@@ -181,7 +181,7 @@ $ auth end [OPTIONS]
 
 ### `auth token`
 
-Auth token management
+Authorization token management
 
 **Usage**:
 
@@ -195,11 +195,13 @@ $ auth token [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `clear`
-* `refresh`
-* `show`
+* `clear`: Clear the current access token from the...
+* `refresh`: Refresh the current access token from the...
+* `show`: Show the current access token from the...
 
 #### `auth token clear`
+
+Clear the current access token from the authorization session (current context)
 
 **Usage**:
 
@@ -213,6 +215,8 @@ $ auth token clear [OPTIONS]
 
 #### `auth token refresh`
 
+Refresh the current access token from the authorization session (current context)
+
 **Usage**:
 
 ```console
@@ -224,6 +228,8 @@ $ auth token refresh [OPTIONS]
 * `--help`: Show this message and exit.
 
 #### `auth token show`
+
+Show the current access token from the authorization session (current context)
 
 **Usage**:
 
