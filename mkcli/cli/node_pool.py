@@ -96,7 +96,7 @@ def create(
 
     if dry_run:
         console.display(
-            f"[bold yellow]Dry run mode:[/bold yellow] {new_nodepool.dict()}"
+            f"[bold yellow]Dry run mode:[/bold yellow] {new_nodepool.model_dump_json(indent=2)}"
         )
         return
     with open_context_catalogue() as cat:
@@ -116,7 +116,6 @@ def _list(
     ),
 ):
     """List all node pools in the cluster"""
-    console.display(f"Listing node pools for cluster ID: {cluster_id}")
 
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
@@ -125,7 +124,7 @@ def _list(
 
     match format:
         case Format.JSON:
-            console.display(json.dumps(node_pools, indent=2))
+            console.display(json.dumps({"node-pools": node_pools}, indent=2))
         case Format.TABLE:
             console.display_table(
                 title=f"Node Pools in Cluster {cluster_id}",
@@ -141,6 +140,18 @@ def _list(
                     for np in node_pools
                 ],
             )
+
+
+@app.command(name="show")
+def show(
+    cluster_id: str = typer.Argument(..., help=_HELP["cluster_id"]),
+    node_pool_id: str = typer.Argument(..., help=_HELP["node_pool_id"]),
+):
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+        node_pool = client.get_node_pool(cluster_id, node_pool_id)
+    console.display_json(json.dumps(node_pool, indent=2))
 
 
 @app.command()

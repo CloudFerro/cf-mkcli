@@ -5,7 +5,7 @@ from typing import (
 )
 
 import rich.rule
-from rich import box, print, json
+from rich import box, print, print_json
 from rich.console import Console
 from rich.table import Table
 
@@ -43,7 +43,7 @@ def display_json(_data: str) -> None:
     """
     Print the given data as JSON.
     """
-    print(json.JSON(_data))
+    print_json(_data, indent=2, ensure_ascii=False, highlight=True)
 
 
 def draw_rule(title: str = None) -> None:

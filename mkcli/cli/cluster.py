@@ -109,7 +109,7 @@ def update(
             parser=ClusterPayload.from_json,
             help=_HELP["from_json"],
         ),
-    ] = None,
+    ] = None,  # TODO: remove default value
     dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Update the cluster with given id"""
@@ -146,11 +146,11 @@ def delete(
     )
 
     if confirmed is False:
-        console.Console().print("Aborted.")
+        console.display("Aborted.")
         return
 
     if dry_run:
-        console.Console().print(f"Dry run: would delete cluster {cluster_id}")
+        console.display(f"Dry run: would delete cluster {cluster_id}")
         return
 
     with open_context_catalogue() as cat:
@@ -158,7 +158,7 @@ def delete(
         client = MK8SClient(state)
 
         client.delete_cluster(cluster_id)
-        console.Console().print(f"Cluster {cluster_id} deleted.")
+        console.display("Cluster {cluster_id} deleted.")
 
 
 @app.command(name="list", help=_HELP["list"])
@@ -202,7 +202,7 @@ def _list(
                 )
                 console.display("See more details with json output format.")
             case Format.JSON:
-                console.display(json.dumps(clusters, indent=2))
+                console.display_json(json.dumps(clusters, indent=2))
 
 
 @app.command(help=_HELP["show"])
@@ -213,7 +213,7 @@ def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
         client = MK8SClient(state)
         _out = client.get_cluster(cluster_id)
 
-    console.display_json(_out)
+    console.display_json(json.dumps(_out, indent=2))
 
 
 @app.command(help=_HELP["get_kubeconfig"])
@@ -227,9 +227,7 @@ def get_kubeconfig(
 ):
     """Download kube-config.yaml"""
     if dry_run:
-        console.Console().print(
-            f"Dry run: would download kube-config for cluster {cluster_id}"
-        )
+        console.display(f"Dry run: would download kube-config for cluster {cluster_id}")
         return
 
     with open_context_catalogue() as cat:

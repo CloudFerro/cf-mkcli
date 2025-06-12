@@ -448,6 +448,7 @@ $ node-pool [OPTIONS] COMMAND [ARGS]...
 
 * `create`: Create a new node pool
 * `list`: List all node pools in the cluster
+* `show`
 * `delete`: Delete a node pool
 
 ### `node-pool create`
@@ -494,6 +495,23 @@ $ node-pool list [OPTIONS] CLUSTER_ID
 **Options**:
 
 * `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
+* `--help`: Show this message and exit.
+
+### `node-pool show`
+
+**Usage**:
+
+```console
+$ node-pool show [OPTIONS] CLUSTER_ID NODE_POOL_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID to operate on  [required]
+* `NODE_POOL_ID`: Node pool ID to operate on  [required]
+
+**Options**:
+
 * `--help`: Show this message and exit.
 
 ### `node-pool delete`

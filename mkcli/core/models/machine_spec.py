@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -32,3 +33,17 @@ class MachineSpec(BaseModel):  # Flavor
             self.created_at.isoformat(),
             self.updated_at.isoformat(),
         ]
+
+    def as_json(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "region_name": self.region_name,
+            "name": self.name,
+            "cpu": self.cpu,
+            "memory": self.memory,
+            "local_disc_size": self.local_disc_size,
+            "is_active": self.is_active,
+            "tags": self.tags,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }

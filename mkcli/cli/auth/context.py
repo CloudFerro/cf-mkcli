@@ -1,3 +1,4 @@
+import json
 from typing import Annotated
 
 import typer
@@ -51,7 +52,7 @@ def show(
                 f"Current auth context is:[bold green] {cat.current_context.name}[/bold green]"
             )
         case Format.JSON:
-            console.display_json(cat.current_context.json())
+            console.display_json(ctx.json())
 
 
 @app.command(name="list")
@@ -83,7 +84,9 @@ def _list(
             )
             console.draw_rule()
         case Format.JSON:
-            console.display([ctx.model_dump() for ctx in contexts])
+            console.display_json(
+                json.dumps({"contexts": [ctx.as_json() for ctx in contexts]}),
+            )
 
 
 @app.command()
@@ -237,7 +240,7 @@ def edit(
 
         console.display(f"[bold green]Edited auth context '{ctx}'![/bold green]")
         console.display("New context data:")
-        console.display_json(context.json())
+        console.display_json(context.as_json())
 
 
 @app.command()

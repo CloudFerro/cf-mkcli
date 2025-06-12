@@ -1,3 +1,5 @@
+import json
+
 import typer
 
 from mkcli.core import mappings
@@ -39,6 +41,8 @@ def _list(
                     rows=[v.as_table_row() for v in k8sv_map.values()],
                 )
             case Format.JSON:
-                console.display(
-                    {key: value.model_dump() for key, value in k8sv_map.items()}
+                console.display_json(
+                    json.dumps(
+                        {key: value.as_json() for key, value in k8sv_map.items()}
+                    )
                 )

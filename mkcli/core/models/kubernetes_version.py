@@ -25,3 +25,12 @@ class KubernetesVersion(BaseModel):
             self.updated_at.isoformat(),
             "Yes" if self.is_active else "No",
         ]
+
+    def as_json(self) -> dict[str, str | bool]:
+        return {
+            "id": self.id,
+            "version": self.version,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }

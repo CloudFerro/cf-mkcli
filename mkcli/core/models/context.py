@@ -1,6 +1,6 @@
 from __future__ import annotations
 import json
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from pathlib import Path
 
 from loguru import logger
@@ -34,6 +34,18 @@ class Context(BaseModel):
             self.region,
             self.identity_server_url,
         ]
+
+    def as_json(self) -> Dict[str, Any]:
+        """Return the context as a JSON serializable dictionary"""
+        return {
+            "name": self.name,
+            "client_id": self.client_id,
+            "realm": self.realm,
+            "scope": self.scope,
+            "region": self.region,
+            "identity_server_url": self.identity_server_url,
+            "public_key": self.public_key,
+        }
 
 
 default_context = Context(**DEFAULT_CTX_SETTINGS.dict())
