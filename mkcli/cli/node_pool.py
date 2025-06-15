@@ -5,9 +5,10 @@ import typer
 
 from mkcli.core import mappings
 from mkcli.core.enums import Format
+from mkcli.core.exceptions import FlavorNotFound
 from mkcli.core.models import NodePoolPayload
 from mkcli.core.state import State
-from mkcli.settings import DefaultNodePoolSettings, APP_SETTINGS
+from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console, names
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.session import open_context_catalogue
@@ -34,26 +35,19 @@ _HELP: dict = {
 
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
-DEFAULT_NODEPOOL = DefaultNodePoolSettings()
+DEFAULT_NODEPOOL = NodePoolPayload()
 
 
 @app.command()
 def create(
+    flavor_name: Annotated[str, typer.Option("--flavor", help=_HELP["flavor"])],
     cluster_id: str = typer.Argument(..., help="Cluster ID"),
-    name: str = typer.Option(
-        None, help="Node pool name, if None, generate with petname"
-    ),
-    node_count: int = typer.Option(
-        DEFAULT_NODEPOOL.node_count, help=_HELP["node_count"]
-    ),
-    min_nodes: int = typer.Option(DEFAULT_NODEPOOL.min_nodes, help=_HELP["min_nodes"]),
-    max_nodes: int = typer.Option(DEFAULT_NODEPOOL.max_nodes, help=_HELP["max_nodes"]),
+    name: str = typer.Option(help=_HELP["name"]),
+    node_count: int = typer.Option(DEFAULT_NODEPOOL.size, help=_HELP["node_count"]),
+    min_nodes: int = typer.Option(DEFAULT_NODEPOOL.size_min, help=_HELP["min_nodes"]),
+    max_nodes: int = typer.Option(DEFAULT_NODEPOOL.size_max, help=_HELP["max_nodes"]),
     shared_networks: list[str] = typer.Option(None, help=_HELP["shared_networks"]),
     autoscale: bool = typer.Option(DEFAULT_NODEPOOL.autoscale, help=_HELP["autoscale"]),
-    flavor: str = typer.Option(
-        DEFAULT_NODEPOOL.flavor,
-        help=_HELP["flavor"],
-    ),
     from_json: Annotated[
         NodePoolPayload,
         typer.Option(
@@ -77,14 +71,19 @@ def create(
             flavor_map = mappings.get_machine_spec_mapping(
                 client, region_map[state.ctx.region].id
             )
-            flavor = flavor_map.get(flavor)
+            flavor = flavor_map.get(flavor_name)
+
+        if flavor is None:
+            raise FlavorNotFound(
+                flavor_name=flavor_name, available_flavors=list(flavor_map.keys())
+            )
 
         if name is None:
             name = names.generate()
 
         node_pool_data = {
             "name": name,
-            "node_count": node_count,
+            "size": node_count,
             "min_nodes": min_nodes,
             "max_nodes": max_nodes,
             "autoscale": autoscale,
@@ -120,6 +119,10 @@ def _list(
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)
+        region_map = mappings.get_regions_mapping(client)
+        region = region_map[state.ctx.region]
+        flavor_map = mappings.get_machine_spec_mapping(client, region.id)
+        reversed_flavor_map = {v.id: v for v in flavor_map.values()}
         node_pools = client.list_node_pools(cluster_id)
 
     match format:
@@ -135,11 +138,60 @@ def _list(
                         np["name"],
                         np["autoscale"],
                         np["status"],
-                        np["machine_spec"]["id"] if np["machine_spec"] else "N/A",
+                        reversed_flavor_map.get(np["machine_spec"]["id"]).name
+                        if np["machine_spec"]
+                        else "N/A",
                     ]
                     for np in node_pools
                 ],
             )
+
+
+@app.command(help=_HELP["update"])
+def update(
+    cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
+    node_pool_id: Annotated[str, typer.Argument(help="Node Pool ID to update")],
+    node_count: int = typer.Option(None, help=_HELP["node_count"]),
+    min_nodes: int = typer.Option(None, help=_HELP["min_nodes"]),
+    max_nodes: int = typer.Option(None, help=_HELP["max_nodes"]),
+    shared_networks: list[str] = typer.Option(None, help=_HELP["shared_networks"]),
+    autoscale: bool = typer.Option(None, help=_HELP["autoscale"]),
+):
+    """Update the node pool with given id"""
+
+    if not any([node_count, min_nodes, max_nodes, shared_networks, autoscale]):
+        console.display(
+            "At least one of the options must be provided to update the node pool."
+        )
+        return
+
+    with open_context_catalogue() as cat:
+        state = State(cat.current_context)
+        client = MK8SClient(state)
+
+        # Fetch existing node pool
+        node_pool = client.get_node_pool(cluster_id, node_pool_id)
+
+        node_pool.size = node_count if node_count is not None else node_pool.size
+        node_pool.size_min = min_nodes if min_nodes is not None else node_pool.size_min
+        node_pool.size_max = max_nodes if max_nodes is not None else node_pool.size_max
+        node_pool.autoscale = (
+            autoscale if autoscale is not None else node_pool.autoscale
+        )
+        node_pool.shared_networks = (
+            shared_networks
+            if shared_networks is not None
+            else node_pool.shared_networks
+        )
+
+        # Update the node pool
+        updated_node_pool = client.update_node_pool(
+            cluster_id=cluster_id,
+            node_pool_id=node_pool_id,
+            node_pool_data=node_pool.dict(),
+        )
+
+    console.display(f"Node Pool updated: {updated_node_pool}")
 
 
 @app.command(name="show")
@@ -151,7 +203,8 @@ def show(
         state = State(cat.current_context)
         client = MK8SClient(state)
         node_pool = client.get_node_pool(cluster_id, node_pool_id)
-    console.display_json(json.dumps(node_pool, indent=2))
+
+    console.display(node_pool)
 
 
 @app.command()

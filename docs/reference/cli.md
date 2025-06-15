@@ -353,7 +353,9 @@ $ cluster update [OPTIONS] CLUSTER_ID
 
 **Options**:
 
-* `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
+* `--kubernetes-version TEXT`: Kubernetes version, if None, use default
+* `--master-count INTEGER`: Number of master nodes, if None, use default
+* `--master-flavor TEXT`: Master node flavor name, if None, use default
 * `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
@@ -448,6 +450,7 @@ $ node-pool [OPTIONS] COMMAND [ARGS]...
 
 * `create`: Create a new node pool
 * `list`: List all node pools in the cluster
+* `update`: Update the node pool with given id
 * `show`
 * `delete`: Delete a node pool
 
@@ -467,13 +470,13 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 
 **Options**:
 
-* `--name TEXT`: Node pool name, if None, generate with petname
-* `--node-count INTEGER`: Number of nodes in the pool  [default: 1]
-* `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 1]
-* `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 10]
+* `--flavor TEXT`: Machine flavor for the node pool, if None, use the default flavor  [required]
+* `--name TEXT`: Node pool name, if None, generate with petname  [required]
+* `--node-count INTEGER`: Number of nodes in the pool  [default: 0]
+* `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 0]
+* `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 0]
 * `--shared-networks TEXT`: List of shared networks for the node pool
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool  [default: no-autoscale]
-* `--flavor TEXT`: Machine flavor for the node pool, if None, use the default flavor  [default: hmad.medium]
 * `--from-json FROM_JSON`: Node-pool payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
@@ -495,6 +498,31 @@ $ node-pool list [OPTIONS] CLUSTER_ID
 **Options**:
 
 * `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
+* `--help`: Show this message and exit.
+
+### `node-pool update`
+
+Update the node pool with given id
+
+**Usage**:
+
+```console
+$ node-pool update [OPTIONS] CLUSTER_ID NODE_POOL_ID
+```
+
+**Arguments**:
+
+* `CLUSTER_ID`: Cluster ID  [required]
+* `NODE_POOL_ID`: Node Pool ID to update  [required]
+
+**Options**:
+
+* `--node-count INTEGER`: Number of nodes in the pool
+* `--min-nodes INTEGER`: Minimum number of nodes in the pool
+* `--max-nodes INTEGER`: Maximum number of nodes in the pool
+* `--shared-networks TEXT`: List of shared networks for the node pool
+* `--autoscale / --no-autoscale`: Enable autoscaling for the node pool
+* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ### `node-pool show`

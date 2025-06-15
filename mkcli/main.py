@@ -1,4 +1,6 @@
 import typer
+from mkcli.core.exceptions import ResourceNotFound
+
 from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors, regions
 from keycloak import KeycloakPostError
 from loguru import logger
@@ -54,4 +56,5 @@ def run():
             "Keycloak Post Error occurred. Please check your auth configuration."
             "Ensure that you successfully logged in the browser during `mkcli auth token refresh`."
         )
-    # TODO(EA): add handling general exception
+    except ResourceNotFound as err:
+        display(f"[red]Resource Not Found[/red]: {err}")

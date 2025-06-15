@@ -1,43 +1,28 @@
 {
-"kubernetes_version": {
-"id": "string"
-},
-"control_plane": {
-"preset": "string",
-"custom": {
-"size": 0,
-"machine_spec": {
-"id": "string"
-}
-}
-},
-"node_pools": [
-{
-"quantity": 0,
-"machine_spec": {
-"id": "string"
-},
-"name": "string",
-"size": 0,
-"size_min": 0,
-"size_max": 0,
-"autoscale": true,
-"shared_networks": [
-"string"
-],
-"labels": [
-{
-"key": "string",
-"value": "string"
-}
-],
-"taints": [
-{
-"key": "string",
-"value": "string",
-"effect": "NoSchedule"
-}
-]
-}
-]
+  "name": "test-cluster-json2",
+  "kubernetes_version": {
+    "id": "8e03cd66-555b-4156-b4f6-51e1a6f15661"
+  },
+  "control_plane": {
+    "custom": {
+      "size": 1,
+      "machine_spec": {
+        "id": "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"
+      }
+    }
+  },
+  "node_pools": [
+    {
+      "quantity": 1,
+      "machine_spec": {
+        "id": "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"
+      },
+      "name": "test-node-pool-json",
+      "size": 1,
+      "autoscale": false,
+      "shared_networks": [],
+      "labels": [],
+      "taints": []
+    }
+  ]
 }

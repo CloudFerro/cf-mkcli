@@ -4,12 +4,11 @@
     "id": "b003e1cf-fd40-4ad1-827c-cc20c2ddd519"
   },
   "name": "string",
-  "size": 1,
+  "size": 2,
   "size_min": 1,
   "size_max": 3,
   "autoscale": true,
   "shared_networks": [
-    "string"
   ],
   "labels": [
     {

@@ -1,25 +1,28 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
-from mkcli.utils import names
 from .request import RequestPayload
-
-
-class KubernetesVersion(BaseModel):
-    id: str
-
-
-class ShortSpec(BaseModel):
-    id: str
+from .machine_spec import MachineSpec, MachineSpecPayload
+from .kubernetes_version import KubernetesVersion, KubernetesVersionPayload
 
 
 class ControlPlaneCustom(BaseModel):
-    size: int
-    machine_spec: ShortSpec
+    size: Optional[int] = 1
+    machine_spec: MachineSpec
+
+
+class ControlPlaneCustomPayload(BaseModel):
+    size: Optional[int] = 1
+    machine_spec: MachineSpecPayload
+
+
+class ControlPlanePayload(BaseModel):
+    custom: ControlPlaneCustomPayload
+    preset: Optional[dict] = None
 
 
 class ControlPlane(BaseModel):
-    preset: str | None = None
     custom: ControlPlaneCustom
+    preset: Optional[dict] = None
 
 
 class Label(BaseModel):
@@ -33,24 +36,24 @@ class Taint(BaseModel):
     effect: str
 
 
-class NodePool(BaseModel):
+class NodePoolPayload(BaseModel):
     quantity: int
-    machine_spec: ShortSpec
+    machine_spec: MachineSpecPayload
     name: str
     size: int
-    size_min: int
-    size_max: int
-    autoscale: bool
-    shared_networks: List[str]
-    labels: List[Label]
-    taints: List[Taint]
+    autoscale: Optional[bool] = False
+    size_min: Optional[int] = 1
+    size_max: Optional[int] = 1
+    shared_networks: List[str] = []
+    labels: List[Label] = []
+    taints: List[Taint] = []
 
 
 class ClusterPayload(RequestPayload):
-    name: Optional[str] = names.generate()
-    kubernetes_version: Optional[KubernetesVersion] = None
-    control_plane: Optional[ControlPlane]
-    node_pools: List[NodePool] = []
+    name: Optional[str]
+    kubernetes_version: Optional[KubernetesVersionPayload] = None
+    control_plane: Optional[ControlPlanePayload] = None
+    node_pools: List[NodePoolPayload] = []
 
     @classmethod
     def from_cli_args(
@@ -72,3 +75,18 @@ class ClusterPayload(RequestPayload):
             "node_pools": [],
         }
         return cls(**_payload)
+
+
+class Cluster(BaseModel):
+    id: str
+    created_at: str
+    updated_at: str
+    name: str
+    organisation_id: str
+    status: str
+    control_plane: ControlPlane
+    version: KubernetesVersion
+    metadata: dict
+    errors: List[str] = []
+
+    model_config = ConfigDict(extra="allow")

@@ -46,11 +46,11 @@ def get_machine_spec_mapping(client: MK8SClient, region_id: str) -> MachineSpecM
     return {
         machine["name"]: MachineSpec(
             id=machine["id"],
-            region_name=machine["region"],
+            region=machine["region"],
             name=machine["name"],
             cpu=machine["cpu"],
             memory=machine["memory"],
-            local_disc_size=machine["local_disk_size"],
+            local_disk_size=machine["local_disk_size"],
             is_active=machine["is_active"],
             tags=machine.get("tags", []),
             created_at=machine["created_at"],

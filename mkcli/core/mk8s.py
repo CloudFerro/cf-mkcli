@@ -1,6 +1,10 @@
 import httpx
+
+from mkcli.core.models.node_pool import NodePool
 from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
+
+from mkcli.core.models import Cluster
 
 
 class APICallError(Exception):
@@ -48,10 +52,11 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()
 
-    def get_cluster(self, cluster_id: str) -> dict:
+    def get_cluster(self, cluster_id: str) -> Cluster:
         resp = self.api.get(f"cluster/{cluster_id}")
         self._verify(resp)
-        return resp.json()
+        _dict = resp.json()
+        return Cluster.model_validate(_dict)
 
     def update_cluster(self, cluster_id: str, cluster_data: dict) -> dict:
         resp = self.api.put(f"/cluster/{cluster_id}", json=cluster_data)
@@ -82,10 +87,10 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()
 
-    def get_node_pool(self, cluster_id: str, node_pool_id: str) -> dict:
+    def get_node_pool(self, cluster_id: str, node_pool_id: str) -> NodePool:
         resp = self.api.get(f"/cluster/{cluster_id}/node-pool/{node_pool_id}")
         self._verify(resp)
-        return resp.json()
+        return NodePool.model_validate(resp.json())
 
     def update_node_pool(
         self, cluster_id: str, node_pool_id: str, node_pool_data: dict

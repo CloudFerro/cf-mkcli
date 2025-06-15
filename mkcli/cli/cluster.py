@@ -4,6 +4,7 @@ import typer
 from typing_extensions import Annotated
 
 from mkcli.core.enums import Format
+from mkcli.core.exceptions import FlavorNotFound, K8sVersionNotFound
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.models import ClusterPayload
 from mkcli.core.session import open_context_catalogue
@@ -61,7 +62,6 @@ def create(
     dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Create a new k8s cluster"""
-
     if from_json is not None:
         console.display(
             "Using provided cluster payload from JSON, ignoring other options."
@@ -75,7 +75,12 @@ def create(
             region_map = mappings.get_regions_mapping(client)
             region = region_map[state.ctx.region]
             flavor_map = mappings.get_machine_spec_mapping(client, region.id)
-            flavor = flavor_map[master_flavor]
+            flavor = flavor_map.get(master_flavor)
+
+        if flavor is None:
+            raise FlavorNotFound(
+                flavor_name=master_flavor, available_flavors=list(flavor_map.keys())
+            )
 
         new_cluster = ClusterPayload.from_cli_args(
             name=name,
@@ -103,33 +108,64 @@ def create(
 @app.command(help=_HELP["update"])
 def update(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
-    from_json: Annotated[
-        ClusterPayload,
-        typer.Option(
-            parser=ClusterPayload.from_json,
-            help=_HELP["from_json"],
-        ),
-    ] = None,  # TODO: remove default value
+    kubernetes_version: str = typer.Option(None, help=_HELP["kubernetes_version"]),
+    master_count: int = typer.Option(
+        None, help=_HELP["master_count"]
+    ),  # TODO(EA): maybe control-plane count?
+    master_flavor: str = typer.Option(None, help=_HELP["master_flavor"]),
     dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
     """Update the cluster with given id"""
-
-    console.display(f"Updating cluster {cluster_id} with data: {from_json}")
-
-    if dry_run:
+    if not kubernetes_version and not master_count and not master_flavor:
         console.display(
-            f"[bold yellow]Dry run mode:[/bold yellow] would update cluster {cluster_id} with data: {from_json}"
+            "[bold red]No options provided to update the cluster![/bold red]"
         )
-        return
-
-    console.display(f"Updating cluster {cluster_id}\nwith {from_json}")
+        raise typer.Exit()
 
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)
-        _out = client.update_cluster(cluster_id, cluster_data=from_json.dict())
+        k8sv_map = mappings.get_kubernetes_versions_mapping(client)
 
-    console.print(_out)
+        region_map = mappings.get_regions_mapping(client)
+        region = region_map[state.ctx.region]
+        flavor_map = mappings.get_machine_spec_mapping(client, region.id)
+        cluster = client.get_cluster(cluster_id)
+
+        if kubernetes_version is not None:
+            version = k8sv_map.get(kubernetes_version)
+            if version is None:
+                raise K8sVersionNotFound(
+                    version=kubernetes_version,
+                    available_versions=list(k8sv_map.keys()),
+                )
+        if master_flavor is not None:
+            flavor = flavor_map.get(master_flavor)
+            if flavor is None:
+                raise FlavorNotFound(
+                    flavor_name=master_flavor, available_flavors=list(flavor_map.keys())
+                )
+
+        # TODO(EA): refactor it to increase readability
+        # cluster.updated_at = (
+        #     datetime.datetime.now().isoformat(timespec="microseconds") + "Z"
+        # )
+        cluster.version = flavor or cluster.version
+        cluster.control_plane.custom.machine_spec = (
+            flavor or cluster.control_plane.custom.machine_spec
+        )
+
+        if dry_run:
+            console.display(
+                f"[bold yellow]Dry run mode:[/bold yellow] would update cluster {cluster_id}"
+            )
+            console.display_json(cluster.model_dump_json())
+            return
+
+        console.display(f"Updating cluster {cluster_id} ({cluster.name}) with:")
+        payload = cluster.model_dump(exclude_unset=True)
+        console.display_json(json.dumps(payload, indent=2))
+        client.update_cluster(cluster_id, payload)
 
 
 @app.command(help=_HELP["delete"])
@@ -158,7 +194,7 @@ def delete(
         client = MK8SClient(state)
 
         client.delete_cluster(cluster_id)
-        console.display("Cluster {cluster_id} deleted.")
+        console.display(f"Cluster {cluster_id} deleted.")
 
 
 @app.command(name="list", help=_HELP["list"])
@@ -171,6 +207,10 @@ def _list(
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)
+        region_map = mappings.get_regions_mapping(client)
+        region = region_map[state.ctx.region]
+        flavor_map = mappings.get_machine_spec_mapping(client, region.id)
+        reversed_flavor_map = {v.id: v for v in flavor_map.values()}
         clusters = client.get_clusters()
 
         match format:
@@ -186,6 +226,7 @@ def _list(
                         "ID",
                         "Name",
                         "Status",
+                        "Flavor",
                         "Created At",
                         "Updated At",
                     ],
@@ -194,6 +235,9 @@ def _list(
                             cluster["id"],
                             cluster["name"],
                             cluster["status"],
+                            reversed_flavor_map.get(
+                                cluster["control_plane"]["custom"]["machine_spec"]["id"]
+                            ).name,
                             cluster["created_at"],
                             cluster["updated_at"],
                         ]
@@ -213,7 +257,8 @@ def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
         client = MK8SClient(state)
         _out = client.get_cluster(cluster_id)
 
-    console.display_json(json.dumps(_out, indent=2))
+    console.display(f"Cluster details for {cluster_id}:")
+    console.display(_out)
 
 
 @app.command(help=_HELP["get_kubeconfig"])

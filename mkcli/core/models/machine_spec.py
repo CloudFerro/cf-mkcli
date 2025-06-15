@@ -1,17 +1,22 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 
 
-class MachineSpec(BaseModel):  # Flavor
-    id: str
-    region_name: str
+class MachineSpecPayload(BaseModel):
+    id: str = Field(..., description="Unique identifier for the machine spec")
+
+
+class MachineSpec(MachineSpecPayload):  # Flavor
+    region_name: str = Field(
+        alias="region", description="Region where the machine spec is available"
+    )
     name: str = Field(..., description="Name of the machine specification")
 
     cpu: int = Field(..., description="Number of CPU cores")
     memory: int = Field(..., description="Memory in MB")
-    local_disc_size: int = Field(..., description="Disk size in GB")
+    local_disk_size: int = Field(..., description="Disk size in GB")
     is_active: bool = Field(..., description="Is this machine spec active?")
     tags: list[str] = Field(
         default_factory=list,
@@ -20,6 +25,10 @@ class MachineSpec(BaseModel):  # Flavor
     created_at: datetime = Field(..., description="Creation time")
     updated_at: datetime = Field(..., description="Last update time")
 
+    @field_serializer("created_at", "updated_at")
+    def serialize_created_at(self, value: datetime):
+        return value.isoformat(timespec="microseconds").replace("+00:00", "") + "Z"
+
     def as_table_row(self):
         return [
             self.id,
@@ -27,7 +36,7 @@ class MachineSpec(BaseModel):  # Flavor
             self.name,
             self.cpu,
             self.memory,
-            self.local_disc_size,
+            self.local_disk_size,
             "Yes" if self.is_active else "No",
             ", ".join(self.tags) if self.tags else "None",
             self.created_at.isoformat(),
@@ -41,7 +50,7 @@ class MachineSpec(BaseModel):  # Flavor
             "name": self.name,
             "cpu": self.cpu,
             "memory": self.memory,
-            "local_disc_size": self.local_disc_size,
+            "local_disk_size": self.local_disk_size,
             "is_active": self.is_active,
             "tags": self.tags,
             "created_at": self.created_at.isoformat(),

@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 
 
-class KubernetesVersion(BaseModel):
+class KubernetesVersionPayload(BaseModel):
     id: str = Field(..., description="Unique identifier for the Kubernetes version")
+
+
+class KubernetesVersion(KubernetesVersionPayload):
     version: str = Field(..., description="Kubernetes version number")
     is_active: bool = Field(
         ..., description="Indicates if this Kubernetes version is currently active"
@@ -16,6 +19,10 @@ class KubernetesVersion(BaseModel):
         ...,
         description="Timestamp when the Kubernetes version was last updated",
     )
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_created_at(self, value: datetime):
+        return value.isoformat(timespec="microseconds").replace("+00:00", "") + "Z"
 
     def as_table_row(self):
         return [
