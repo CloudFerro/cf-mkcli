@@ -133,27 +133,21 @@ def update(
         cluster = client.get_cluster(cluster_id)
 
         if kubernetes_version is not None:
-            version = k8sv_map.get(kubernetes_version)
-            if version is None:
+            try:
+                cluster.version = k8sv_map[kubernetes_version]
+            except KeyError:
                 raise K8sVersionNotFound(
                     version=kubernetes_version,
                     available_versions=list(k8sv_map.keys()),
                 )
+
         if master_flavor is not None:
-            flavor = flavor_map.get(master_flavor)
-            if flavor is None:
+            try:
+                cluster.control_plane.custom.machine_spec = flavor_map[master_flavor]
+            except KeyError:
                 raise FlavorNotFound(
                     flavor_name=master_flavor, available_flavors=list(flavor_map.keys())
                 )
-
-        # TODO(EA): refactor it to increase readability
-        # cluster.updated_at = (
-        #     datetime.datetime.now().isoformat(timespec="microseconds") + "Z"
-        # )
-        cluster.version = flavor or cluster.version
-        cluster.control_plane.custom.machine_spec = (
-            flavor or cluster.control_plane.custom.machine_spec
-        )
 
         if dry_run:
             console.display(
@@ -163,9 +157,11 @@ def update(
             return
 
         console.display(f"Updating cluster {cluster_id} ({cluster.name}) with:")
-        payload = cluster.model_dump(exclude_unset=True)
+        payload = cluster.model_dump()
+        out = client.update_cluster(cluster_id, payload)
         console.display_json(json.dumps(payload, indent=2))
-        client.update_cluster(cluster_id, payload)
+        console.display(f"Cluster {cluster_id} updated:")
+        console.display_json(json.dumps(out, indent=2))
 
 
 @app.command(help=_HELP["delete"])
