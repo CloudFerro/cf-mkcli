@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import List, Optional
+
+from .labels import Label, Taint
 from .request import RequestPayload
 from .machine_spec import MachineSpec, MachineSpecPayload
 from .kubernetes_version import KubernetesVersion, KubernetesVersionPayload
@@ -23,17 +25,6 @@ class ControlPlanePayload(BaseModel):
 class ControlPlane(BaseModel):
     custom: ControlPlaneCustom
     preset: Optional[dict] = None
-
-
-class Label(BaseModel):
-    key: str
-    value: str
-
-
-class Taint(BaseModel):
-    key: str
-    value: str
-    effect: str
 
 
 class NodePoolPayload(BaseModel):

@@ -581,6 +581,8 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 0]
 * `--shared-networks TEXT`: List of shared networks for the node pool
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool  [default: no-autoscale]
+* `--labels _PARSE_LABELS`: List of labels in the format &#x27;key=value&#x27;, e.g. &#x27;env=prod&#x27;
+* `--taints _PARSE_TAINTS`: List of taints in the format &#x27;key=value:effect&#x27;, e.g. &#x27;key=value:NoSchedule&#x27;
 * `--from-json FROM_JSON`: Node-pool payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
@@ -626,7 +628,6 @@ $ node-pool update [OPTIONS] CLUSTER_ID NODE_POOL_ID
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool
 * `--shared-networks TEXT`: List of shared networks for the node pool
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool
-* `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
 ### `node-pool show`

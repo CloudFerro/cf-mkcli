@@ -1,5 +1,5 @@
 import json
-from typing import Annotated
+from typing import Annotated, List
 
 import typer
 
@@ -7,6 +7,7 @@ from mkcli.core import mappings
 from mkcli.core.enums import Format
 from mkcli.core.exceptions import FlavorNotFound
 from mkcli.core.models import NodePoolPayload
+from mkcli.core.models.labels import Label, Taint
 from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console, names
@@ -31,11 +32,24 @@ _HELP: dict = {
     "dry_run": "If True, do not perform any actions, just print the payload",
     "format": "Output format, either 'table' or 'json'",
     "shared_networks": "List of shared networks for the node pool",
+    "labels": "List of labels in the format 'key=value', e.g. 'env=prod'",
+    "taints": "List of taints in the format 'key=value:effect', e.g. 'key=value:NoSchedule'",
 }
 
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 DEFAULT_NODEPOOL = NodePoolPayload()
+
+
+def _parse_labels(value):
+    k, v = value.split("=")
+    return Label(key=k.strip(), value=v.strip())
+
+
+def _parse_taints(value):
+    key, _v = value.split("=")
+    value, effect = _v.split(":")
+    return Taint(key=key.strip(), value=value.strip(), effect=effect.strip())
 
 
 @app.command()
@@ -48,6 +62,20 @@ def create(
     max_nodes: int = typer.Option(DEFAULT_NODEPOOL.size_max, help=_HELP["max_nodes"]),
     shared_networks: list[str] = typer.Option(None, help=_HELP["shared_networks"]),
     autoscale: bool = typer.Option(DEFAULT_NODEPOOL.autoscale, help=_HELP["autoscale"]),
+    labels: Annotated[
+        List[Label],
+        typer.Option(
+            parser=_parse_labels,
+            help=_HELP["labels"],
+        ),
+    ] = None,
+    taints: Annotated[
+        List[Taint],
+        typer.Option(
+            parser=_parse_taints,
+            help=_HELP["taints"],
+        ),
+    ] = None,
     from_json: Annotated[
         NodePoolPayload,
         typer.Option(
@@ -89,6 +117,8 @@ def create(
             "autoscale": autoscale,
             "shared_networks": shared_networks or [],
             "machine_spec": {"id": flavor.id},
+            "labels": labels or [],
+            "taints": taints or [],  # TODO: add taints support
         }
 
         new_nodepool = NodePoolPayload.model_validate(node_pool_data)
@@ -156,10 +186,26 @@ def update(
     max_nodes: int = typer.Option(None, help=_HELP["max_nodes"]),
     shared_networks: list[str] = typer.Option(None, help=_HELP["shared_networks"]),
     autoscale: bool = typer.Option(None, help=_HELP["autoscale"]),
+    labels: Annotated[
+        List[Label],
+        typer.Option(
+            parser=_parse_labels,
+            help=_HELP["labels"],
+        ),
+    ] = None,
+    taints: Annotated[
+        List[Taint],
+        typer.Option(
+            parser=_parse_taints,
+            help=_HELP["taints"],
+        ),
+    ] = None,
 ):
     """Update the node pool with given id"""
 
-    if not any([node_count, min_nodes, max_nodes, shared_networks, autoscale]):
+    if not any(
+        [node_count, min_nodes, max_nodes, shared_networks, autoscale, labels, taints]
+    ):
         console.display(
             "At least one of the options must be provided to update the node pool."
         )
@@ -183,15 +229,19 @@ def update(
             if shared_networks is not None
             else node_pool.shared_networks
         )
+        node_pool.labels = labels if labels is not None else node_pool.labels
+        node_pool.taints = taints if taints is not None else node_pool.taints
 
+        console.display_json(node_pool.model_dump_json(indent=2))
         # Update the node pool
         updated_node_pool = client.update_node_pool(
             cluster_id=cluster_id,
             node_pool_id=node_pool_id,
-            node_pool_data=node_pool.dict(),
+            node_pool_data=node_pool.model_dump(),
         )
 
-    console.display(f"Node Pool updated: {updated_node_pool}")
+    console.display("Node Pool updated:")
+    console.display_json(json.dumps(updated_node_pool))
 
 
 @app.command(name="show")

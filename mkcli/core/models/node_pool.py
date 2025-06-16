@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, field_serializer
 from typing import List, Optional
 from mkcli.utils import names
+from .labels import Label, Taint
 from .request import RequestPayload
 
 
@@ -23,8 +24,8 @@ class NodePoolPayload(RequestPayload):
     autoscale: bool = False
 
     shared_networks: List[str] = []
-    labels: List[dict] = []
-    taints: List[dict] = []
+    labels: List[Label] = []
+    taints: List[Taint] = []
 
     model_config = ConfigDict(extra="allow")
 
