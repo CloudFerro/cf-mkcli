@@ -4,7 +4,7 @@ from mkcli.core.models.node_pool import NodePool
 from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 
-from mkcli.core.models import Cluster
+from mkcli.core.models import Cluster, Region
 
 
 class APICallError(Exception):
@@ -79,10 +79,10 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()["kubeconfig"]
 
-    def list_node_pools(self, cluster_id: str) -> list:
+    def list_node_pools(self, cluster_id: str) -> list[NodePool]:
         resp = self.api.get(f"/cluster/{cluster_id}/node-pool")
         self._verify(resp)
-        return resp.json()["items"]
+        return [NodePool.model_validate(item) for item in resp.json().get("items", [])]
 
     def create_node_pool(self, cluster_id: str, node_pool_data: dict) -> dict:
         resp = self.api.post(f"/cluster/{cluster_id}/node-pool", json=node_pool_data)
@@ -117,10 +117,10 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()["items"]
 
-    def list_regions(self) -> list:
+    def list_regions(self) -> list[Region]:
         resp = self.api.get("/region", headers=self.headers)
         self._verify(resp)
-        return resp.json()["items"]
+        return [Region.model_validate(item) for item in resp.json().get("items", [])]
 
     def get_region(self, name) -> dict:
         params = {"name": name} if name else {}

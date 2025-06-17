@@ -9,6 +9,10 @@ from rich.console import Console
 from rich.table import Table
 
 
+HIGHLIGHTED: str = "italic bright_green"
+INACTIVE: str = "dim"
+
+
 class ResourceTable:
     def __init__(self, columns: list[str], title: str) -> None:
         self.console = Console()

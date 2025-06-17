@@ -8,6 +8,7 @@ from mkcli.core.enums import Format
 from mkcli.core.exceptions import FlavorNotFound
 from mkcli.core.models import NodePoolPayload
 from mkcli.core.models.labels import Label, Taint
+from mkcli.core.models.node_pool import NodePool
 from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console, names
@@ -150,32 +151,23 @@ def _list(
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)
-        region_map = mappings.get_regions_mapping(client)
-        region = region_map[state.ctx.region]
-        flavor_map = mappings.get_machine_spec_mapping(client, region.id)
-        reversed_flavor_map = {v.id: v for v in flavor_map.values()}
         node_pools = client.list_node_pools(cluster_id)
 
     match format:
         case Format.JSON:
-            console.display(json.dumps({"node-pools": node_pools}, indent=2))
-        case Format.TABLE:
-            console.display_table(
-                title=f"Node Pools in Cluster {cluster_id}",
-                columns=["ID", "Name", "Autoscale", "Status", "Flavor"],
-                rows=[
-                    [
-                        np["id"],
-                        np["name"],
-                        np["autoscale"],
-                        np["status"],
-                        reversed_flavor_map.get(np["machine_spec"]["id"]).name
-                        if np["machine_spec"]
-                        else "N/A",
-                    ]
-                    for np in node_pools
-                ],
+            console.display(
+                json.dumps(
+                    {"node-pools": [np.model_dump() for np in node_pools]}, indent=2
+                )
             )
+        case Format.TABLE:
+            table = console.ResourceTable(
+                title=f"Node Pools in Cluster {cluster_id}",
+                columns=NodePool.table_columns,
+            )
+            for np in node_pools:
+                table.add_row(np.as_table_row())
+            table.display()
 
 
 @app.command(help=_HELP["update"])

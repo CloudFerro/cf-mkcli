@@ -29,12 +29,7 @@ def get_kubernetes_versions_mapping(client: MK8SClient) -> KubernetesVersionMapp
 @cache()
 def get_regions_mapping(client: MK8SClient) -> RegionNameIdMapping:
     regions = client.list_regions()
-    return {
-        region["name"]: Region(
-            name=region["name"], id=region["id"], is_active=region["is_active"]
-        )
-        for region in regions
-    }
+    return {region.name: region for region in regions}
 
 
 @cache()

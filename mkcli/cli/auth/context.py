@@ -59,19 +59,12 @@ def _list(
         case Format.TABLE:
             table = console.ResourceTable(
                 title="Available Auth Contexts",
-                columns=[
-                    "Name",
-                    "Client_id",
-                    "Realm",
-                    "Scope",
-                    "Region",
-                    "Identity server",
-                ],
+                columns=Context.table_columns,
             )
             for ctx in contexts:
                 table.add_row(
                     ctx.as_table_row(),
-                    style="italic bright_green" if ctx.name == cat.current else None,
+                    style=console.HIGHLIGHTED if ctx.name == cat.current else None,
                 )
             table.display()
             console.draw_rule()

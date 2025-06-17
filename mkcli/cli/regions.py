@@ -4,6 +4,7 @@ import typer
 
 from mkcli.core import mappings
 from mkcli.core.mk8s import MK8SClient
+from mkcli.core.models import Region
 from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
@@ -34,12 +35,20 @@ def _list(
 
         match format:
             case Format.TABLE:
-                console.display_table(
+                table = console.ResourceTable(
                     title="Available Regions",
-                    columns=["ID", "Name", "Created At", "Updated At", "Is Active"],
-                    rows=[v.as_table_row() for v in region_map.values()],
+                    columns=Region.table_columns,
                 )
+                for region in region_map.values():
+                    table.add_row(
+                        region.as_table_row(),
+                        style="dim" if not region.is_active else None,
+                    )
+                table.display()
             case Format.JSON:
                 console.display_json(
-                    json.dumps({key: value.dict() for key, value in region_map.items()})
+                    json.dumps(
+                        {"regions": [r.model_dump() for r in region_map.values()]},
+                        indent=2,
+                    )
                 )
