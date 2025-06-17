@@ -4,6 +4,7 @@ import typer
 
 from mkcli.core import mappings
 from mkcli.core.mk8s import MK8SClient
+from mkcli.core.models import MachineSpec
 from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
@@ -36,22 +37,14 @@ def _list(
 
     match format:
         case Format.TABLE:
-            console.display_table(
-                title="Available Kubernetes Versions",
-                columns=[
-                    "ID",
-                    "Region",
-                    "Name",
-                    "CPU",
-                    "Memory",
-                    "Local Disk Size",
-                    "Is Active",
-                    "Tags",
-                    "Created At",
-                    "Updated At",
-                ],
-                rows=[v.as_table_row() for v in flavor_map.values()],
+            table = console.ResourceTable(
+                title="Available Kubernetes Flavors", columns=MachineSpec.table_columns
             )
+            for flavor in flavor_map.values():
+                table.add_row(
+                    flavor.as_table_row(), style="dim" if not flavor.is_active else None
+                )
+            table.display()
         case Format.JSON:
             console.display_json(
                 json.dumps(

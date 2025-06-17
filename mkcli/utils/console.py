@@ -1,5 +1,4 @@
 from typing import (
-    ContextManager,
     Optional,
     Any,
 )
@@ -8,6 +7,27 @@ import rich.rule
 from rich import box, print, print_json
 from rich.console import Console
 from rich.table import Table
+
+
+SHOW_INACTIVE_RESOURCES = False
+
+
+class ResourceTable:
+    def __init__(self, columns: list[str], title: str) -> None:
+        self.console = Console()
+        self.table = Table(title=title, box=box.HEAVY_HEAD)
+        for col in columns:
+            self.table.add_column(col)
+
+    def add_row(self, values: list[Any], style=None) -> None:
+        """
+        Add a row to the table.
+        """
+        values = map(str, values)
+        self.table.add_row(*values, style=style)
+
+    def display(self) -> None:
+        self.console.print(self.table)
 
 
 def ok() -> None:
@@ -33,10 +53,6 @@ def display_table(columns: list[str], rows: list[list[Any]], title: str):
 
 def display(_str: Any) -> None:
     print(_str)
-
-
-def status_frame(_str: str) -> ContextManager:
-    return Console().status(_str)
 
 
 def display_json(_data: str) -> None:

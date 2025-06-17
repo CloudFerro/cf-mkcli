@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import ClassVar
 
 from pydantic import BaseModel, Field, field_serializer
 
@@ -8,6 +9,14 @@ class KubernetesVersionPayload(BaseModel):
 
 
 class KubernetesVersion(KubernetesVersionPayload):
+    table_columns: ClassVar[list[str]] = [
+        "ID",
+        "Version",
+        "Is Active",
+        "Created At",
+        "Updated At",
+    ]
+
     version: str = Field(..., description="Kubernetes version number")
     is_active: bool = Field(
         ..., description="Indicates if this Kubernetes version is currently active"
@@ -28,9 +37,9 @@ class KubernetesVersion(KubernetesVersionPayload):
         return [
             self.id,
             self.version,
+            "Yes" if self.is_active else "No",
             self.created_at.isoformat(),
             self.updated_at.isoformat(),
-            "Yes" if self.is_active else "No",
         ]
 
     def as_json(self) -> dict[str, str | bool]:

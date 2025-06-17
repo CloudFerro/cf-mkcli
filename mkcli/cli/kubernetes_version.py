@@ -9,6 +9,7 @@ from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console
 from mkcli.core.enums import Format
+from mkcli.core.models import KubernetesVersion
 
 
 _HELP: dict = {
@@ -35,11 +36,15 @@ def _list(
 
         match format:
             case Format.TABLE:
-                console.display_table(
+                table = console.ResourceTable(
                     title="Available Kubernetes Versions",
-                    columns=["ID", "Version", "Created At", "Updated At", "Is Active"],
-                    rows=[v.as_table_row() for v in k8sv_map.values()],
+                    columns=KubernetesVersion.table_columns,
                 )
+                for row in k8sv_map.values():
+                    table.add_row(
+                        row.as_table_row(), style="dim" if not row.is_active else None
+                    )
+                table.display()
             case Format.JSON:
                 console.display_json(
                     json.dumps(

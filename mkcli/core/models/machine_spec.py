@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, ClassVar
 
 from pydantic import BaseModel, Field, field_serializer
 
@@ -9,6 +9,19 @@ class MachineSpecPayload(BaseModel):
 
 
 class MachineSpec(MachineSpecPayload):  # Flavor
+    table_columns: ClassVar[list[str]] = [
+        "ID",
+        "Region",
+        "Name",
+        "CPU",
+        "Memory (MB)",
+        "Local Disk Size (GB)",
+        "Is Active",
+        "Tags",
+        "Created At",
+        "Updated At",
+    ]
+
     region_name: str = Field(
         alias="region", description="Region where the machine spec is available"
     )
@@ -29,7 +42,7 @@ class MachineSpec(MachineSpecPayload):  # Flavor
     def serialize_created_at(self, value: datetime):
         return value.isoformat(timespec="microseconds").replace("+00:00", "") + "Z"
 
-    def as_table_row(self):
+    def as_table_row(self) -> list[Any]:
         return [
             self.id,
             self.region_name,
