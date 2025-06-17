@@ -52,8 +52,8 @@ class MachineSpec(MachineSpecPayload):  # Flavor
             self.local_disk_size,
             "Yes" if self.is_active else "No",
             ", ".join(self.tags) if self.tags else "None",
-            self.created_at.isoformat(),
-            self.updated_at.isoformat(),
+            self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         ]
 
     def as_json(self) -> dict[str, Any]:
@@ -66,6 +66,6 @@ class MachineSpec(MachineSpecPayload):  # Flavor
             "local_disk_size": self.local_disk_size,
             "is_active": self.is_active,
             "tags": self.tags,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         }

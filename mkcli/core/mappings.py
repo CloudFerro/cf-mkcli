@@ -11,10 +11,7 @@ type RegionNameIdMapping = Dict[str, Region]
 type MachineSpecMapping = Dict[str, MachineSpec]
 
 
-CACHE_TTL: seconds = 3600
-
-
-@cache(ttl=CACHE_TTL)
+@cache()
 def get_kubernetes_versions_mapping(client: MK8SClient) -> KubernetesVersionMapping:
     versions = client.list_kubernetes_versions()
     return {
@@ -29,7 +26,7 @@ def get_kubernetes_versions_mapping(client: MK8SClient) -> KubernetesVersionMapp
     }
 
 
-@cache(CACHE_TTL)
+@cache()
 def get_regions_mapping(client: MK8SClient) -> RegionNameIdMapping:
     regions = client.list_regions()
     return {
@@ -40,7 +37,7 @@ def get_regions_mapping(client: MK8SClient) -> RegionNameIdMapping:
     }
 
 
-@cache(CACHE_TTL)
+@cache()
 def get_machine_spec_mapping(client: MK8SClient, region_id: str) -> MachineSpecMapping:
     machine_specs = client.list_machine_specs(region_id)
     return {

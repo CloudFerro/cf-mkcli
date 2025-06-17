@@ -118,7 +118,7 @@ def create(
             "shared_networks": shared_networks or [],
             "machine_spec": {"id": flavor.id},
             "labels": labels or [],
-            "taints": taints or [],  # TODO: add taints support
+            "taints": taints or [],
         }
 
         new_nodepool = NodePoolPayload.model_validate(node_pool_data)
@@ -128,6 +128,7 @@ def create(
             f"[bold yellow]Dry run mode:[/bold yellow] {new_nodepool.model_dump_json(indent=2)}"
         )
         return
+
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)

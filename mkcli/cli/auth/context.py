@@ -36,21 +36,12 @@ def show(
 
     match format:
         case Format.TABLE:
-            console.display_table(
-                title="Current Auth Context",
-                columns=[
-                    "Name",
-                    "Client ID",
-                    "Realm",
-                    "Scope",
-                    "Region",
-                    "Identity Server",
-                ],
-                rows=[ctx.as_table_row()],
+            table = console.ResourceTable(
+                title="Current Authorization Context",
+                columns=Context.table_columns,
             )
-            console.display(
-                f"Current auth context is:[bold green] {cat.current_context.name}[/bold green]"
-            )
+            table.add_row(ctx.as_table_row())
+            table.display()
         case Format.JSON:
             console.display_json(ctx.json())
 
@@ -66,7 +57,7 @@ def _list(
         contexts = cat.list_all()
     match format:
         case Format.TABLE:
-            console.display_table(
+            table = console.ResourceTable(
                 title="Available Auth Contexts",
                 columns=[
                     "Name",
@@ -76,12 +67,15 @@ def _list(
                     "Region",
                     "Identity server",
                 ],
-                rows=[ctx.as_table_row() for ctx in contexts],
             )
+            for ctx in contexts:
+                table.add_row(
+                    ctx.as_table_row(),
+                    style="italic bright_green" if ctx.name == cat.current else None,
+                )
+            table.display()
             console.draw_rule()
-            console.display(
-                f"Current context: [bold yellow]{cat.current}[/bold yellow]"
-            )
+            console.display(f"Current context: [bold]{cat.current}[/bold]")
             console.draw_rule()
         case Format.JSON:
             console.display_json(

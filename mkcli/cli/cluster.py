@@ -6,7 +6,7 @@ from typing_extensions import Annotated
 from mkcli.core.enums import Format
 from mkcli.core.exceptions import FlavorNotFound, K8sVersionNotFound
 from mkcli.core.mk8s import MK8SClient
-from mkcli.core.models import ClusterPayload
+from mkcli.core.models import ClusterPayload, Cluster
 from mkcli.core.session import open_context_catalogue
 from mkcli.core.state import State
 from mkcli.utils import console
@@ -203,46 +203,25 @@ def _list(
     with open_context_catalogue() as cat:
         state = State(cat.current_context)
         client = MK8SClient(state)
-        region_map = mappings.get_regions_mapping(client)
-        region = region_map[state.ctx.region]
-        flavor_map = mappings.get_machine_spec_mapping(client, region.id)
-        reversed_flavor_map = {v.id: v for v in flavor_map.values()}
         clusters = client.get_clusters()
 
         match format:
             case Format.TABLE:
-                # TODO: add info about region and machine spec using mapping
-                clusters = clusters.get(
-                    "items", []
-                )  # TODO: move operating on 'items' to client
-                # )
-                console.display_table(
-                    title="Kubernetes Clusters",
-                    columns=[
-                        "ID",
-                        "Name",
-                        "Status",
-                        "Flavor",
-                        "Created At",
-                        "Updated At",
-                    ],
-                    rows=[
-                        [
-                            cluster["id"],
-                            cluster["name"],
-                            cluster["status"],
-                            reversed_flavor_map.get(
-                                cluster["control_plane"]["custom"]["machine_spec"]["id"]
-                            ).name,
-                            cluster["created_at"],
-                            cluster["updated_at"],
-                        ]
-                        for cluster in clusters
-                    ],
+                table = console.ResourceTable(
+                    title="Kubernetes Clusters", columns=Cluster.table_columns
                 )
+                for cluster in clusters:
+                    table.add_row(
+                        cluster.as_table_row(),
+                    )
+                table.display()
                 console.display("See more details with json output format.")
             case Format.JSON:
-                console.display_json(json.dumps(clusters, indent=2))
+                console.display(
+                    json.dumps(
+                        {"clusters": [c.model_dump() for c in clusters]}, indent=2
+                    )
+                )
 
 
 @app.command(help=_HELP["show"])

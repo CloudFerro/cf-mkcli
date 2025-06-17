@@ -15,6 +15,6 @@ class Region(BaseModel):
             self.id,
             self.name,
             "Yes" if self.is_active else "No",
-            self.created_at.isoformat() if self.created_at else "N/A",
-            self.updated_at.isoformat() if self.updated_at else "N/A",
+            self.created_at.strftime("%Y-%m-%d %H:%M:%S") if self.created_at else "N/A",
+            self.updated_at.strftime("%Y-%m-%d %H:%M:%S") if self.updated_at else "N/A",
         ]

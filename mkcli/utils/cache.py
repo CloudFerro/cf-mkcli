@@ -28,8 +28,9 @@ def load(key: str) -> Any:
         return _dict[key] if key in _dict else None
 
 
-def cache(ttl: int = 60, enabled: bool = False):  # TODO: add cache auto cleanup logic
+def cache(enabled: bool = APP_SETTINGS.resource_mappings_cache) -> callable:
     """Decorator to cache the result of a function for a specified time."""
+    # TODO(EA): Implement a time-based cache invalidation mechanism
 
     def decorator(func):
         if not enabled:

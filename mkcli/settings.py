@@ -9,6 +9,7 @@ class AppSettings(BaseSettings):
     state_file: Path = "contexts.json"
     mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1"
     default_format: str = "table"
+    resource_mappings_cache: bool = False
 
     @property
     def cached_context_path(self) -> Path:

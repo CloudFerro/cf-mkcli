@@ -36,7 +36,9 @@ class MK8SClient:
         if response.status_code != 200:
             raise APICallError(response.status_code, response.text)
 
-    def get_clusters(self, organisation_id=None, order_by=None, region=None) -> list:
+    def get_clusters(
+        self, organisation_id=None, order_by=None, region=None
+    ) -> list[Cluster]:
         params = {
             "organisationId": organisation_id,
             "orderBy": order_by,
@@ -44,7 +46,7 @@ class MK8SClient:
         }
         resp = self.api.get("/cluster", headers=self.headers, params=params)
         self._verify(resp)
-        return resp.json()
+        return [Cluster.model_validate(item) for item in resp.json().get("items", [])]
 
     def create_cluster(self, cluster_data: dict | str, organisation_id=None) -> dict:
         params = {"organisationId": organisation_id}
@@ -110,9 +112,7 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()["items"]
 
-    def list_machine_specs(
-        self, region_id: str | None
-    ) -> list:  # TODO: add region filter
+    def list_machine_specs(self, region_id: str | None) -> list:
         resp = self.api.get(f"/region/{region_id}/machine-spec", headers=self.headers)
         self._verify(resp)
         return resp.json()["items"]

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import json
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, ClassVar
 from pathlib import Path
 
 from loguru import logger
@@ -10,11 +10,18 @@ from mkcli.core.models import Token
 from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS
 
 
-# NOTE(EA): this code comes from https://gitlab.cloudferro.com/jtompolski/CFCliV4
-# TODO(EA): refactor it, move const out of here etc.
-
-
 class Context(BaseModel):
+    """Represents a connection context for authentication with an identity server."""
+
+    table_columns: ClassVar[list[str]] = [
+        "Name",
+        "Client ID",
+        "Realm",
+        "Scope",
+        "Region",
+        "Identity Server",
+    ]
+
     name: str
     client_id: str
     realm: str

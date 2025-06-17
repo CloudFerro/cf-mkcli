@@ -38,8 +38,8 @@ class KubernetesVersion(KubernetesVersionPayload):
             self.id,
             self.version,
             "Yes" if self.is_active else "No",
-            self.created_at.isoformat(),
-            self.updated_at.isoformat(),
+            self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
         ]
 
     def as_json(self) -> dict[str, str | bool]:

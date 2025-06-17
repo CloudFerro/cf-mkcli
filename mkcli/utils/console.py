@@ -9,9 +9,6 @@ from rich.console import Console
 from rich.table import Table
 
 
-SHOW_INACTIVE_RESOURCES = False
-
-
 class ResourceTable:
     def __init__(self, columns: list[str], title: str) -> None:
         self.console = Console()
