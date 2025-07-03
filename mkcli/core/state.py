@@ -49,6 +49,9 @@ class State:
             client_id=self.ctx.client_id,
             realm_name=self.ctx.realm,
         )
+        logger.info(
+            f"KeycloakOpenID(server_url={self.ctx.identity_server_url}, client_id={self.ctx.client_id}, realm_name={self.ctx.realm})"
+        )
         return self._keycloak_openid
 
     def _renew_token_with_refresh_token(self) -> None:

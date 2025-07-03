@@ -48,6 +48,8 @@ class ClusterPayload(RequestPayload):
     control_plane: Optional[ControlPlanePayload] = None
     node_pools: List[NodePoolPayload] = []
 
+    model_config = ConfigDict(extra="allow")
+
     @classmethod
     def from_cli_args(
         cls,
@@ -88,7 +90,8 @@ class Cluster(BaseModel):
     status: str
     control_plane: ControlPlane
     version: KubernetesVersion
-    metadata: dict
+    metadata: dict | None = None
+    is_active: bool | None = None
     errors: List[str] = []
 
     @field_serializer("created_at", "updated_at")

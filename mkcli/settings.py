@@ -1,7 +1,12 @@
+import os
+
 from platformdirs import user_cache_dir
 import typer
 from pydantic_settings import BaseSettings
 from pathlib import Path
+
+
+ENV: str = os.getenv("MKCLI_ENV")
 
 
 class AppSettings(BaseSettings):
@@ -20,6 +25,14 @@ class AppSettings(BaseSettings):
         return Path(user_cache_dir(self.name))
 
 
+class LocalAppSettings(AppSettings):
+    name: str = "mkcli-local"
+    state_file: Path = "contexts-local.json"
+    mk8s_api_url: str = "http://localhost:10000/api/v1/"
+    default_format: str = "table"
+    resource_mappings_cache: bool = False
+
+
 class DefaultContextSettings(BaseSettings):
     name: str = "creodias"
     realm: str = "Creodias-new"
@@ -35,5 +48,8 @@ class DefaultClusterSettings(BaseSettings):
     master_flavor: str = "hma.medium"
 
 
-APP_SETTINGS = AppSettings()
+if ENV == "dev":
+    APP_SETTINGS = LocalAppSettings()
+else:
+    APP_SETTINGS = AppSettings()
 DEFAULT_CTX_SETTINGS = DefaultContextSettings()
