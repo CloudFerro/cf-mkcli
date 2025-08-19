@@ -6,7 +6,6 @@ import typer
 from mkcli.core.enums import Format
 from mkcli.core.models.context import default_context, Context
 from mkcli.core.session import open_context_catalogue
-from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console
 
 
@@ -20,9 +19,7 @@ app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 @app.command()
 def show(
-    format: Annotated[
-        Format, typer.Option("--format", "-f")
-    ] = APP_SETTINGS.default_format,
+    format: Annotated[Format, typer.Option("--format", "-f")] = Format.TABLE,
 ):
     """Show current auth context"""
     with open_context_catalogue() as cat:
@@ -48,9 +45,7 @@ def show(
 
 @app.command(name="list")
 def _list(
-    format: Annotated[
-        Format, typer.Option("--format", "-f")
-    ] = APP_SETTINGS.default_format,
+    format: Annotated[Format, typer.Option("--format", "-f")] = Format.TABLE,
 ):
     """Remove given auth context from the catalogue"""
     with open_context_catalogue() as cat:
@@ -108,7 +103,7 @@ def add(
         identity_server_url=identity_server,
         public_key=None,
     )
-    console.display_json(new_ctx.json())
+    console.display_json(new_ctx.model_dump_json())
 
     with open_context_catalogue() as cat:
         if name in cat.list_available():
@@ -180,25 +175,26 @@ def duplicate(
 def edit(
     ctx: Annotated[str, typer.Argument(help="Name of the auth context to update")],
     name: Annotated[
-        str,
-        typer.Option("--name", "-n", help="Name for the new auth context"),
+        str | None,
+        typer.Option("--name", "-n", help="New name of the edited auth context"),
     ] = None,
     client_id: Annotated[
-        str, typer.Option("--client_id", help="Client ID for the new auth context")
+        str | None,
+        typer.Option("--client_id", help="New Client ID for the edited auth context"),
     ] = None,
     realm: Annotated[
-        str, typer.Option("--realm", help="Realm for the new auth context")
+        str | None, typer.Option("--realm", help="Realm for the edited auth context")
     ] = None,
     scope: Annotated[
-        str, typer.Option("--scope", help="Scope for the new auth context")
+        str | None, typer.Option("--scope", help="Scope for the edited auth context")
     ] = None,
     region: Annotated[
-        str, typer.Option("--region", help="Region for the new auth context")
+        str | None, typer.Option("--region", help="Region for the edited auth context")
     ] = None,
     identity_server: Annotated[
-        str,
+        str | None,
         typer.Option(
-            "--identity_server", help="Identity server URL for the new auth context"
+            "--identity_server", help="Identity server URL for the edited auth context"
         ),
     ] = None,
 ):
@@ -208,14 +204,14 @@ def edit(
             console.display(f"[bold red]Auth context '{ctx}' not found![/bold red]")
             typer.Abort()
 
-        context = cat.pop(ctx)
-
         if name in cat.list_available():
             console.display(
                 f"[bold red]Auth context named '{name}' already exists![/bold red]. Aborting."
             )
             typer.Abort()
 
+        context = cat.get(ctx)
+        is_active = context.name == cat.current
         context.name = name or context.name
         context.client_id = client_id or context.client_id
         context.realm = realm or context.realm
@@ -223,11 +219,13 @@ def edit(
         context.region = region or context.region
         context.identity_server_url = identity_server or context.identity_server_url
 
+        cat.delete(ctx)
+        if is_active:
+            cat.current = context.name
         cat.add(context)
 
-        console.display(f"[bold green]Edited auth context '{ctx}'![/bold green]")
-        console.display("New context data:")
-        console.display_json(context.as_json())
+        console.display(f"[bold green]Edited auth context '{ctx}'[/bold green]")
+        console.display(context.as_json())  # type: ignore
 
 
 @app.command()

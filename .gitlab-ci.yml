@@ -1,0 +1,56 @@
+variables:
+  POETRY_VERSION: "1.7.1"
+
+stages:
+  - test
+
+
+.base_ruff:
+  stage: test
+  interruptible: true
+  tags:
+    - kubernetes
+  image:
+    name: ghcr.io/astral-sh/ruff:0.12.9-alpine
+  before_script:
+    - ruff --version
+
+
+ruff_check:
+  extends: .base_ruff
+  only:
+    - merge_requests
+  script:
+    - ruff check --output-format=gitlab > code-quality-report.json
+
+ruff_format:
+  extends: .base_ruff
+  only:
+    - merge_requests
+  script:
+    - ruff format --diff
+
+
+tests:
+  stage: test
+  only:
+    - merge_requests
+  image: "python:3.12"
+  variables:
+    ENV: test
+  tags:
+    - kubernetes
+  before_script:
+    - pip install poetry=="$POETRY_VERSION" && poetry config virtualenvs.create false
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cloudferro.com/".insteadOf "https://gitlab.cloudferro.com/"
+    - poetry install --with dev
+  script:
+    - pytest --junitxml=report.xml
+
+  artifacts:
+    when: always
+    expire_in: 2 days
+    reports:
+      junit: report.xml
+    paths:
+      - .pytest_cache/

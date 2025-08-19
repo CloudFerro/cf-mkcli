@@ -1,11 +1,13 @@
 from contextlib import contextmanager
-from mkcli.core.models.context import ContextCatalogue
+from mkcli.core.models.context import ContextCatalogue, JsonStorage
 
 
 @contextmanager
-def open_context_catalogue() -> "ContextCatalogue":
+def open_context_catalogue():
     """Context manager to open a ContextCatalogue and ensure it is closed properly."""
-    cat = ContextCatalogue.from_storage()
+    storage = JsonStorage()
+    cat = ContextCatalogue(storage=storage)
+
     try:
         yield cat
     finally:

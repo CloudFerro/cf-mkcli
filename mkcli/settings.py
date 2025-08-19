@@ -4,16 +4,16 @@ from platformdirs import user_cache_dir
 import typer
 from pydantic_settings import BaseSettings
 from pathlib import Path
+from mkcli.core.enums import Format
 
-
-ENV: str = os.getenv("MKCLI_ENV")
+ENV: str = os.getenv("MKCLI_ENV") or ""
 
 
 class AppSettings(BaseSettings):
     name: str = "mkcli"
-    state_file: Path = "contexts.json"
+    state_file: Path = Path("contexts.json")
     mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1"
-    default_format: str = "table"
+    default_format: str = Format.TABLE
     resource_mappings_cache: bool = False
 
     @property
@@ -27,14 +27,14 @@ class AppSettings(BaseSettings):
 
 class LocalAppSettings(AppSettings):
     name: str = "mkcli-local"
-    state_file: Path = "contexts-local.json"
+    state_file: Path = Path("contexts-local.json")
     mk8s_api_url: str = "http://localhost:10000/api/v1/"
-    default_format: str = "table"
+    default_format: str = Format.TABLE
     resource_mappings_cache: bool = False
 
 
 class DefaultContextSettings(BaseSettings):
-    name: str = "creodias"
+    name: str = "default"
     realm: str = "Creodias-new"
     client_id: str = "managed-kubernetes"
     scope: str = "email profile openid"
@@ -52,4 +52,5 @@ if ENV == "dev":
     APP_SETTINGS = LocalAppSettings()
 else:
     APP_SETTINGS = AppSettings()
+
 DEFAULT_CTX_SETTINGS = DefaultContextSettings()

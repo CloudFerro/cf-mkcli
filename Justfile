@@ -28,7 +28,6 @@ unhook:
 
 docs:
     python -m typer mkcli/main.py utils docs --title "mkcli reference documentation" --output docs/reference/cli.md  # Update CLI documentation
-    echo '[[_TOC_]]' > README.md  # clear README.md
     cat docs/intro.md >> README.md  # add intro
     echo '' >> README.md  # add a newline
     cat docs/guides/installation.md >> README.md  # add installation

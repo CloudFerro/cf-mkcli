@@ -1,13 +1,15 @@
 from __future__ import annotations
 import json
-from typing import Dict, Optional, Any, ClassVar
+from typing import Dict, Optional, Any, ClassVar, Protocol
 from pathlib import Path
-
 from loguru import logger
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
+from mkcli.core import exceptions as exc
 from mkcli.core.models import Token
 from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS
+
+type key = str | None
 
 
 class Context(BaseModel):
@@ -55,45 +57,53 @@ class Context(BaseModel):
         }
 
 
-default_context = Context(**DEFAULT_CTX_SETTINGS.dict())
+default_context = Context(**DEFAULT_CTX_SETTINGS.model_dump())
 
 
-class ContextStorage:
-    PATH_PATTERN: Path = APP_SETTINGS.cached_context_path
+class ContextStorage(Protocol):
+    """Protocol for context storage, defines methods for saving and loading contexts."""
+
+    def ensure_exists(self) -> None: ...
+
+    def init_storage(self, _data: dict) -> None: ...
+
+    def save(self, _dict: dict) -> None: ...
+
+    def load(self) -> dict: ...
+
+    def clear(self) -> None: ...
+
+
+class JsonStorage:
+    PATH_PATTERN: Path = APP_SETTINGS.cached_context_path  # TODO(EA): rename
 
     def __init__(self):
         self.path: Path = self.PATH_PATTERN
-        self._ensure_file_exists()
 
-    def _ensure_file_exists(self):
-        """Ensure that the context file exists, if not create it"""
+    def ensure_exists(self):
         if not self.path.is_file():
-            self.path.parent.mkdir(parents=True, exist_ok=True)
+            raise FileNotFoundError(f"Context file {self.path} does not exist.")
 
-    def save_all(self, cat: ContextCatalogue) -> None:
-        """Write the context data catalogue to the storage"""
+    def init_storage(self, _data: dict) -> None:
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.touch(exist_ok=True)
         with open(self.path, "w") as f:
-            f.write(cat.model_dump_json())
+            f.write(json.dumps(_data))
+
+    def save(self, _dict: dict) -> None:
+        with open(self.path, "w") as f:
+            f.write(json.dumps(_dict))
         logger.info(f"Data saved to {self.path}")
 
-    def load_all(self) -> ContextCatalogue:
-        """Read the context data catalogue from the storage"""
-        try:
-            with open(self.path, "r") as f:
+    def load(self) -> dict:
+        with open(self.path, "r") as f:
+            try:
                 logger.info(f"Data loaded from {self.path}")
-                data = json.load(f)
-                cat = ContextCatalogue.model_validate(data)
-        except FileNotFoundError:
-            logger.warning(
-                f"Context file {self.path} not found, creating new catalogue."
-            )
-            raise FileNotFoundError(
-                f"Context file {self.path} not found. Please create a context first. With `mkcli auth init`"
-            )
-        return cat
+                return json.load(f)
+            except json.JSONDecodeError:
+                raise exc.InvalidFileLayout(file_path=str(self.path))
 
     def clear(self) -> None:
-        """Clear the context data catalogue"""
         if self.path.is_file():
             self.path.unlink()
             logger.info(f"Context file {self.path} cleared.")
@@ -102,25 +112,42 @@ class ContextStorage:
                 f"Context file {self.path} does not exist, nothing to clear."
             )
 
+    def __repr__(self):
+        return f"JsonStorage(path={self.path})"
 
-class ContextCatalogue(BaseModel):
+
+class ContextCatalogue:
     """Catalogue of contexts, used to store and manage multiple connection contexts."""
 
-    cat: Dict[str, Context] = {default_context.name: default_context}
-    current: str = default_context.name
+    def __init__(self, storage: ContextStorage) -> None:
+        self.current: str | None = None
+        self.cat: Dict[key, Context] = {}
 
-    storage: ContextStorage = Field(default_factory=ContextStorage, exclude=True)
+        self.storage: ContextStorage = storage
+        self.ensure_storage()
+        self.load()
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-    )
+    def ensure_storage(self):
+        """Ensure the context storage is initialized and ready to use"""
+        try:
+            self.storage.ensure_exists()
+        except FileNotFoundError:
+            self.storage.init_storage({"current": None, "cat": {}})
+        except json.JSONDecodeError:
+            raise exc.InvalidFileLayout(file_path=str(self.storage))
+
+    def load(self):
+        """Load the context catalogue from storage"""
+        # try:
+        data = self.storage.load()
+        self.current = data.get("current")
+        self.cat = {name: Context(**ctx) for name, ctx in data.get("cat", {}).items()}
 
     def switch(self, value: str):
         """Set the current context by name"""
         if value not in self.cat:
-            raise ValueError(
-                f"Context '{value}' does not exist in the catalogue."
-                f" Available contexts: {self.list_available()}"
+            raise exc.ContextNotFound(
+                context_name=value, available_contexts=self.list_available()
             )
         self.current = value
         self.save()
@@ -128,37 +155,42 @@ class ContextCatalogue(BaseModel):
 
     @property
     def current_context(self) -> Context:
-        return self.cat[self.current]  # TODO: maybe setter
+        try:
+            return self.cat[self.current]
+        except KeyError:
+            raise exc.NoActiveSession()
+
+    def save(self):
+        """Save the current context to the storage"""
+        self.storage.save(self.as_dict())
+        logger.info("Context catalogue saved.")
 
     def add(self, item: Context):
+        """Add a new context to the catalogue"""
         self.cat[item.name] = item
         self.save()
         logger.info(f"Context '{item.name}' added to the catalogue.")
 
-    def pop(self, name):
-        """Get and remove a context from the catalogue by name"""
-        if name not in self.cat:
-            raise ValueError(f"Context '{name}' does not exist in the catalogue.")
-        if self.current == name:
-            raise ValueError(
-                f"Cannot remove the current context '{name}'. Switch to another context first."
-            )
-        item = self.cat.pop(name)
-        return item
-
     def get(self, name: str) -> Context:
         """Returns the context deep copy"""
+        if name not in self.cat:
+            raise exc.ContextNotFound(
+                context_name=name, available_contexts=self.list_available()
+            )
         return self.cat[name].model_copy(deep=True)
 
     def delete(self, name: str):
-        logger.info(f"Removing context '{name}' from the catalogue.")
         """Remove a context from the catalogue by name"""
-        if self.current == name:
-            raise ValueError(
-                f"Cannot remove the current context '{name}'. Switch to another context first."
-            )
         del self.cat[name]
         self.save()
+        logger.info(f"Removed context '{name}' from the catalogue.")
+
+    def purge(self):
+        """Remove all contexts from the catalogue"""
+        self.cat.clear()
+        self.current = None
+        self.save()
+        logger.info("All contexts removed from the catalogue.")
 
     def list_all(self) -> list[Context]:
         """List all contexts in the catalogue"""
@@ -166,17 +198,14 @@ class ContextCatalogue(BaseModel):
 
     def list_available(self) -> list[str]:
         """List all available context names in the catalogue"""
-        return list(self.cat.keys())
+        return list(self.cat.keys())  # type: ignore
 
-    def save(self):
-        """Save the current context to the storage"""
-        self.storage.save_all(self)
-
-    @classmethod
-    def from_storage(cls) -> "ContextCatalogue":
-        """Load the context catalogue from the storage"""
-        cat = ContextStorage().load_all()
-        return cat
+    def as_dict(self) -> dict[str, Any]:
+        """Convert the context catalogue to a dictionary"""
+        return {
+            "current": self.current,
+            "cat": {name: context.model_dump() for name, context in self.cat.items()},
+        }
 
     def __repr__(self):
         return f"Current context: {self.cat.get(self.current)}\nCatalogue: {self.list_available()}"
