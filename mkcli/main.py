@@ -1,5 +1,6 @@
+from typing import Annotated, Optional
 import typer
-from mkcli.core.exceptions import ResourceNotFound
+from mkcli.core.exceptions import ResourceNotFound, StorageBaseError
 
 from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors, regions
 from keycloak import KeycloakPostError
@@ -8,6 +9,8 @@ import logging
 
 from mkcli.core.mk8s import APICallError
 from mkcli.utils.console import display
+
+__version__ = "0.2.0"  # TODO(EA): load it in pyproject toml
 
 state = {"verbose": False}
 
@@ -21,13 +24,20 @@ cli = typer.Typer(
 )
 
 
-@cli.callback()
-def main(verbose: bool = False):
+def version_callback(value: bool):
+    if value:
+        print(f"cf-mkcli version: {__version__}")
+        raise typer.Exit()
+
+
+def verbosity_callback(
+    value: bool,
+):
     """
     Manage verbosity.
     """
-    if verbose:
-        return
+    if value:
+        logging.getLogger("mkcli").setLevel(logging.INFO)
     logger.remove()
     logging.getLogger("mkcli").setLevel(logging.ERROR)
 
@@ -40,9 +50,24 @@ cli.add_typer(flavors.app, name="flavors", no_args_is_help=True)
 cli.add_typer(regions.app, name="regions", no_args_is_help=True)
 
 
+@cli.callback()
+def main(
+    verbose: Annotated[
+        Optional[bool], typer.Option("--verbose", callback=verbosity_callback)
+    ] = False,
+    version: Annotated[
+        Optional[bool],
+        typer.Option("--version", callback=version_callback, is_eager=True),
+    ] = False,
+):
+    pass
+
+
 def run():
     try:
         cli()
+    except StorageBaseError as err:
+        display(f"[red]Storage Error: {err}[/red]")
     except APICallError as err:
         display(f"[red]API Call Error: {err}[/red]")
         if err.code in [401, 403]:

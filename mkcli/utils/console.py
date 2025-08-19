@@ -24,7 +24,7 @@ class ResourceTable:
         """
         Add a row to the table.
         """
-        values = map(str, values)
+        values = map(str, values)  # type: ignore
         self.table.add_row(*values, style=style)
 
     def display(self) -> None:
@@ -63,7 +63,7 @@ def display_json(_data: str) -> None:
     print_json(_data, indent=2, ensure_ascii=False, highlight=True)
 
 
-def draw_rule(title: str = None) -> None:
+def draw_rule(title: str | None = None) -> None:
     """
     Draw a horizontal rule.
     """

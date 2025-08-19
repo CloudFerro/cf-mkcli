@@ -57,7 +57,7 @@ and it will purge all saved credentials and tokens, so you will need to run `mkc
 
 ![Auth init preview](docs/demo/auth_init.gif)
 
-### Simple usage examples just for starting up
+## Simple usage examples just for starting up
 Here you can find a several examples of how to use the mkcli tool.
 
 #### List all clusters
@@ -69,6 +69,7 @@ To increase readability you can easily filter the output by using `jq` command. 
 ```commandline
 mkcli cluster list --format json | jq '.items[] | {id, name, status}'```
 ```
+
 #### List all available flavors
 ```commandline
 mkcli flavor list
@@ -104,7 +105,6 @@ If you want, you can also list, edit, duplicate or delete contexts (see help for
 
 ![Contexts preview](docs/demo/context.gif)
 
-
 # mkcli reference documentation
 
 mkcli - A CLI for managing your Kubernetes clusters
@@ -117,7 +117,8 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Options**:
 
-* `--verbose / --no-verbose`: [default: no-verbose]
+* `--verbose`
+* `--version`
 * `--install-completion`: Install completion for the current shell.
 * `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
 * `--help`: Show this message and exit.
@@ -164,8 +165,8 @@ $ auth init [OPTIONS]
 
 **Options**:
 
-* `--realm TEXT`: Realm name  [default: Creodias-new]
-* `--region TEXT`: Region name  [default: WAW4-1]
+* `--realm [Creodias-new|CloudFerro-Cloud]`: Realm name  [default: Creodias-new]
+* `--region [WAW4-1|FRA1-2]`: Region name  [default: WAW4-1]
 * `--help`: Show this message and exit.
 
 ### `auth end`
@@ -375,12 +376,12 @@ $ auth context edit [OPTIONS] CTX
 
 **Options**:
 
-* `-n, --name TEXT`: Name for the new auth context
-* `--client_id TEXT`: Client ID for the new auth context
-* `--realm TEXT`: Realm for the new auth context
-* `--scope TEXT`: Scope for the new auth context
-* `--region TEXT`: Region for the new auth context
-* `--identity_server TEXT`: Identity server URL for the new auth context
+* `-n, --name TEXT`: New name of the edited auth context
+* `--client_id TEXT`: New Client ID for the edited auth context
+* `--realm TEXT`: Realm for the edited auth context
+* `--scope TEXT`: Scope for the edited auth context
+* `--region TEXT`: Region for the edited auth context
+* `--identity_server TEXT`: Identity server URL for the edited auth context
 * `--help`: Show this message and exit.
 
 #### `auth context switch`
@@ -631,6 +632,8 @@ $ node-pool update [OPTIONS] CLUSTER_ID NODE_POOL_ID
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool
 * `--shared-networks TEXT`: List of shared networks for the node pool
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool
+* `--labels _PARSE_LABELS`: List of labels in the format &#x27;key=value&#x27;, e.g. &#x27;env=prod&#x27;
+* `--taints _PARSE_TAINTS`: List of taints in the format &#x27;key=value:effect&#x27;, e.g. &#x27;key=value:NoSchedule&#x27;
 * `--help`: Show this message and exit.
 
 ### `node-pool show`
