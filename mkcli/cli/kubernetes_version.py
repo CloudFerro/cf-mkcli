@@ -4,8 +4,7 @@ import typer
 
 from mkcli.core import mappings
 from mkcli.core.mk8s import MK8SClient
-from mkcli.core.session import open_context_catalogue
-from mkcli.core.state import State
+from mkcli.core.session import get_auth_adapter, open_context_catalogue
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console
 from mkcli.core.enums import Format
@@ -28,9 +27,8 @@ def _list(
     ),
 ):
     """List all Kubernetes versions"""
-    with open_context_catalogue() as catalogue:
-        state = State(catalogue.current_context)
-        client = MK8SClient(state)
+    with open_context_catalogue() as cat:
+        client = MK8SClient(get_auth_adapter(cat.current_context))
 
         k8sv_map = mappings.get_kubernetes_versions_mapping(client)
 

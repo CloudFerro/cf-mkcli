@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from mkcli.core import exceptions as exc
 from mkcli.core.models import Token
-from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS
+from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS, AuthType
 
 type key = str | None
 
@@ -22,6 +22,7 @@ class Context(BaseModel):
         "Scope",
         "Region",
         "Identity Server",
+        "Auth Type",
     ]
 
     name: str
@@ -30,7 +31,7 @@ class Context(BaseModel):
     scope: str
     region: str
     identity_server_url: str
-    public_key: str | None = None
+    auth_type: AuthType
     token: Optional[Token] = None
 
     def as_table_row(self):
@@ -42,6 +43,7 @@ class Context(BaseModel):
             self.scope,
             self.region,
             self.identity_server_url,
+            self.auth_type,
         ]
 
     def as_json(self) -> Dict[str, Any]:
@@ -53,7 +55,7 @@ class Context(BaseModel):
             "scope": self.scope,
             "region": self.region,
             "identity_server_url": self.identity_server_url,
-            "public_key": self.public_key,
+            "auth_type": self.auth_type,
         }
 
 

@@ -1,5 +1,6 @@
 import json
 import pytest
+from mkcli.core.enums import AuthType
 from mkcli.core.models.context import Context
 
 
@@ -14,7 +15,7 @@ def mock_catalogue(catalogue):
             scope="test_scope",
             region="test_region",
             identity_server_url="https://test.identity.server",
-            public_key="test_key",
+            auth_type=AuthType.OPENID,
         )
     )
 
@@ -26,7 +27,7 @@ def mock_catalogue(catalogue):
             scope="test_scope",
             region="test_region",
             identity_server_url="https://test.identity.server",
-            public_key="test_key",
+            auth_type=AuthType.OPENID,
         )
     )
     catalogue.current = "test_ctx"
@@ -62,13 +63,14 @@ def test_auth_context_add(mock_open_context, make_mkcli_call):
             "context",
             "add",
             "--realm",
-            "CREODIAS",
+            "Creodias-new",
             "--region",
             "WAW4-1",
             new_ctx_name,
         ],
-        _input="test_client_id\ntest_scope\nhttps://test.identity.server\ntest_realm\n",  # Simulate user input
+        _input="test_client_id\ntest_scope\nhttps://test.identity.server\nopenid\n",  # Simulate user input
     )
+
     assert result.exit_code == 0
 
     # Check that the new context is in the list of available contexts

@@ -46,3 +46,12 @@ class Token(BaseModel):
             self.renew_after is not None
             and self.renew_after < datetime.datetime.now(tz=datetime.timezone.utc)
         )
+
+
+class APIKeyToken(BaseModel):
+    id: str | None = None
+    secret: str | None = None
+    roles: list[str] | None = None
+    comment: str | None = None
+    valid_until: datetime.datetime | None = None
+    created: datetime.datetime | None = None

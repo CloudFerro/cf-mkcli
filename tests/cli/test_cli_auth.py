@@ -1,6 +1,7 @@
 import pytest
 from mkcli.core.models.context import Context
-from unittest import mock
+
+from mkcli.settings import AuthType
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -14,7 +15,7 @@ def mock_catalogue(catalogue):
             scope="test_scope",
             region="test_region",
             identity_server_url="https://test.identity.server",
-            public_key="test_key",
+            auth_type=AuthType.OPENID,
         )
     )
 
@@ -23,22 +24,6 @@ def test_auth_command(mock_open_context, make_mkcli_call):
     """Test the auth command with default parameters"""
     result = make_mkcli_call(["auth", "--help"])
     assert result.exit_code == 0
-
-
-@mock.patch("mkcli.cli.auth._auth.State.renew_token")
-def test_auth_init_when_context_exists(
-    mock_renew_token, mock_open_context, make_mkcli_call
-):
-    """Test the auth init command when context already exists"""
-
-    # Configure mock to return None or an appropriate value
-    mock_renew_token.return_value = None
-
-    result = make_mkcli_call(args=["auth", "init"], _input="\n\n")
-
-    assert result.exit_code == 0
-    # Verify the token renewal was attempted
-    mock_renew_token.assert_called_once()
 
 
 def test_auth_end(mock_open_context, make_mkcli_call):

@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 
 
 class Format(str, Enum):
@@ -6,9 +6,9 @@ class Format(str, Enum):
     JSON = "json"
 
 
-class AuthType(Enum):
-    JWT = auto()
-    APP_CREDENTIAL = auto()
+class AuthType(str, Enum):
+    OPENID = "openid"
+    API_KEY = "api_key"
 
 
 class SupportedRealms(str, Enum):

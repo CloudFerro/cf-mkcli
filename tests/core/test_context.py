@@ -1,6 +1,7 @@
 import pytest
 import json
 from mkcli.core import exceptions as exc
+from mkcli.core.enums import AuthType
 from mkcli.core.models.context import Context
 from mkcli.core.models.context import JsonStorage
 
@@ -21,7 +22,7 @@ def test_context_catalogue_add(catalogue):
         scope="test_scope",
         region="test_region",
         identity_server_url="https://test.identity.server",
-        public_key="test_public_key",
+        auth_type=AuthType.OPENID,
     )
     catalogue.add(new_ctx)
     assert catalogue.cat["test"] == new_ctx
@@ -39,7 +40,7 @@ def test_context_catalogue_switch(catalogue):
         scope="test2_scope",
         region="test2_region",
         identity_server_url="https://test2.identity.server",
-        public_key="test2_public_key",
+        auth_type=AuthType.OPENID,
     )
     catalogue.add(ctx2)
     assert catalogue.cat["test2"] == ctx2

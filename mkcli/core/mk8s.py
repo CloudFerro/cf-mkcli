@@ -1,10 +1,10 @@
 import httpx
 
 from mkcli.core.models.node_pool import NodePool
-from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 
 from mkcli.core.models import Cluster, Region
+from .adapters import AuthProtocol
 
 
 class APICallError(Exception):
@@ -19,16 +19,13 @@ class APICallError(Exception):
 class MK8SClient:
     _API_URL = APP_SETTINGS.mk8s_api_url
 
-    def __init__(self, state: State):
-        self.state = state
+    def __init__(self, auth: AuthProtocol):
+        self._auth = auth
         self.api = httpx.Client(base_url=self._API_URL, headers=self.headers)
 
     @property
     def headers(self) -> dict:
-        token = self.state.token
-        return {
-            "authorization": f"Bearer {token}",
-        }
+        return {"accept": "application/json", **self._auth.get_auth_header()}
 
     @staticmethod
     def _verify(response: httpx.Response) -> None:

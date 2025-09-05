@@ -3,7 +3,7 @@ from typing import Annotated
 
 import typer
 
-from mkcli.core.enums import Format
+from mkcli.core.enums import AuthType, Format, SupportedRealms, SupportedRegions
 from mkcli.core.models.context import default_context, Context
 from mkcli.core.session import open_context_catalogue
 from mkcli.utils import console
@@ -78,18 +78,24 @@ def add(
         str, typer.Option(prompt=True, help="Client ID for the new auth context")
     ] = default_context.client_id,
     realm: Annotated[
-        str, typer.Option(prompt=True, help="Realm for the new auth context")
-    ] = default_context.realm,
+        SupportedRealms,
+        typer.Option(prompt=True, help="Realm for the new auth context"),
+    ] = SupportedRealms.CREODIAS,
     scope: Annotated[
         str, typer.Option(prompt=True, help="Scope for the new auth context")
     ] = default_context.scope,
     region: Annotated[
-        str, typer.Option(prompt=True, help="Region for the new auth context")
-    ] = default_context.region,
+        SupportedRegions,
+        typer.Option(prompt=True, help="Region for the new auth context"),
+    ] = SupportedRegions.WAW4_1,
     identity_server: Annotated[
         str,
         typer.Option(prompt=True, help="Identity server URL for the new auth context"),
     ] = default_context.identity_server_url,
+    auth_type: Annotated[
+        AuthType,
+        typer.Option(prompt=True, help="Authentication type for the new auth context"),
+    ] = AuthType.OPENID,
 ):
     """Prompt for new auth context and add it to the catalogue"""
 
@@ -101,7 +107,7 @@ def add(
         scope=scope,
         region=region,
         identity_server_url=identity_server,
-        public_key=None,
+        auth_type=auth_type,
     )
     console.display_json(new_ctx.model_dump_json())
 
@@ -183,19 +189,25 @@ def edit(
         typer.Option("--client_id", help="New Client ID for the edited auth context"),
     ] = None,
     realm: Annotated[
-        str | None, typer.Option("--realm", help="Realm for the edited auth context")
+        SupportedRealms | None,
+        typer.Option("--realm", help="Realm for the edited auth context"),
     ] = None,
     scope: Annotated[
         str | None, typer.Option("--scope", help="Scope for the edited auth context")
     ] = None,
     region: Annotated[
-        str | None, typer.Option("--region", help="Region for the edited auth context")
+        SupportedRegions | None,
+        typer.Option("--region", help="Region for the edited auth context"),
     ] = None,
     identity_server: Annotated[
         str | None,
         typer.Option(
             "--identity_server", help="Identity server URL for the edited auth context"
         ),
+    ] = None,
+    auth_type: Annotated[
+        AuthType | None,
+        typer.Option("--auth_type", help="Auth type for the edited auth context"),
     ] = None,
 ):
     """Update given auth context"""
@@ -218,6 +230,7 @@ def edit(
         context.scope = scope or context.scope
         context.region = region or context.region
         context.identity_server_url = identity_server or context.identity_server_url
+        context.auth_type = auth_type or context.auth_type
 
         cat.delete(ctx)
         if is_active:

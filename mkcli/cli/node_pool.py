@@ -9,10 +9,10 @@ from mkcli.core.exceptions import FlavorNotFound
 from mkcli.core.models import NodePoolPayload
 from mkcli.core.models.labels import Label, Taint
 from mkcli.core.models.node_pool import NodePool
-from mkcli.core.state import State
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console, names
 from mkcli.core.mk8s import MK8SClient
+from mkcli.core.session import get_auth_adapter
 from mkcli.core.session import open_context_catalogue
 
 _HELP: dict = {
@@ -94,11 +94,10 @@ def create(
         new_nodepool = from_json
     else:
         with open_context_catalogue() as cat:  # TODO: move mappings to callback
-            state = State(cat.current_context)
-            client = MK8SClient(state)
+            client = MK8SClient(get_auth_adapter(cat.current_context))
             region_map = mappings.get_regions_mapping(client)
             flavor_map = mappings.get_machine_spec_mapping(
-                client, region_map[state.ctx.region].id
+                client, region_map[cat.current_context.region].id
             )
             flavor = flavor_map.get(flavor_name)
 
@@ -131,8 +130,7 @@ def create(
         return
 
     with open_context_catalogue() as cat:
-        state = State(cat.current_context)
-        client = MK8SClient(state)
+        client = MK8SClient(get_auth_adapter(cat.current_context))
         response = client.create_node_pool(
             cluster_id=cluster_id, node_pool_data=new_nodepool.dict()
         )
@@ -149,8 +147,7 @@ def _list(
     """List all node pools in the cluster"""
 
     with open_context_catalogue() as cat:
-        state = State(cat.current_context)
-        client = MK8SClient(state)
+        client = MK8SClient(get_auth_adapter(cat.current_context))
         node_pools = client.list_node_pools(cluster_id)
 
     match format:
@@ -205,8 +202,7 @@ def update(
         return
 
     with open_context_catalogue() as cat:
-        state = State(cat.current_context)
-        client = MK8SClient(state)
+        client = MK8SClient(get_auth_adapter(cat.current_context))
 
         # Fetch existing node pool
         node_pool = client.get_node_pool(cluster_id, node_pool_id)
@@ -243,8 +239,7 @@ def show(
     node_pool_id: str = typer.Argument(..., help=_HELP["node_pool_id"]),
 ):
     with open_context_catalogue() as cat:
-        state = State(cat.current_context)
-        client = MK8SClient(state)
+        client = MK8SClient(get_auth_adapter(cat.current_context))
         node_pool = client.get_node_pool(cluster_id, node_pool_id)
 
     console.display(node_pool)
@@ -273,8 +268,7 @@ def delete(
         return
 
     with open_context_catalogue() as cat:
-        state = State(cat.current_context)
-        client = MK8SClient(state)
+        client = MK8SClient(get_auth_adapter(cat.current_context))
         client.delete_node_pool(cluster_id=cluster_id, node_pool_id=node_pool_id)
 
     console.display(f"Node pool {node_pool_id} deleted from cluster {cluster_id}.")

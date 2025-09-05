@@ -5,8 +5,7 @@ import typer
 from mkcli.core import mappings
 from mkcli.core.mk8s import MK8SClient
 from mkcli.core.models import Region
-from mkcli.core.session import open_context_catalogue
-from mkcli.core.state import State
+from mkcli.core.session import get_auth_adapter, open_context_catalogue
 from mkcli.settings import APP_SETTINGS
 from mkcli.utils import console
 from mkcli.core.enums import Format
@@ -29,8 +28,7 @@ def _list(
 ):
     """List all available regions"""
     with open_context_catalogue() as cat:
-        state = State(cat.current_context)
-        client = MK8SClient(state)
+        client = MK8SClient(get_auth_adapter(cat.current_context))
         region_map = mappings.get_regions_mapping(client)
 
         match format:

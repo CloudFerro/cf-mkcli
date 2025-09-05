@@ -1,8 +1,7 @@
 from typing import Annotated
 
 import typer
-from mkcli.core.session import open_context_catalogue
-from mkcli.core.state import State
+from mkcli.core.session import get_auth_adapter, open_context_catalogue
 from mkcli.core.enums import SupportedRealms, SupportedRegions
 from mkcli.utils import console
 from mkcli.core.models.context import (
@@ -41,6 +40,7 @@ def init(
         scope=default_context.scope,
         region=region,
         identity_server_url=default_context.identity_server_url,
+        auth_type=default_context.auth_type,
     )
 
     with open_context_catalogue() as cat:
@@ -50,8 +50,8 @@ def init(
             f"[bold green]Initialized a new auth session in `{cat.current_context.name} context`.[/bold green]"
         )
         # Validate token or log in browser
-        state = State(cat.current_context)
-        state.renew_token()
+        get_auth_adapter(cat.current_context).validate()
+
         console.display(
             f"[bold green]Successfully refreshed token in `{cat.current_context.name}` context.[/bold green]"
         )

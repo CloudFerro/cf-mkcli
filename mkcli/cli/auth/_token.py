@@ -1,17 +1,17 @@
 import typer
+from mkcli.core.adapters import OpenIDAdapter
 from mkcli.core.session import open_context_catalogue
-from mkcli.core.state import State
 from mkcli.utils import console
 
 
-app = typer.Typer(no_args_is_help=True, help="Authorization token management")
+app = typer.Typer(no_args_is_help=True, help="Auth OpenID token management")
 
 
 @app.command()
 def clear():
     """Clear the current access token from the authorization session (current context)"""
     with open_context_catalogue() as cat:
-        s = State(cat.current_context)
+        s = OpenIDAdapter(cat.current_context)
         s.clear()
 
 
@@ -19,7 +19,7 @@ def clear():
 def refresh():
     """Refresh the current access token from the authorization session (current context)"""
     with open_context_catalogue() as cat:
-        s = State(cat.current_context)
+        s = OpenIDAdapter(cat.current_context)
         s.renew_token()
 
 
@@ -27,7 +27,7 @@ def refresh():
 def show():
     """Show the current access token from the authorization session (current context)"""
     with open_context_catalogue() as cat:
-        s = State(cat.current_context)
+        s = OpenIDAdapter(cat.current_context)
 
         if s.token is not None:
             console.display(s.token)

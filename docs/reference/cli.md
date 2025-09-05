@@ -43,7 +43,7 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 * `init`: Initialize authentication session
 * `end`: End authentication session and clear saved...
-* `token`: Authorization token management
+* `token`: Auth OpenID token management
 * `context`: Manage authentication contexts
 
 ### `auth init`
@@ -78,7 +78,7 @@ $ auth end [OPTIONS]
 
 ### `auth token`
 
-Authorization token management
+Auth OpenID token management
 
 **Usage**:
 
@@ -209,10 +209,11 @@ $ auth context add [OPTIONS] NAME
 **Options**:
 
 * `--client-id TEXT`: Client ID for the new auth context  [default: managed-kubernetes]
-* `--realm TEXT`: Realm for the new auth context  [default: Creodias-new]
+* `--realm [Creodias-new|CloudFerro-Cloud]`: Realm for the new auth context  [default: Creodias-new]
 * `--scope TEXT`: Scope for the new auth context  [default: email profile openid]
-* `--region TEXT`: Region for the new auth context  [default: WAW4-1]
+* `--region [WAW4-1|FRA1-2]`: Region for the new auth context  [default: WAW4-1]
 * `--identity-server TEXT`: Identity server URL for the new auth context  [default: https://identity.cloudferro.com/auth/]
+* `--auth-type [openid|api_key]`: Authentication type for the new auth context  [default: openid]
 * `--help`: Show this message and exit.
 
 #### `auth context delete`
@@ -271,10 +272,11 @@ $ auth context edit [OPTIONS] CTX
 
 * `-n, --name TEXT`: New name of the edited auth context
 * `--client_id TEXT`: New Client ID for the edited auth context
-* `--realm TEXT`: Realm for the edited auth context
+* `--realm [Creodias-new|CloudFerro-Cloud]`: Realm for the edited auth context
 * `--scope TEXT`: Scope for the edited auth context
-* `--region TEXT`: Region for the edited auth context
+* `--region [WAW4-1|FRA1-2]`: Region for the edited auth context
 * `--identity_server TEXT`: Identity server URL for the edited auth context
+* `--auth_type [openid|api_key]`: Auth type for the edited auth context
 * `--help`: Show this message and exit.
 
 #### `auth context switch`
