@@ -9,8 +9,7 @@ import logging
 
 from mkcli.core.mk8s import APICallError
 from mkcli.utils.console import display
-
-__version__ = "0.2.0"  # TODO(EA): load it in pyproject toml
+from mkcli._version import __version__
 
 state = {"verbose": False}
 
@@ -26,7 +25,7 @@ cli = typer.Typer(
 
 def version_callback(value: bool):
     if value:
-        print(f"cf-mkcli version: {__version__}")
+        print(f"mkcli version: {__version__}")
         raise typer.Exit()
 
 

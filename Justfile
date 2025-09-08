@@ -40,3 +40,7 @@ docs:
 docs-run-server:
     {{ poetry_run }} mkdocs build
     {{ poetry_run }} mkdocs serve
+
+bump-version *args:
+    {{ poetry }} version {{ args }}
+    echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > _version.py

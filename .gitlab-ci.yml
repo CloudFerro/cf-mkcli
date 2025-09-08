@@ -3,7 +3,7 @@ variables:
 
 stages:
   - test
-
+  - publish
 
 .base_ruff:
   stage: test
@@ -54,3 +54,35 @@ tests:
       junit: report.xml
     paths:
       - .pytest_cache/
+
+
+versioning:
+  stage: publish
+  image: python:3.12
+  tags:
+    - kubernetes
+  variables:
+    DEPLOY_TOKEN: ${CI_TOKEN}
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - git remote set-url origin https://oauth2:${DEPLOY_TOKEN}@gitlab.cloudferro.com/k8s/mk-cli.git
+    - git config --global user.email "gitlab@cloudferro.com"
+    - git config --global user.name "GitLab CI/CD"
+    - git clone https://oauth2:${DEPLOY_TOKEN}@gitlab.cloudferro.com/k8s/mk-cli.git -b master
+    - cd mk-cli
+    - curl -sSL https://install.python-poetry.org | python3 -
+    - export PATH="$HOME/.local/bin:$PATH"
+    - pip install poetry=="$POETRY_VERSION" && poetry config virtualenvs.create false
+    - git config --global user.email "gitlab@cloudferro.com"
+    - git config --global user.name "GitLab CI/CD"
+    - apt update
+    - apt install -y just
+
+  script:
+    - echo 'Publishing package version ${CI_COMMIT_TAG}'
+    - git checkout -b v${CI_COMMIT_TAG}
+    - just bump-version ${CI_COMMIT_TAG}
+    - echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > _version.py
+    - git add pyproject.toml _version.py && git commit -m "update version to ${CI_COMMIT_TAG}"
+    - git push origin v${CI_COMMIT_TAG}
