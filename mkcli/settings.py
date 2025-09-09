@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os
 
 from platformdirs import user_cache_dir
@@ -10,10 +11,18 @@ from mkcli.core.enums import Format, AuthType
 ENV: str = os.getenv("MKCLI_ENV") or ""
 
 
+API_URL_MAPPING = {
+    "Creodias-new": "https://managed-kubernetes.creodias.eu/api/v1",
+    "CloudFerro-Cloud": "https://managed-kubernetes.cloudferro.com/api/v1",
+}
+
+if ENV == "dev":
+    API_URL_MAPPING = defaultdict(lambda: "http://localhost:8080/api/v1")
+
+
 class AppSettings(BaseSettings):
     name: str = "mkcli"
     session_persistence_file: Path = Path("contexts.json")
-    mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1"
     default_format: str = Format.TABLE
     resource_mappings_cache: bool = False
 
@@ -24,14 +33,6 @@ class AppSettings(BaseSettings):
     @property
     def cache_dir(self) -> Path:
         return Path(user_cache_dir(self.name))
-
-
-class LocalAppSettings(AppSettings):
-    name: str = "mkcli-local"
-    session_persistence_file: Path = Path("contexts-local.json")
-    mk8s_api_url: str = "http://localhost:10000/api/v1/"
-    default_format: str = Format.TABLE
-    resource_mappings_cache: bool = False
 
 
 class DefaultContextSettings(BaseSettings):
@@ -50,9 +51,5 @@ class DefaultClusterSettings(BaseSettings):
     master_flavor: str = "hma.medium"
 
 
-if ENV == "dev":
-    APP_SETTINGS = LocalAppSettings()
-else:
-    APP_SETTINGS = AppSettings()
-
 DEFAULT_CTX_SETTINGS = DefaultContextSettings()
+APP_SETTINGS = AppSettings()

@@ -68,10 +68,11 @@ def create(
         new_cluster = from_json
     else:
         with open_context_catalogue() as cat:
-            client = MK8SClient(get_auth_adapter(cat.current_context))  # noqa: F821
+            ctx = cat.current_context
+            client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
             k8sv_map = mappings.get_kubernetes_versions_mapping(client)
             region_map = mappings.get_regions_mapping(client)
-            region = region_map[cat.current_context.region]
+            region = region_map[ctx.region]
             flavor_map = mappings.get_machine_spec_mapping(client, region.id)
             flavor = flavor_map.get(master_flavor)
 
@@ -96,7 +97,8 @@ def create(
         return
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         _out = client.create_cluster(cluster_data=new_cluster.dict())
 
     console.display(_out)
@@ -120,11 +122,12 @@ def update(
         raise typer.Exit()
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         k8sv_map = mappings.get_kubernetes_versions_mapping(client)
 
         region_map = mappings.get_regions_mapping(client)
-        region = region_map[cat.current_context.region]
+        region = region_map[ctx.region]
         flavor_map = mappings.get_machine_spec_mapping(client, region.id)
         cluster = client.get_cluster(cluster_id)
 
@@ -182,7 +185,8 @@ def delete(
         return
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
 
         client.delete_cluster(cluster_id)
         console.display(f"Cluster {cluster_id} deleted.")
@@ -196,7 +200,8 @@ def _list(
 ):
     """List all clusters"""
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         clusters = client.get_clusters()
 
         match format:
@@ -222,7 +227,8 @@ def _list(
 def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
     """Show cluster details"""
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         _out = client.get_cluster(cluster_id)
 
     console.display(f"Cluster details for {cluster_id}:")
@@ -244,7 +250,8 @@ def get_kubeconfig(
         return
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         _out = client.download_kubeconfig(cluster_id)
 
     with open(output, "w") as f:

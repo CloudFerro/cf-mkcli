@@ -28,7 +28,8 @@ def _list(
 ):
     """List all available regions"""
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         region_map = mappings.get_regions_mapping(client)
 
         match format:

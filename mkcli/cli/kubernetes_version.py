@@ -28,7 +28,8 @@ def _list(
 ):
     """List all Kubernetes versions"""
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
 
         k8sv_map = mappings.get_kubernetes_versions_mapping(client)
 

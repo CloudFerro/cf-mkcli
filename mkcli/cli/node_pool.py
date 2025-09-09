@@ -130,7 +130,8 @@ def create(
         return
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         response = client.create_node_pool(
             cluster_id=cluster_id, node_pool_data=new_nodepool.dict()
         )
@@ -147,7 +148,8 @@ def _list(
     """List all node pools in the cluster"""
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         node_pools = client.list_node_pools(cluster_id)
 
     match format:
@@ -202,7 +204,8 @@ def update(
         return
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
 
         # Fetch existing node pool
         node_pool = client.get_node_pool(cluster_id, node_pool_id)
@@ -239,7 +242,8 @@ def show(
     node_pool_id: str = typer.Argument(..., help=_HELP["node_pool_id"]),
 ):
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         node_pool = client.get_node_pool(cluster_id, node_pool_id)
 
     console.display(node_pool)
@@ -268,7 +272,8 @@ def delete(
         return
 
     with open_context_catalogue() as cat:
-        client = MK8SClient(get_auth_adapter(cat.current_context))
+        ctx = cat.current_context
+        client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         client.delete_node_pool(cluster_id=cluster_id, node_pool_id=node_pool_id)
 
     console.display(f"Node pool {node_pool_id} deleted from cluster {cluster_id}.")

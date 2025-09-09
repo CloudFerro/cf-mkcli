@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from mkcli.core import exceptions as exc
 from mkcli.core.models import Token
-from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS, AuthType
+from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS, AuthType, API_URL_MAPPING
 
 type key = str | None
 
@@ -19,9 +19,8 @@ class Context(BaseModel):
         "Name",
         "Client ID",
         "Realm",
-        "Scope",
         "Region",
-        "Identity Server",
+        "API URL",
         "Auth Type",
     ]
 
@@ -34,15 +33,18 @@ class Context(BaseModel):
     auth_type: AuthType
     token: Optional[Token] = None
 
+    @property
+    def mk8s_api_url(self) -> str:
+        return API_URL_MAPPING[self.realm]
+
     def as_table_row(self):
         """Return a list of values to be used in a table row"""
         return [
             self.name,
             self.client_id,
             self.realm,
-            self.scope,
             self.region,
-            self.identity_server_url,
+            self.mk8s_api_url,
             self.auth_type,
         ]
 
@@ -55,6 +57,7 @@ class Context(BaseModel):
             "scope": self.scope,
             "region": self.region,
             "identity_server_url": self.identity_server_url,
+            "mk8s_api_url": self.mk8s_api_url,
             "auth_type": self.auth_type,
         }
 
