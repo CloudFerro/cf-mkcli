@@ -42,6 +42,8 @@ def init(
         identity_server_url=default_context.identity_server_url,
         auth_type=default_context.auth_type,
     )
+    # Validate if auth context is correct by trying to get a token
+    get_auth_adapter(new_ctx).validate()
 
     with open_context_catalogue() as cat:
         cat.add(new_ctx)
@@ -49,9 +51,6 @@ def init(
         console.display(
             f"[bold green]Initialized a new auth session in `{cat.current_context.name} context`.[/bold green]"
         )
-        # Validate token or log in browser
-        get_auth_adapter(cat.current_context).validate()
-
         console.display(
             f"[bold green]Successfully refreshed token in `{cat.current_context.name}` context.[/bold green]"
         )

@@ -44,6 +44,7 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 * `init`: Initialize authentication session
 * `end`: End authentication session and clear saved...
 * `token`: Auth OpenID token management
+* `key`: MK8s API key management
 * `context`: Manage authentication contexts
 
 ### `auth init`
@@ -133,6 +134,72 @@ Show the current access token from the authorization session (current context)
 ```console
 $ auth token show [OPTIONS]
 ```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `auth key`
+
+MK8s API key management
+
+**Usage**:
+
+```console
+$ auth key [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `clear`: Clear the current API key from the session...
+* `show`: Show the current API key from the session...
+* `set`: Set the current API key for the session...
+
+#### `auth key clear`
+
+Clear the current API key from the session (current context)
+
+**Usage**:
+
+```console
+$ auth key clear [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth key show`
+
+Show the current API key from the session (current context)
+
+**Usage**:
+
+```console
+$ auth key show [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+#### `auth key set`
+
+Set the current API key for the session (current context)
+
+**Usage**:
+
+```console
+$ auth key set [OPTIONS] API_KEY
+```
+
+**Arguments**:
+
+* `API_KEY`: API key to set for the current context  [required]
 
 **Options**:
 
@@ -527,8 +594,6 @@ $ node-pool update [OPTIONS] CLUSTER_ID NODE_POOL_ID
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool
 * `--shared-networks TEXT`: List of shared networks for the node pool
 * `--autoscale / --no-autoscale`: Enable autoscaling for the node pool
-* `--labels _PARSE_LABELS`: List of labels in the format &#x27;key=value&#x27;, e.g. &#x27;env=prod&#x27;
-* `--taints _PARSE_TAINTS`: List of taints in the format &#x27;key=value:effect&#x27;, e.g. &#x27;key=value:NoSchedule&#x27;
 * `--help`: Show this message and exit.
 
 ### `node-pool show`

@@ -8,6 +8,7 @@ from loguru import logger
 import logging
 
 from mkcli.core.mk8s import APICallError
+from mkcli.core import exceptions as exc
 from mkcli.utils.console import display
 from mkcli._version import __version__
 
@@ -74,7 +75,12 @@ def run():
                 "[bold red]Please check your authentication token or login credentials.[/bold red]\n"
                 "You might want to mkake `mkcli auth token refresh call`."
             )
-
+    except exc.NoActiveSession as err:
+        display(f"[red]No Active Session.{err}[/red]")
+        display(
+            "Please initialize an auth session using:\n"
+            ">> [green]`mkcli auth init`[/green] or check if you have a valid auth context set."
+        )
     except KeycloakPostError:
         logger.exception(
             "Keycloak Post Error occurred. Please check your auth configuration."

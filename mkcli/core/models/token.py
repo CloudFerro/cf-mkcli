@@ -4,6 +4,8 @@ from pydantic import BaseModel, field_serializer
 
 
 class Token(BaseModel):
+    """Represents OPENID Connect token details"""
+
     access_token: str | None = None
     refresh_token: str | None = None
     expires_in: datetime.datetime | None = None
@@ -11,7 +13,7 @@ class Token(BaseModel):
     refresh_expires_in: datetime.datetime | None = None
 
     @field_serializer("expires_in", "renew_after", "refresh_expires_in")
-    def serialize_created_at(self, value: datetime.datetime):
+    def serialize_date(self, value: datetime.datetime):
         if value is None:
             return None
         if value.tzinfo is None:
@@ -47,11 +49,22 @@ class Token(BaseModel):
             and self.renew_after < datetime.datetime.now(tz=datetime.timezone.utc)
         )
 
-
-class APIKeyToken(BaseModel):
-    id: str | None = None
-    secret: str | None = None
-    roles: list[str] | None = None
-    comment: str | None = None
-    valid_until: datetime.datetime | None = None
-    created: datetime.datetime | None = None
+    @classmethod
+    def load_from_response(cls, _response: dict) -> "Token":  # type: ignore
+        """Load the token from a token response dictionary (OpenID token response)"""
+        # now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        expires_in = now + datetime.timedelta(seconds=_response.get("expires_in"))  # type: ignore
+        renew_after = now + datetime.timedelta(
+            seconds=int(_response.get("expires_in") / 2)  # type: ignore
+        )
+        refresh_expires_in = now + datetime.timedelta(
+            seconds=_response.get("refresh_expires_in")  # type: ignore
+        )
+        return cls(
+            access_token=_response.get("access_token"),
+            expires_in=expires_in,
+            renew_after=renew_after,
+            refresh_token=_response.get("refresh_token"),
+            refresh_expires_in=refresh_expires_in,
+        )

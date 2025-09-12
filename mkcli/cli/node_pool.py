@@ -178,26 +178,10 @@ def update(
     max_nodes: int = typer.Option(None, help=_HELP["max_nodes"]),
     shared_networks: list[str] = typer.Option(None, help=_HELP["shared_networks"]),
     autoscale: bool = typer.Option(None, help=_HELP["autoscale"]),
-    labels: Annotated[
-        List[Label],
-        typer.Option(
-            parser=_parse_labels,
-            help=_HELP["labels"],
-        ),
-    ] = None,
-    taints: Annotated[
-        List[Taint],
-        typer.Option(
-            parser=_parse_taints,
-            help=_HELP["taints"],
-        ),
-    ] = None,
 ):
     """Update the node pool with given id"""
 
-    if not any(
-        [node_count, min_nodes, max_nodes, shared_networks, autoscale, labels, taints]
-    ):
+    if not any([node_count, min_nodes, max_nodes, shared_networks, autoscale]):
         console.display(
             "At least one of the options must be provided to update the node pool."
         )
@@ -221,8 +205,6 @@ def update(
             if shared_networks is not None
             else node_pool.shared_networks
         )
-        node_pool.labels = labels if labels is not None else node_pool.labels
-        node_pool.taints = taints if taints is not None else node_pool.taints
 
         console.display_json(node_pool.model_dump_json(indent=2))
         # Update the node pool

@@ -31,7 +31,8 @@ class Context(BaseModel):
     region: str
     identity_server_url: str
     auth_type: AuthType
-    token: Optional[Token] = None
+    token: Optional[Token] = None  # used only for AuthType.OIDC
+    api_key: Optional[str] = None  # used only for AuthType.API_KEY
 
     @property
     def mk8s_api_url(self) -> str:

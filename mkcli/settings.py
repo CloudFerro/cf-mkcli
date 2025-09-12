@@ -42,7 +42,7 @@ class DefaultContextSettings(BaseSettings):
     scope: str = "email profile openid"
     region: str = "WAW4-1"
     identity_server_url: str = "https://identity.cloudferro.com/auth/"
-    auth_type: AuthType = AuthType.OPENID
+    auth_type: AuthType = AuthType.API_KEY
 
 
 class DefaultClusterSettings(BaseSettings):

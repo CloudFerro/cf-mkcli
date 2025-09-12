@@ -24,4 +24,6 @@ def get_auth_adapter(ctx: Context) -> AuthProtocol:
             return OpenIDAdapter(ctx)
 
         case AuthType.API_KEY:
-            return APIKeyAdapter()
+            return APIKeyAdapter(ctx)
+
+    raise ValueError(f"Unsupported auth type: {ctx.auth_type}")

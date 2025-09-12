@@ -86,7 +86,6 @@ class Cluster(BaseModel):
     created_at: datetime
     updated_at: datetime
     name: str
-    organisation_id: str
     status: str
     control_plane: ControlPlane
     version: KubernetesVersion
