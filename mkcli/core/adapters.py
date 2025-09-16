@@ -9,6 +9,7 @@ from loguru import logger
 from .callback import CallbackServer
 from .models import Context, Token
 from mkcli.utils import wait_until
+from mkcli.core.exceptions import AuthorizationError
 
 
 class AuthProtocol(Protocol):
@@ -28,7 +29,7 @@ class APIKeyAdapter:
 
     def validate(self):
         if not self.ctx.api_key:
-            raise ValueError("API Key is not set")
+            raise AuthorizationError("API Key is not set")
 
 
 class OpenIDAdapter:
@@ -38,7 +39,7 @@ class OpenIDAdapter:
 
     def get_auth_header(self) -> Dict[str, str | None]:
         if not self.token.access_token:
-            raise ValueError("Token is not set")
+            raise AuthorizationError("Token is not set")
         return {
             "authorization": f"Bearer {self.token.access_token}",
         }
@@ -100,4 +101,4 @@ class OpenIDAdapter:
 
     def validate(self) -> None:
         if not self.token.access_token:
-            raise ValueError("Token is not set")  # TODO(EA): custom exception
+            raise AuthorizationError("Token is not set")

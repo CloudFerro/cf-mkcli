@@ -17,7 +17,7 @@ API_URL_MAPPING = {
 }
 
 if ENV == "dev":
-    API_URL_MAPPING = defaultdict(lambda: "http://localhost:8080/api/v1")
+    API_URL_MAPPING = defaultdict(lambda: "http://localhost:10000/api/v1/")
 
 
 class AppSettings(BaseSettings):

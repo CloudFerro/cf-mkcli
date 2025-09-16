@@ -1,3 +1,4 @@
+from unittest import mock
 import pytest
 from mkcli.core.models.context import Context
 
@@ -31,3 +32,17 @@ def test_auth_end(mock_open_context, make_mkcli_call):
     result = make_mkcli_call(args=["auth", "end"])
     assert result.exit_code == 0
     assert mock_open_context.current is None
+
+
+@mock.patch("typer.prompt", return_value="")
+def test_auth_init_no_api_key(mock_open_context, make_mkcli_call):
+    """Test the auth init command without providing an API key"""
+    from typer.testing import CliRunner
+    from mkcli.main import cli
+
+    runner = CliRunner(echo_stdin=True, catch_exceptions=False)
+    result = runner.invoke(
+        cli, ["auth", "init", "--auth-type", "api_key"], input="\n\n\n"
+    )
+
+    assert result.exit_code == 0

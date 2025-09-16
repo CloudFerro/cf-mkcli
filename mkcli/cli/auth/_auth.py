@@ -1,8 +1,8 @@
 from typing import Annotated
 
 import typer
-from mkcli.core.session import get_auth_adapter, open_context_catalogue
-from mkcli.core.enums import SupportedRealms, SupportedRegions
+from mkcli.core.session import open_context_catalogue
+from mkcli.core.enums import AuthType, SupportedRealms, SupportedRegions
 from mkcli.utils import console
 from mkcli.core.models.context import (
     default_context,
@@ -27,6 +27,9 @@ def init(
     region: Annotated[
         SupportedRegions, typer.Option(prompt=True, help="Region name")
     ] = SupportedRegions.WAW4_1,
+    auth_type: Annotated[
+        AuthType, typer.Option(prompt=True, help="Auth type")
+    ] = AuthType.API_KEY,
 ):
     """
     Initialize your first auth context (with default attribute values).
@@ -40,10 +43,11 @@ def init(
         scope=default_context.scope,
         region=region,
         identity_server_url=default_context.identity_server_url,
-        auth_type=default_context.auth_type,
+        auth_type=auth_type,
     )
-    # Validate if auth context is correct by trying to get a token
-    get_auth_adapter(new_ctx).validate()
+    if auth_type == AuthType.API_KEY:
+        api_key = typer.prompt("Enter your API key", hide_input=False, default="")
+        new_ctx.api_key = api_key
 
     with open_context_catalogue() as cat:
         cat.add(new_ctx)

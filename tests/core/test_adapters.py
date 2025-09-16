@@ -5,6 +5,7 @@ import pytest
 from mkcli.core.models.context import Context, Token
 from mkcli.core.enums import AuthType
 from mkcli.core.adapters import APIKeyAdapter, OpenIDAdapter
+from mkcli.core.exceptions import AuthorizationError
 
 
 def get_context(auth_type: AuthType) -> Context:
@@ -20,7 +21,7 @@ def get_context(auth_type: AuthType) -> Context:
     )
 
 
-os.environ["MK8S_API_KEY"] = "test_api_key"
+os.environ["MK8S_API_KEY"] = "test_api_key_from_env"
 
 
 def test_api_key_adapter_loading_key():
@@ -29,14 +30,22 @@ def test_api_key_adapter_loading_key():
     adapter = APIKeyAdapter(ctx)
 
     assert adapter.ctx.api_key is not None
-    assert adapter.ctx.api_key == "test_api_key"
-    assert adapter.get_auth_header() == {"Authorization": "Token test_api_key"}
+    assert adapter.ctx.api_key == "test_api_key_from_env"
+    assert adapter.get_auth_header() == {"Authorization": "Token test_api_key_from_env"}
 
     # case when api key is set in the context
     ctx.api_key = "ctx_api_key"
     adapter = APIKeyAdapter(ctx)
     assert adapter.ctx.api_key == "ctx_api_key"
     assert adapter.get_auth_header() == {"Authorization": "Token ctx_api_key"}
+
+    # case when api key is not set in the context neither in env vars
+    os.environ["MK8S_API_KEY"] = ""
+    ctx.api_key = ""
+    adapter = APIKeyAdapter(ctx)
+
+    with pytest.raises(AuthorizationError):
+        adapter.validate()
 
 
 @mock.patch.dict(os.environ, {"MK8S_API_KEY": ""}, clear=True)
@@ -45,7 +54,7 @@ def test_api_key_adapter_no_env_var():
     ctx.api_key = None
     adapter = APIKeyAdapter(ctx)
     assert adapter.ctx.api_key == ""
-    with pytest.raises(ValueError):
+    with pytest.raises(AuthorizationError):
         adapter.get_auth_header()
 
 
@@ -58,7 +67,7 @@ def test_openid_adapter_getting_empty_header_raises_error():
         ctx = get_context(AuthType.OPENID)
         adapter = OpenIDAdapter(ctx)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(AuthorizationError):
             adapter.get_auth_header()
 
 

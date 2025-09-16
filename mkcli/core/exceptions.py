@@ -57,3 +57,10 @@ class InvalidFileLayout(StorageBaseError):
 
 class NoActiveSession(BaseException):
     """No active session found."""
+
+
+class AuthorizationError(BaseException):
+    """Unauthorized access error."""
+
+    def __init__(self, message: str | None = None):
+        super().__init__(message or "You are not authorized.")

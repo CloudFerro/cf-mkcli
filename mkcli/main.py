@@ -1,6 +1,6 @@
 from typing import Annotated, Optional
 import typer
-from mkcli.core.exceptions import ResourceNotFound, StorageBaseError
+from mkcli.core.exceptions import AuthorizationError, ResourceNotFound, StorageBaseError
 
 from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors, regions
 from keycloak import KeycloakPostError
@@ -66,14 +66,19 @@ def main(
 def run():
     try:
         cli()
+    except AuthorizationError as err:
+        display(f"[red]Authorization Error: {err}.[/red]")
+        typer.Exit(code=1)
     except StorageBaseError as err:
         display(f"[red]Storage Error: {err}[/red]")
+        typer.Exit(code=1)
     except APICallError as err:
         display(f"[red]API Call Error: {err}[/red]")
         if err.code in [401, 403]:
             display(
                 "[bold red]Please check your authentication token or login credentials.[/bold red]\n"
-                "You might want to mkake `mkcli auth token refresh call`."
+                "You might want to make `mkcli auth token refresh call` if you authorize by OpenID "
+                "or check if your API key is correct."
             )
     except exc.NoActiveSession as err:
         display(f"[red]No Active Session.{err}[/red]")

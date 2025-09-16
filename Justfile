@@ -43,4 +43,4 @@ docs-run-server:
 
 bump-version *args:
     {{ poetry }} version {{ args }}
-    echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > _version.py
+    echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > mkcli/_version.py
