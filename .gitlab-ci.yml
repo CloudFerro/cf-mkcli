@@ -47,6 +47,7 @@ tests:
     - poetry add pytest-cov --group dev
   script:
     - pytest --junitxml=report.xml --cov=mkcli --cov-report=xml --cov-report=term
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
   artifacts:
     when: always
