@@ -46,6 +46,7 @@ def verbosity_callback(
     Manage verbosity.
     """
     if value:
+        state["verbose"] = True
         logging.getLogger("mkcli").setLevel(logging.INFO)
     logger.remove()
     logging.getLogger("mkcli").setLevel(logging.ERROR)
@@ -64,7 +65,8 @@ cli.add_typer(resource.app, name="resource-usage", no_args_is_help=True)
 @cli.callback()
 def main(
     verbose: Annotated[
-        Optional[bool], typer.Option("--verbose", callback=verbosity_callback)
+        Optional[bool],
+        typer.Option("--verbose", callback=verbosity_callback, is_flag=True),
     ] = False,
     version: Annotated[
         Optional[bool],
@@ -106,6 +108,9 @@ def run():
         display(f"[red]Resource Not Found[/red]: {err}")
 
     except Exception as err:
-        logger.exception("An unexpected error occurred: {}", err)
-        display(f"[red]An unexpected error occurred: {err}[/red]")
-        raise typer.Exit(code=1)
+        if state["verbose"]:
+            display("An unexpected error occurred.")
+            raise err
+        else:
+            display(f"[red]An unexpected error occurred - {err}[/red]")
+            typer.Exit(code=1)
