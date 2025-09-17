@@ -26,6 +26,8 @@ mkdocs = "^1.6.1"
 mkdocs-material = "^9.6.14"
 markdown-include = "^0.8.1"
 mkdocs-typer = "^0.0.3"
+pytest-cov = "^7.0.0"
+coverage = "^7.10.6"
 
 [build-system]
 requires = ["poetry-core"]
