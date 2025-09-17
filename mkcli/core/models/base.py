@@ -1,5 +1,5 @@
 import datetime
-from typing import ClassVar
+from typing import ClassVar, Optional
 from pydantic import BaseModel, ConfigDict, field_serializer
 
 
@@ -13,8 +13,8 @@ class BaseResourceModel(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     table_columns: ClassVar[list[str]]
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
 
     # TODO(EA): consider using pendulum for datetime handling
     @field_serializer("created_at", "updated_at")

@@ -127,12 +127,11 @@ class MK8SClient:
             raise ValueError(f"Region '{name}' not found.")
         return resp.json()["items"].pop()
 
-    # Backup management methods
-    def create_backup(self, cluster_id: str, backup_data: dict) -> dict:
+    def create_backup(self, cluster_id: str, backup_data: dict) -> Backup:
         """Create a new backup for a cluster"""
-        resp = self.api.post(f"/cluster/{cluster_id}/backup", json=backup_data)
+        resp = self.api.put(f"/cluster/{cluster_id}/backup", json=backup_data)
         self._verify(resp)
-        return resp.json()
+        return Backup.model_validate(resp.json())
 
     def get_backup(self, cluster_id: str, backup_id: str) -> Backup:
         """Get details of a specific backup"""
@@ -145,11 +144,6 @@ class MK8SClient:
         resp = self.api.get(f"/cluster/{cluster_id}/backup")
         self._verify(resp)
         return [Backup.model_validate(item) for item in resp.json().get("items", [])]
-
-    def delete_backup(self, cluster_id: str, backup_id: str) -> None:
-        """Delete a backup"""
-        resp = self.api.delete(f"/cluster/{cluster_id}/backup/{backup_id}")
-        self._verify(resp)
 
     # Resource usage methods
     def get_resource_usage(self, cluster_id: str) -> list[ResourceUsage]:
