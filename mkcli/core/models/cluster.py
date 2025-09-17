@@ -97,6 +97,11 @@ class Cluster(BaseResourceModel):
     def flavor(self) -> str:
         if self.control_plane is None:
             return "N/A"
+        if (
+            self.control_plane.custom is None
+            or self.control_plane.custom.machine_spec is None
+        ):
+            return "N/A"
         return self.control_plane.custom.machine_spec.name
 
     # @field_serializer("created_at", "updated_at")

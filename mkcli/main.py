@@ -2,7 +2,16 @@ from typing import Annotated, Optional
 import typer
 from mkcli.core.exceptions import AuthorizationError, ResourceNotFound, StorageBaseError
 
-from mkcli.cli import auth, cluster, node_pool, kubernetes_version, flavors, regions
+from mkcli.cli import (
+    auth,
+    cluster,
+    node_pool,
+    kubernetes_version,
+    flavors,
+    regions,
+    backup,
+    resource,
+)
 from keycloak import KeycloakPostError
 from loguru import logger
 import logging
@@ -48,6 +57,8 @@ cli.add_typer(node_pool.app, name="node-pool", no_args_is_help=True)
 cli.add_typer(kubernetes_version.app, name="kubernetes-version", no_args_is_help=True)
 cli.add_typer(flavors.app, name="flavors", no_args_is_help=True)
 cli.add_typer(regions.app, name="regions", no_args_is_help=True)
+cli.add_typer(backup.app, name="backup", no_args_is_help=True)
+cli.add_typer(resource.app, name="resource-usage", no_args_is_help=True)
 
 
 @cli.callback()

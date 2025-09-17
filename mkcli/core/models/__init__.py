@@ -5,3 +5,5 @@ from .machine_spec import MachineSpec, MachineSpecPayload  # noqa: F401
 from .node_pool import NodePoolPayload  # noqa: F401
 from .regions import Region  # noqa: F401
 from .kubernetes_version import KubernetesVersion  # noqa: F401
+from .backup import Backup, BackupPayload  # noqa: F401
+from .resource_usage import ResourceUsage  # noqa: F401
