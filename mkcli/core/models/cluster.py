@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, field_serializer
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional, ClassVar
-
+from .base import BaseResourceModel
 from .labels import Label, Taint
 from .request import RequestPayload
 from .machine_spec import MachineSpec, MachineSpecPayload
@@ -72,9 +72,9 @@ class ClusterPayload(RequestPayload):
         return cls(**_payload)
 
 
-class Cluster(BaseModel):
+class Cluster(BaseResourceModel):
     table_columns: ClassVar[list[str]] = [
-        "ID",
+        "Id",
         "Name",
         "Status",
         "Flavor",
@@ -93,18 +93,24 @@ class Cluster(BaseModel):
     is_active: bool | None = None
     errors: List[str] = []
 
-    @field_serializer("created_at", "updated_at")
-    def serialize_created_at(self, value: datetime):
-        return value.isoformat(timespec="microseconds").replace("+00:00", "") + "Z"
+    @property
+    def flavor(self) -> str:
+        if self.control_plane is None:
+            return "N/A"
+        return self.control_plane.custom.machine_spec.name
 
-    model_config = ConfigDict(extra="allow")
+    # @field_serializer("created_at", "updated_at")
+    # def serialize_created_at(self, value: datetime):
+    #     return value.isoformat(timespec="microseconds").replace("+00:00", "") + "Z"
 
-    def as_table_row(self) -> List[str]:
-        return [
-            self.id,
-            self.name,
-            self.status,
-            self.control_plane.custom.machine_spec.name,
-            self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
-        ]
+    # model_config = ConfigDict(extra="allow")
+
+    # def as_table_row(self) -> List[str]:
+    #     return [
+    #         self.id,
+    #         self.name,
+    #         self.status,
+    #         self.control_plane.custom.machine_spec.name,
+    #         self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+    #         self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+    #     ]

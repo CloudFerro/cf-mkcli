@@ -93,3 +93,8 @@ def run():
         )
     except ResourceNotFound as err:
         display(f"[red]Resource Not Found[/red]: {err}")
+
+    except Exception as err:
+        logger.exception("An unexpected error occurred: {}", err)
+        display(f"[red]An unexpected error occurred: {err}[/red]")
+        raise typer.Exit(code=1)
