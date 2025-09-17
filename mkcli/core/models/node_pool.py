@@ -38,11 +38,12 @@ class NodePool(NodePoolPayload):
         "Taints",
     ]
 
+    id: str
     created_at: datetime
     updated_at: datetime
     status: str
-    machine_spec: MachineSpec
 
+    machine_spec: Optional[MachineSpec] = None
     deleted_at: Optional[str] = None
     attach_external_ip: Optional[bool] = False
     autoheal: Optional[bool] = False
