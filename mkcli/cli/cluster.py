@@ -59,6 +59,9 @@ def create(
         ),
     ] = None,
     dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
+    format: Format = typer.Option(
+        default=APP_SETTINGS.default_format, help=_HELP["format"]
+    ),
 ):
     """Create a new k8s cluster"""
     if from_json is not None:
@@ -88,8 +91,6 @@ def create(
             master_flavor=flavor.id,
         )
 
-    console.display(f"Creating new cluster: {new_cluster}")
-
     if dry_run:
         console.display(
             f"[bold yellow]Dry run mode:[/bold yellow] would create cluster with data: {new_cluster}"
@@ -101,7 +102,11 @@ def create(
         client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         _out = client.create_cluster(cluster_data=new_cluster.dict())
 
-    console.display(_out)
+    match format:
+        case Format.TABLE:
+            console.display(f"Creating new cluster: {new_cluster}")
+        case Format.JSON:
+            console.display(json.dumps(_out, indent=2))
 
 
 @app.command(help=_HELP["update"])

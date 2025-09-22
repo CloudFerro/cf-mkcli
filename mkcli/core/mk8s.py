@@ -193,7 +193,6 @@ class MK8SClient:
         resp = self._format_response(resp)
         return [Backup.model_validate(item) for item in resp.get("items", [])]
 
-    # Resource usage methods
     def get_resource_usage(self, cluster_id: str) -> list[ResourceUsage]:
         """Get resource usage statistics for a cluster"""
         resp = self.api.get(f"/cluster/{cluster_id}/resource-counts")

@@ -94,7 +94,9 @@ def create(
         new_nodepool = from_json
     else:
         with open_context_catalogue() as cat:  # TODO: move mappings to callback
-            client = MK8SClient(get_auth_adapter(cat.current_context))
+            client = MK8SClient(
+                get_auth_adapter(cat.current_context), cat.current_context.mk8s_api_url
+            )
             region_map = mappings.get_regions_mapping(client)
             flavor_map = mappings.get_machine_spec_mapping(
                 client, region_map[cat.current_context.region].id
