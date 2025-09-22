@@ -1,4 +1,6 @@
 import httpx
+import re
+from json import JSONDecodeError
 
 from mkcli.core.models.node_pool import NodePool
 from mkcli.core.models.backup import Backup
@@ -6,6 +8,16 @@ from mkcli.core.models.resource_usage import ResourceUsage
 
 from mkcli.core.models import Cluster, Region
 from .adapters import AuthProtocol
+
+WAF_ERROR_MSG: str = (
+    "The requested URL was rejected. Please consult with your administrator."
+)
+
+
+def remove_html_tags(text):
+    """Remove html tags from a string"""
+    clean = re.compile("<.*?>")
+    return re.sub(clean, "", text)
 
 
 class APICallError(Exception):
@@ -19,6 +31,12 @@ class APICallError(Exception):
 
 class APIResponseFormattingError(Exception):
     """Custom exception for API response formatting errors."""
+
+    ...
+
+
+class WAFException(Exception):
+    """Web Application Firewall Exception."""
 
     ...
 
@@ -39,6 +57,26 @@ class MK8SClient:
         if response.status_code // 100 != 2:
             raise APICallError(response.status_code, response.text)
 
+    @staticmethod
+    def _format_response(response: httpx.Response) -> dict:
+        """Format the response from the API call."""
+        try:
+            return response.json()
+        except JSONDecodeError as e:
+            msg: str = ""
+            if isinstance(response.content, bytes):
+                msg = response.content.decode()
+            elif isinstance(response.content, str):
+                msg: str = response.content
+            if WAF_ERROR_MSG in msg:  # noqa
+                msg = msg.replace("[Go Back]", "")
+                raise WAFException(
+                    f"Request blocked by Web Application Firewall. Please contact your administrator.\n{remove_html_tags(msg)}"
+                ) from e
+            raise APIResponseFormattingError(
+                f"Failed to parse API JSON response: {e}"
+            ) from e
+
     def get_clusters(
         self, organisation_id=None, order_by=None, region=None
     ) -> list[Cluster]:
@@ -55,12 +93,12 @@ class MK8SClient:
         params = {"organisationId": organisation_id}
         resp = self.api.post("/cluster", json=cluster_data, params=params)
         self._verify(resp)
-        return resp.json()
+        return self._format_response(resp)
 
     def get_cluster(self, cluster_id: str) -> Cluster:
         resp = self.api.get(f"cluster/{cluster_id}")
         self._verify(resp)
-        _dict = resp.json()
+        _dict = self._format_response(resp)
         return Cluster.model_validate(_dict)
 
     def update_cluster(self, cluster_id: str, cluster_data: dict) -> dict:
@@ -75,27 +113,28 @@ class MK8SClient:
     def refresh_kubeconfig(self, cluster_id: str) -> dict:
         resp = self.api.post(f"cluster/{cluster_id}/refresh-kubeconfig")
         self._verify(resp)
-        return resp.json()
+        return self._format_response(resp)
 
     def download_kubeconfig(self, cluster_id: str) -> str:
         resp = self.api.get(f"cluster/{cluster_id}/files", headers=self.headers)
         self._verify(resp)
-        return resp.json()["kubeconfig"]
+        return self._format_response(resp)["kubeconfig"]
 
     def list_node_pools(self, cluster_id: str) -> list[NodePool]:
         resp = self.api.get(f"/cluster/{cluster_id}/node-pool")
         self._verify(resp)
-        return [NodePool.model_validate(item) for item in resp.json().get("items", [])]
+        resp = self._format_response(resp)
+        return [NodePool.model_validate(item) for item in resp.get("items", [])]
 
     def create_node_pool(self, cluster_id: str, node_pool_data: dict) -> dict:
         resp = self.api.post(f"/cluster/{cluster_id}/node-pool", json=node_pool_data)
         self._verify(resp)
-        return resp.json()
+        return self._format_response(resp)
 
     def get_node_pool(self, cluster_id: str, node_pool_id: str) -> NodePool:
         resp = self.api.get(f"/cluster/{cluster_id}/node-pool/{node_pool_id}")
         self._verify(resp)
-        return NodePool.model_validate(resp.json())
+        return NodePool.model_validate(self._format_response(resp))
 
     def update_node_pool(
         self, cluster_id: str, node_pool_id: str, node_pool_data: dict
@@ -104,7 +143,7 @@ class MK8SClient:
             f"/cluster/{cluster_id}/node-pool/{node_pool_id}", json=node_pool_data
         )
         self._verify(resp)
-        return resp.json()
+        return self._format_response(resp)
 
     def delete_node_pool(self, cluster_id: str, node_pool_id: str) -> None:
         resp = self.api.delete(f"/cluster/{cluster_id}/node-pool/{node_pool_id}")
@@ -113,52 +152,56 @@ class MK8SClient:
     def list_kubernetes_versions(self) -> list:  # TODO: add region filter
         resp = self.api.get("/kubernetes-version", headers=self.headers)
         self._verify(resp)
-        return resp.json()["items"]
+        return self._format_response(resp)["items"]
 
     def list_machine_specs(self, region_id: str | None) -> list:
         resp = self.api.get(f"/region/{region_id}/machine-spec", headers=self.headers)
         self._verify(resp)
-        return resp.json()["items"]
+        return self._format_response(resp)["items"]
 
     def list_regions(self) -> list[Region]:
         resp = self.api.get("/region", headers=self.headers)
         self._verify(resp)
-        return [Region.model_validate(item) for item in resp.json().get("items", [])]
+        resp = self._format_response(resp)
+        return [Region.model_validate(item) for item in resp.get("items", [])]
 
     def get_region(self, name) -> dict:
         params = {"name": name} if name else {}
         resp = self.api.get("/region", headers=self.headers, params=params)
         self._verify(resp)
-        if not resp.json()["items"]:
+        resp = self._format_response(resp)
+        if not resp["items"]:
             raise ValueError(f"Region '{name}' not found.")
-        return resp.json()["items"].pop()
+        return resp["items"].pop()
 
     def create_backup(self, cluster_id: str, backup_data: dict) -> Backup:
         """Create a new backup for a cluster"""
         resp = self.api.put(f"/cluster/{cluster_id}/backup", json=backup_data)
         self._verify(resp)
-        return Backup.model_validate(resp.json())
+        return Backup.model_validate(self._format_response(resp))
 
     def get_backup(self, cluster_id: str, backup_id: str) -> Backup:
         """Get details of a specific backup"""
         resp = self.api.get(f"/cluster/{cluster_id}/backup/{backup_id}")
         self._verify(resp)
-        return Backup.model_validate(resp.json())
+        return Backup.model_validate(self._format_response(resp))
 
     def list_backups(self, cluster_id: str) -> list[Backup]:
         """List all backups for a cluster"""
         resp = self.api.get(f"/cluster/{cluster_id}/backup")
         self._verify(resp)
-        return [Backup.model_validate(item) for item in resp.json().get("items", [])]
+        resp = self._format_response(resp)
+        return [Backup.model_validate(item) for item in resp.get("items", [])]
 
     # Resource usage methods
     def get_resource_usage(self, cluster_id: str) -> list[ResourceUsage]:
         """Get resource usage statistics for a cluster"""
         resp = self.api.get(f"/cluster/{cluster_id}/resource-counts")
         self._verify(resp)
+        resp = self._format_response(resp)
         return [
             ResourceUsage(name=key, usage_count=value)
-            for key, value in resp.json().get("counts", {}).items()
+            for key, value in resp.get("counts", {}).items()
         ]
 
     def __str__(self):
