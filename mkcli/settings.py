@@ -3,7 +3,7 @@ import os
 
 from platformdirs import user_cache_dir
 import typer
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 from mkcli.core.enums import Format, AuthType
 
@@ -25,6 +25,7 @@ class AppSettings(BaseSettings):
     session_persistence_file: Path = Path("contexts.json")
     default_format: str = Format.TABLE
     resource_mappings_cache: bool = False
+    beta_feature_flag: bool = False
 
     @property
     def cached_context_path(self) -> Path:
@@ -33,6 +34,8 @@ class AppSettings(BaseSettings):
     @property
     def cache_dir(self) -> Path:
         return Path(user_cache_dir(self.name))
+
+    model_config = SettingsConfigDict(env_prefix="MKCLI_")
 
 
 class DefaultContextSettings(BaseSettings):

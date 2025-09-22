@@ -17,6 +17,12 @@ class APICallError(Exception):
         super().__init__(_msg)
 
 
+class APIResponseFormattingError(Exception):
+    """Custom exception for API response formatting errors."""
+
+    ...
+
+
 class MK8SClient:
     def __init__(self, auth: AuthProtocol, api_url: str):
         self._auth = auth
@@ -30,7 +36,7 @@ class MK8SClient:
     @staticmethod
     def _verify(response: httpx.Response) -> None:
         """Verify the response from the API call."""
-        if response.status_code != 200:
+        if response.status_code // 100 != 2:
             raise APICallError(response.status_code, response.text)
 
     def get_clusters(

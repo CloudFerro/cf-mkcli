@@ -20,6 +20,7 @@ from mkcli.core.mk8s import APICallError
 from mkcli.core import exceptions as exc
 from mkcli.utils.console import display
 from mkcli._version import __version__
+from mkcli.settings import APP_SETTINGS
 
 state = {"verbose": False}
 
@@ -58,8 +59,12 @@ cli.add_typer(node_pool.app, name="node-pool", no_args_is_help=True)
 cli.add_typer(kubernetes_version.app, name="kubernetes-version", no_args_is_help=True)
 cli.add_typer(flavors.app, name="flavors", no_args_is_help=True)
 cli.add_typer(regions.app, name="regions", no_args_is_help=True)
-cli.add_typer(backup.app, name="backup", no_args_is_help=True)
-cli.add_typer(resource.app, name="resource-usage", no_args_is_help=True)
+
+if (
+    APP_SETTINGS.beta_feature_flag
+):  # export MKCLI_BETA_FEATURE_FLAG=True if you want to check it
+    cli.add_typer(backup.app, name="backup", no_args_is_help=True)
+    cli.add_typer(resource.app, name="resource-usage", no_args_is_help=True)
 
 
 @cli.callback()
