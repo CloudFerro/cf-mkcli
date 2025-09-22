@@ -9,8 +9,9 @@ from mkcli.utils import console
 
 app = typer.Typer(no_args_is_help=True, help="Manage Kubernetes cluster backups")
 
+DEFAULT_CRON: str = "0 1 * * * *"
 
-# {enabled: true, ttl: "2592000s", schedule: "* * * * */5", should_backup_volumes: false}
+
 @app.command(name="create", help="Create a new backup for a cluster")
 def create(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID to create backup for")],
@@ -23,8 +24,10 @@ def create(
     ] = "30d",
     schedule: Annotated[
         Optional[str],
-        typer.Option(help="Cron schedule for automated backups, e.g. '* * * */1 *'"),
-    ] = "* * * */1 *",
+        typer.Option(
+            help=f"Cron schedule for automated backups, e.g. '{DEFAULT_CRON}'"
+        ),
+    ] = DEFAULT_CRON,
     backup_volumes: Annotated[
         Optional[bool], typer.Option(help="Whether to backup volumes")
     ] = False,

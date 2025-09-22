@@ -37,7 +37,8 @@ tests:
     - merge_requests
   image: "python:3.12"
   variables:
-    ENV: test
+    ENV: "test"
+    MKCLI_BETA_FEATURE_FLAG: "True"
   tags:
     - kubernetes
   before_script:
