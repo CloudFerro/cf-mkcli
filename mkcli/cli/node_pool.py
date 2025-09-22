@@ -232,13 +232,20 @@ def update(
 def show(
     cluster_id: str = typer.Argument(..., help=_HELP["cluster_id"]),
     node_pool_id: str = typer.Argument(..., help=_HELP["node_pool_id"]),
+    format: Format = typer.Option(
+        default=APP_SETTINGS.default_format, help=_HELP["format"]
+    ),
 ):
     with open_context_catalogue() as cat:
         ctx = cat.current_context
         client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         node_pool = client.get_node_pool(cluster_id, node_pool_id)
 
-    console.display(node_pool)
+    match format:
+        case Format.JSON:
+            console.display(json.dumps(node_pool.model_dump(), indent=2))
+        case Format.TABLE:
+            console.display(node_pool)
 
 
 @app.command()
