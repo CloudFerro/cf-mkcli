@@ -224,15 +224,24 @@ def _list(
 
 
 @app.command(help=_HELP["show"])
-def show(cluster_id: Annotated[str, typer.Argument(help="Cluster ID")]):
+def show(
+    cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
+    format: Format = typer.Option(
+        default=APP_SETTINGS.default_format, help=_HELP["format"]
+    ),
+):
     """Show cluster details"""
     with open_context_catalogue() as cat:
         ctx = cat.current_context
         client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         _out = client.get_cluster(cluster_id)
 
-    console.display(f"Cluster details for {cluster_id}:")
-    console.display(_out)
+    match format:
+        case Format.TABLE:
+            console.display(f"Cluster details for {cluster_id}:")
+            console.display(_out)
+        case Format.JSON:
+            console.display(json.dumps(_out.model_dump()))
 
 
 @app.command(help=_HELP["get_kubeconfig"])
