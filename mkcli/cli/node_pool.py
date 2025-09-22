@@ -85,6 +85,9 @@ def create(
         ),
     ] = None,
     dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
+    format: Format = typer.Option(
+        default=APP_SETTINGS.default_format, help=_HELP["format"]
+    ),
 ):
     """Create a new node pool"""
     if from_json is not None:
@@ -137,7 +140,12 @@ def create(
         response = client.create_node_pool(
             cluster_id=cluster_id, node_pool_data=new_nodepool.dict()
         )
-        console.display(f"[bold green]Node Pool created:[/bold green] {response}")
+
+    match format:
+        case Format.JSON:
+            console.display(json.dumps(response, indent=2))
+        case Format.TABLE:
+            console.display(f"[bold green]Node Pool created:[/bold green] {response}")
 
 
 @app.command(name="list")
