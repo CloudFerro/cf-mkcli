@@ -86,10 +86,10 @@ def run():
         cli()
     except AuthorizationError as err:
         display(f"[red]Authorization Error: {err}.[/red]")
-        typer.Exit(code=1)
+        exit(1)
     except StorageBaseError as err:
         display(f"[red]Storage Error: {err}[/red]")
-        typer.Exit(code=1)
+        exit(1)
     except APICallError as err:
         display(f"[red]API Call Error: {err}[/red]")
         if err.code in [401, 403]:
@@ -118,4 +118,4 @@ def run():
             raise err
         else:
             display(f"[red]An unexpected error occurred - {err}[/red]")
-            typer.Exit(code=1)
+            exit(1)
