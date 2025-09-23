@@ -61,6 +61,7 @@ $ auth init [OPTIONS]
 
 * `--realm [Creodias-new|CloudFerro-Cloud]`: Realm name  [default: Creodias-new]
 * `--region [WAW4-1|FRA1-2]`: Region name  [default: WAW4-1]
+* `--auth-type [openid|api_key]`: Auth type  [default: api_key]
 * `--help`: Show this message and exit.
 
 ### `auth end`
@@ -405,6 +406,7 @@ $ cluster create [OPTIONS]
 * `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: hma.medium]
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `cluster update`
@@ -480,6 +482,7 @@ $ cluster show [OPTIONS] CLUSTER_ID
 
 **Options**:
 
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `cluster get-kubeconfig`
@@ -551,6 +554,7 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 * `--taints _PARSE_TAINTS`: List of taints in the format &#x27;key=value:effect&#x27;, e.g. &#x27;key=value:NoSchedule&#x27;
 * `--from-json FROM_JSON`: Node-pool payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `node-pool list`
@@ -611,6 +615,7 @@ $ node-pool show [OPTIONS] CLUSTER_ID NODE_POOL_ID
 
 **Options**:
 
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `node-pool delete`

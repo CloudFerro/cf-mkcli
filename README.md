@@ -40,22 +40,31 @@ To start using `mkcli`, you need to authorize it with your credentials. In the s
 ```commandline
 mkcli auth init
 ```
-`mkcli` will prompt you to enter `realm` and `region` names, which are required to connect to your account.
-and then you can check if you are logged in by running:,
-```commandline
-mkcli auth token show
-```
-How does it work? `mkcli` will open web browser window and ask you to log in to your account.
-After successful logging in, `mkcli` will "remember" your credentials and you can use it without logging in again
-for certain amount of time.
 
-If you want to log out, anc clear all saved auth session data, you can run:
+`mkcli` will prompt you to enter `realm` and `region` names, which are required to connect to your account. You will be also asked to choose authorization method.
+You can choose between `api_key` and `openid` methods. Default and recommended is using `api_key`.
+#### Using API Key
+If you choose using api key as an auth method, then you will be prompted to pass API key, which you can get from Managed Kubernetes GUI.
+![Auth by key](docs/demo/auth_prompt.png)
+
+You can also set, clear or preview your Api Key later, by using `mkcli auth key` command.
+If you don't provide explicite any Api Key, `mkcli` will try to load it from ENV variable `MK8S_API_KEY`. After loading your api key `mkcli` will 'remember it', so you don't need to keep it in any .rc file.
+
+![Auth init preview](docs/demo/auth_init.gif)
+
+#### Using OpenId
+When you use OpenId as an auth method, `mkcli` will open web browser window and ask you to log in to your account.
+After successful logging in, `mkcli` will "remember" your credentials and you can use it without logging in again for certain amount of time.
+
+You can also clear, show or refresh OpenId auth token by using `mkcli auth token` command.
+
+#### Logging out
+If you want to log out, anc clear all saved auth session data, you can just run:
 ```commandline
 mkcli auth end
 ```
 and it will purge all saved credentials and tokens, so you will need to run `mkcli auth init` again to log in.
 
-![Auth init preview](docs/demo/auth_init.gif)
 
 ## Simple usage examples just for starting up
 Here you can find a several examples of how to use the mkcli tool.
@@ -168,6 +177,7 @@ $ auth init [OPTIONS]
 
 * `--realm [Creodias-new|CloudFerro-Cloud]`: Realm name  [default: Creodias-new]
 * `--region [WAW4-1|FRA1-2]`: Region name  [default: WAW4-1]
+* `--auth-type [openid|api_key]`: Auth type  [default: api_key]
 * `--help`: Show this message and exit.
 
 ### `auth end`
@@ -512,6 +522,7 @@ $ cluster create [OPTIONS]
 * `--master-flavor TEXT`: Master node flavor name, if None, use default  [default: hma.medium]
 * `--from-json FROM_JSON`: Cluster payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `cluster update`
@@ -587,6 +598,7 @@ $ cluster show [OPTIONS] CLUSTER_ID
 
 **Options**:
 
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `cluster get-kubeconfig`
@@ -658,6 +670,7 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 * `--taints _PARSE_TAINTS`: List of taints in the format &#x27;key=value:effect&#x27;, e.g. &#x27;key=value:NoSchedule&#x27;
 * `--from-json FROM_JSON`: Node-pool payload in JSON format, if None, use provided options
 * `--dry-run`: If True, do not perform any actions, just print the payload
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `node-pool list`
@@ -718,6 +731,7 @@ $ node-pool show [OPTIONS] CLUSTER_ID NODE_POOL_ID
 
 **Options**:
 
+* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
 ### `node-pool delete`

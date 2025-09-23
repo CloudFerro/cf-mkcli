@@ -77,7 +77,10 @@ Enter
 Sleep 500ms
 Enter
 Sleep 2s
-Type "mkcli auth token show"
+Type "supersecret-api-key"
+Enter
+Sleep 2s
+Type "mkcli auth key --help"
 Enter
 Sleep 2s
 Type "mkcli auth end"
