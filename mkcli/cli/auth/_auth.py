@@ -16,20 +16,15 @@ _HELP: dict = {
     "end": "End authentication session and clear saved tokens",
 }
 
+
 app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 
 @app.command(name="init", help=_HELP["init"])
 def init(
-    realm: Annotated[
-        SupportedRealms, typer.Option(prompt=True, help="Realm name")
-    ] = SupportedRealms.CREODIAS,
-    region: Annotated[
-        SupportedRegions, typer.Option(prompt=True, help="Region name")
-    ] = SupportedRegions.WAW4_1,
-    auth_type: Annotated[
-        AuthType, typer.Option(prompt=True, help="Auth type")
-    ] = AuthType.API_KEY,
+    realm: Annotated[SupportedRealms, typer.Option(prompt=True, help="Realm name")],
+    region: Annotated[SupportedRegions, typer.Option(prompt=True, help="Region name")],
+    auth_type: Annotated[AuthType, typer.Option(prompt=True, help="Auth type")],
 ):
     """
     Initialize your first auth context (with default attribute values).
@@ -54,9 +49,6 @@ def init(
         cat.switch(new_ctx.name)
         console.display(
             f"[bold green]Initialized a new auth session in `{cat.current_context.name} context`.[/bold green]"
-        )
-        console.display(
-            f"[bold green]Successfully refreshed token in `{cat.current_context.name}` context.[/bold green]"
         )
         cat.save()
 
