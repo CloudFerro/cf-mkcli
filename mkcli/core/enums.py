@@ -7,8 +7,8 @@ class Format(str, Enum):
 
 
 class AuthType(str, Enum):
-    OPENID = "openid"
     API_KEY = "api_key"
+    OPENID = "openid"
 
 
 class SupportedRealms(str, Enum):
@@ -18,4 +18,3 @@ class SupportedRealms(str, Enum):
 
 class SupportedRegions(str, Enum):
     WAW4_1 = "WAW4-1"
-    FRA1_2 = "FRA1-2"

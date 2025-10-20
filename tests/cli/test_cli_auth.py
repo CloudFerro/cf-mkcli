@@ -84,23 +84,6 @@ def test_auth_init_valid_enum_values(mock_open_context):
 
     assert result.exit_code == 0
 
-    # Test with different valid values
-    result = runner.invoke(
-        cli,
-        [
-            "auth",
-            "init",
-            "--realm",
-            "CloudFerro-Cloud",
-            "--region",
-            "FRA1-2",
-            "--auth-type",
-            "openid",
-        ],
-    )
-
-    assert result.exit_code == 0
-
 
 def test_auth_init_invalid_realm(mock_open_context):
     """Test auth init with invalid realm value"""
