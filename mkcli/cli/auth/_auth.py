@@ -22,9 +22,15 @@ app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
 
 @app.command(name="init", help=_HELP["init"])
 def init(
-    realm: Annotated[SupportedRealms, typer.Option(prompt=True, help="Realm name")],
-    region: Annotated[SupportedRegions, typer.Option(prompt=True, help="Region name")],
-    auth_type: Annotated[AuthType, typer.Option(prompt=True, help="Auth type")],
+    realm: Annotated[
+        SupportedRealms, typer.Option(prompt=True, help="Realm name")
+    ] = SupportedRealms.CREODIAS,
+    region: Annotated[
+        SupportedRegions, typer.Option(prompt=True, help="Region name")
+    ] = SupportedRegions.WAW4_1,
+    auth_type: Annotated[
+        AuthType, typer.Option(prompt=True, help="Auth type")
+    ] = AuthType.API_KEY,
 ):
     """
     Initialize your first auth context (with default attribute values).
@@ -47,6 +53,7 @@ def init(
     with open_context_catalogue() as cat:
         cat.add(new_ctx)
         cat.switch(new_ctx.name)
+        console.display_json(new_ctx.model_dump_json())
         console.display(
             f"[bold green]Initialized a new auth session in `{cat.current_context.name} context`.[/bold green]"
         )

@@ -6,6 +6,8 @@ from mkcli.utils import names
 from mkcli.core.models import MachineSpec, MachineSpecPayload
 from .labels import Label, Taint
 from .request import RequestPayload
+from .base import BaseResourceModel
+from mkcli.settings import APP_SETTINGS
 
 
 class NodePoolPayload(RequestPayload):
@@ -27,16 +29,8 @@ class NodePoolPayload(RequestPayload):
     model_config = ConfigDict(extra="allow")
 
 
-class NodePool(NodePoolPayload):
-    table_columns: ClassVar[List[str]] = [
-        "ID",
-        "Name",
-        "Size",
-        "Flavor",
-        "Status",
-        "Labels",
-        "Taints",
-    ]
+class NodePool(BaseResourceModel, NodePoolPayload):
+    table_columns: ClassVar[List[str]] = APP_SETTINGS.nodepool_columns
 
     id: str
     created_at: datetime

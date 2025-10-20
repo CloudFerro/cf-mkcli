@@ -77,6 +77,11 @@ class MK8SClient:
                 f"Failed to parse API JSON response: {e}"
             ) from e
 
+    def create_api_key(self) -> dict:
+        resp = self.api.post("/token", headers=self.headers)
+        self._verify(resp)
+        return resp.json()
+
     def get_clusters(
         self, organisation_id=None, order_by=None, region=None
     ) -> list[Cluster]:

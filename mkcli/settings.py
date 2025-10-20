@@ -1,9 +1,11 @@
 from collections import defaultdict
 import os
+from typing import Annotated
 
+from pydantic import field_validator
 from platformdirs import user_cache_dir
 import typer
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict, NoDecode
 from pathlib import Path
 from mkcli.core.enums import Format, AuthType
 
@@ -26,6 +28,29 @@ class AppSettings(BaseSettings):
     default_format: str = Format.TABLE
     resource_mappings_cache: bool = False
     beta_feature_flag: bool = False
+
+    @field_validator("cluster_columns", "nodepool_columns", mode="before")
+    @classmethod
+    def decode_columns(cls, v: str) -> list[str]:
+        return v.split(",") if isinstance(v, str) else v
+
+    cluster_columns: Annotated[list[str], NoDecode] = [
+        "Id",
+        "Name",
+        "Status",
+        "Flavor",
+        "Created At",
+        "Updated At",
+    ]
+    nodepool_columns: Annotated[list[str], NoDecode] = [
+        "ID",
+        "Name",
+        "Size",
+        "Flavor",
+        "Status",
+        "Labels",
+        "Taints",
+    ]
 
     @property
     def cached_context_path(self) -> Path:

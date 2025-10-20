@@ -5,6 +5,7 @@ from .labels import Label, Taint
 from .request import RequestPayload
 from .machine_spec import MachineSpec, MachineSpecPayload
 from .kubernetes_version import KubernetesVersion, KubernetesVersionPayload
+from mkcli.settings import APP_SETTINGS
 
 
 class ControlPlaneCustom(BaseModel):
@@ -71,14 +72,7 @@ class ClusterPayload(RequestPayload):
 
 
 class Cluster(BaseResourceModel):
-    table_columns: ClassVar[list[str]] = [
-        "Id",
-        "Name",
-        "Status",
-        "Flavor",
-        "Created At",
-        "Updated At",
-    ]
+    table_columns: ClassVar[list[str]] = APP_SETTINGS.cluster_columns
 
     id: str
     name: str

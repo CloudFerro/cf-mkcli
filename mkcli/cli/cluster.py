@@ -207,7 +207,7 @@ def _list(
     with open_context_catalogue() as cat:
         ctx = cat.current_context
         client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
-        clusters = client.get_clusters()
+        clusters = client.get_clusters(region=ctx.region)
 
         match format:
             case Format.TABLE:
