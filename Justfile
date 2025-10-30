@@ -44,3 +44,9 @@ docs-run-server:
 bump-version *args:
     {{ poetry }} version {{ args }}
     echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > mkcli/_version.py
+
+load-env-local:
+    export VAULT_ADDR="https://vault.intra.cloudferro.com"
+    export VAULT_SKIP_VERIFY=true
+    vault login -method=oidc -path=azure
+    export API_TOKEN_PROD="$(vault kv get -tls-skip-verify -field=API_TOKEN_PROD secrets/mk8s/test)"

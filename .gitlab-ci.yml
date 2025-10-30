@@ -1,40 +1,45 @@
 variables:
   POETRY_VERSION: "1.7.1"
+  VAULT_ADDR: https://vault.intra.cloudferro.com
+  VAULT_ROLE: 'mk8s-gitlab-role'
+
+include:
+- project: 'devops/CD/vault-integration'
+  ref: master
+  file: template.yml
+
+.test_template:
+  stage: test
+  image: "python:3.13-alpine"
+  tags:
+    - kubernetes-waw3-2-general-01-staging
+  id_tokens: !reference [ .id_tokens ]
+  before_script:
+    - !reference [ .vault_secrets_apt, before_script ]
+    - apk update && apk add xdg-utils curl
+    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    - install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    - rm kubectl
 
 stages:
+  - formatting
   - test
   - publish
 
-.base_ruff:
-  stage: test
-  interruptible: true
+
+formatting_check:
+  stage: formatting
+  image: ghcr.io/astral-sh/ruff:0.12.9-alpine
   tags:
     - kubernetes
-  image:
-    name: ghcr.io/astral-sh/ruff:0.12.9-alpine
   before_script:
     - ruff --version
-
-
-ruff_check:
-  extends: .base_ruff
-  only:
-    - merge_requests
   script:
-    - ruff check --output-format=gitlab > code-quality-report.json
+    - ruff check .
+    - ruff format --check
 
-ruff_format:
-  extends: .base_ruff
-  only:
-    - merge_requests
-  script:
-    - ruff format --diff
-
-
-tests:
+unit_tests:
   stage: test
-  only:
-    - merge_requests
   image: "python:3.12"
   variables:
     ENV: "test"
@@ -47,7 +52,7 @@ tests:
     - poetry install --with dev
     - poetry add pytest-cov --group dev
   script:
-    - pytest --junitxml=report.xml --cov=mkcli --cov-report=xml --cov-report=term
+    - pytest tests/unit -rs -v --junitxml=report.xml --cov=mkcli --cov-report=xml --cov-report=term
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
 
   artifacts:
@@ -62,6 +67,28 @@ tests:
       - .pytest_cache/
       - coverage.xml
 
+integration_tests:
+  extends: .test_template
+  only:
+    - merge_requests
+    - manual
+  before_script:
+    - !reference [ .vault_secrets_apt, before_script ]
+    - apk update && apk add xdg-utils curl git
+    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    - install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    - rm kubectl
+    - pip install poetry=="$POETRY_VERSION" && poetry config virtualenvs.create false
+    - export API_TOKEN_PROD="$(vault kv get -tls-skip-verify -field=API_TOKEN_PROD secrets/mk8s/test)"
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cloudferro.com/".insteadOf "https://gitlab.cloudferro.com/"
+    - poetry install --with dev
+  script:
+    - pytest tests/integration -v -s
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - .pytest_cache/
 
 versioning:
   stage: publish
@@ -71,7 +98,7 @@ versioning:
   variables:
     DEPLOY_TOKEN: ${CI_TOKEN}
   rules:
-    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_BRANCH == "master"
   before_script:
     - git remote set-url origin https://oauth2:${DEPLOY_TOKEN}@gitlab.cloudferro.com/k8s/mk-cli.git
     - git config --global user.email "gitlab@cloudferro.com"

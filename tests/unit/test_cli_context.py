@@ -2,9 +2,8 @@ import json
 import pytest
 from mkcli.core.enums import AuthType
 from mkcli.core.models.context import Context
-
-
 from mkcli.settings import API_URL_MAPPING
+
 
 API_URL_MAPPING.update({"test_realm": "https://test.api.url"})
 
