@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mkcli"
-version = "0.6.3"
+version = "0.6.4"
 description = ""
 authors = ["Ewa Adamska <eadamska@cloudferro.com>"]
 readme = "README.md"
@@ -22,7 +22,10 @@ pylint = "^3.3.8"
 pytest-dependency = "^0.6.0"
 pytest-order = "^1.3.0"
 structlog = "^25.4.0"
-
+getchlib = "^1.1.2"
+getchar = "^2.0.0"
+readchar = "^4.2.1"
+pyperclip = "^1.11.0"
 
 
 [tool.poetry.group.dev.dependencies]

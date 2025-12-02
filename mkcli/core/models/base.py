@@ -31,7 +31,11 @@ class BaseResourceModel(BaseModel):
                 f"AttributeError: {e}. Available attributes: {list(self.model_fields.keys())}"
             ) from e
 
-        _dict = self.model_dump()  # TODO(EA): format datetimes explicitly and leave serialize_created_at for json dumps
-        return [  # or for properties, model dump for serialisation
-            _dict.get(x) or self.__getattribute__(x) for x in keys
-        ]
+        result = []  # TODO(EA): refactor it later
+        for key in keys:
+            value = self.__getattribute__(key)
+            # Format datetime fields for table display
+            if isinstance(value, datetime.datetime):
+                value = value.strftime("%Y-%m-%d %H:%M:%S")
+            result.append(value)
+        return result

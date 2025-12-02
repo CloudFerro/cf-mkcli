@@ -2,10 +2,11 @@ import httpx
 import re
 from json import JSONDecodeError
 
+from mkcli.utils.console import print_json
+from mkcli.settings import APP_SETTINGS
 from mkcli.core.models.node_pool import NodePool
 from mkcli.core.models.backup import Backup
 from mkcli.core.models.resource_usage import ResourceUsage
-
 from mkcli.core.models import Cluster, Region
 from .adapters import AuthProtocol
 
@@ -46,6 +47,7 @@ class MK8SClient:
         self._auth = auth
         self.api_url = api_url
         self.api = httpx.Client(base_url=self.api_url, headers=self.headers)
+        self.debug = APP_SETTINGS.debug
 
     @property
     def headers(self) -> dict:
@@ -57,11 +59,15 @@ class MK8SClient:
         if response.status_code // 100 != 2:
             raise APICallError(response.status_code, response.text)
 
-    @staticmethod
-    def _format_response(response: httpx.Response) -> dict:
+    def _format_response(self, response: httpx.Response) -> dict:
         """Format the response from the API call."""
         try:
-            return response.json()
+            json_resp = response.json()
+            if self.debug:
+                print_json(data=json_resp, indent=2)
+                print(f"API response: {response.status_code}")
+                print(f"For request: {response.request.method} {response.request.url}")
+            return json_resp
         except JSONDecodeError as e:
             msg: str = ""
             if isinstance(response.content, bytes):
@@ -82,7 +88,7 @@ class MK8SClient:
         self._verify(resp)
         return resp.json()
 
-    def get_clusters(
+    def get_clusters(  # TODO: rename it to list_clusters since there is similar method get_cluster
         self, organisation_id=None, order_by=None, region=None
     ) -> list[Cluster]:
         params = {
@@ -92,7 +98,8 @@ class MK8SClient:
         }
         resp = self.api.get("/cluster", headers=self.headers, params=params)
         self._verify(resp)
-        return [Cluster.model_validate(item) for item in resp.json().get("items", [])]
+        _dict = self._format_response(resp)
+        return [Cluster.model_validate(item) for item in _dict.get("items", [])]
 
     def create_cluster(self, cluster_data: dict | str, organisation_id=None) -> dict:
         params = {"organisationId": organisation_id}

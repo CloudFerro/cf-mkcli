@@ -11,6 +11,7 @@ from mkcli.cli import (
     regions,
     backup,
     resource,
+    dashboard,
 )
 from keycloak import KeycloakPostError
 from loguru import logger
@@ -65,6 +66,7 @@ if (
 ):  # export MKCLI_BETA_FEATURE_FLAG=True if you want to check it
     cli.add_typer(backup.app, name="backup", no_args_is_help=True)
     cli.add_typer(resource.app, name="resource-usage", no_args_is_help=True)
+    cli.add_typer(dashboard.app, name="dashboard", no_args_is_help=False)
 
 
 @cli.callback()

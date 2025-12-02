@@ -28,6 +28,7 @@ class AppSettings(BaseSettings):
     default_format: str = Format.TABLE
     resource_mappings_cache: bool = False
     beta_feature_flag: bool = False
+    debug: bool = False
 
     @field_validator("cluster_columns", "nodepool_columns", mode="before")
     @classmethod
@@ -39,6 +40,8 @@ class AppSettings(BaseSettings):
         "Name",
         "Status",
         "Flavor",
+        "Phase",
+        "Health",
         "Created At",
         "Updated At",
     ]
@@ -48,6 +51,7 @@ class AppSettings(BaseSettings):
         "Size",
         "Flavor",
         "Status",
+        "Phase",
         "Labels",
         "Taints",
     ]

@@ -77,6 +77,8 @@ class Cluster(BaseResourceModel):
     id: str
     name: str
     status: str
+    phase: Optional[str]
+    health: Optional[str]
     control_plane: ControlPlane
     version: KubernetesVersion
     metadata: dict | None = None

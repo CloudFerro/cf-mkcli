@@ -3,6 +3,7 @@ import json
 import typer
 from typing_extensions import Annotated
 
+
 from mkcli.core.enums import Format
 from mkcli.core.exceptions import FlavorNotFound, K8sVersionNotFound
 from mkcli.core.mk8s import MK8SClient

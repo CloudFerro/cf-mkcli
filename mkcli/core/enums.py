@@ -14,7 +14,10 @@ class AuthType(str, Enum):
 class SupportedRealms(str, Enum):
     CREODIAS = "Creodias-new"
     CF_CLOUD = "CloudFerro-Cloud"
+    STAGING_DOLORES = "Staging-dolores"
 
 
 class SupportedRegions(str, Enum):
     WAW4_1 = "WAW4-1"
+    FRA1_2 = "FRA1-2"
+    WAW3STAGING = "WAW3-staging"
