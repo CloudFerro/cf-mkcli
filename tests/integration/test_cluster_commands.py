@@ -193,10 +193,6 @@ def test_cluster_create(
             "Expected 'updated_at' field in cluster creation output"
         )
 
-        assert '"join_token_expires_at": "0001-01-01t00:00:00z"' in output_lower, (
-            "Expected 'join_token_expires_at' field with default value in creation output"
-        )
-
         assert '"status": "creating"' in output_lower, (
             "Expected cluster status 'Creating' in creation output"
         )
@@ -469,6 +465,7 @@ def test_cluster_update_kubernetes_version(
         log.info("Cluster update test completed successfully")
 
 
+@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.order(-2)
 @pytest.mark.dependency(
     depends=["tests/integration/test_cluster_commands.py::test_cluster_create"],

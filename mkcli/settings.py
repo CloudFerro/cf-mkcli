@@ -12,12 +12,6 @@ from mkcli.core.enums import Format, AuthType
 
 ENV: str = os.getenv("MKCLI_ENV") or ""
 
-
-API_URL_MAPPING = {
-    "Creodias-new": "https://managed-kubernetes.creodias.eu/api/v1",
-    "CloudFerro-Cloud": "https://managed-kubernetes.cloudferro.com/api/v1",
-}
-
 if ENV == "dev":
     API_URL_MAPPING = defaultdict(lambda: "http://localhost:10000/api/v1/")
 
@@ -73,6 +67,7 @@ class DefaultContextSettings(BaseSettings):
     client_id: str = "managed-kubernetes"
     scope: str = "email profile openid"
     region: str = "WAW4-1"
+    mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1"
     identity_server_url: str = "https://identity.cloudferro.com/auth/"
     auth_type: AuthType = AuthType.API_KEY
 

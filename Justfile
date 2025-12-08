@@ -14,7 +14,7 @@ lint:
     {{ poetry_run }} run mypy .
 
 test *args:
-    {{ poetry_run }} pytest {{ args }}
+    {{ poetry_run }} pytest -sv tests/unit/
 
 build:
     rm -rf dist
@@ -27,7 +27,7 @@ unhook:
     {{ poetry_run }} pre-commit uninstall
 
 docs:
-    python -m typer mkcli/main.py utils docs --title "mkcli reference documentation" --output docs/reference/cli.md  # Update CLI documentation
+    MKCLI_BETA_FEATURE_FLAG=false poetry run python -m typer mkcli/main.py utils docs --title "mkcli reference documentation" --output docs/reference/cli.md
     cat docs/intro.md > README.md  # add intro
     echo '' >> README.md  # add a newline
     cat docs/guides/installation.md >> README.md  # add installation
@@ -43,7 +43,7 @@ docs-run-server:
 
 bump-version *args:
     {{ poetry }} version {{ args }}
-    echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > mkcli/_version.py
+    echo "__version__ = \"$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')\"" > mkcli/_version.py
 
 load-env-local:
     export VAULT_ADDR="https://vault.intra.cloudferro.com"

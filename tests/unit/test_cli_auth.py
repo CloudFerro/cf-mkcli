@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 from typer.testing import CliRunner
 from mkcli.core.models.context import Context
-from mkcli.core.enums import AuthType, SupportedRealms, SupportedRegions
+from mkcli.core.enums import AuthType
 from mkcli.main import cli
 
 
@@ -48,6 +48,8 @@ def test_auth_init_no_api_key(mock_prompt, mock_open_context, make_mkcli_call):
             "Creodias-new",
             "--region",
             "WAW4-1",
+            "--api-url",
+            "https://managed-kubernetes.creodias.eu/api/v1",
             "--auth-type",
             "api_key",
         ],
@@ -76,6 +78,8 @@ def test_auth_init_valid_enum_values(mock_open_context):
             "Creodias-new",
             "--region",
             "WAW4-1",
+            "--api-url",
+            "https://managed-kubernetes.creodias.eu/api/v1",
             "--auth-type",
             "api_key",
         ],
@@ -83,58 +87,6 @@ def test_auth_init_valid_enum_values(mock_open_context):
     )
 
     assert result.exit_code == 0
-
-
-def test_auth_init_invalid_realm(mock_open_context):
-    """Test auth init with invalid realm value"""
-    runner = CliRunner(catch_exceptions=False)
-
-    result = runner.invoke(
-        cli,
-        [
-            "auth",
-            "init",
-            "--realm",
-            "invalid-realm",
-            "--region",
-            "WAW4-1",
-            "--auth-type",
-            "api_key",
-        ],
-    )
-
-    # Should fail with validation error
-    assert result.exit_code != 0
-    assert (
-        "Invalid value for '--realm'" in result.output
-        or "invalid-realm" in result.output
-    )
-
-
-def test_auth_init_invalid_region(mock_open_context):
-    """Test auth init with invalid region value"""
-    runner = CliRunner(catch_exceptions=False)
-
-    result = runner.invoke(
-        cli,
-        [
-            "auth",
-            "init",
-            "--realm",
-            "Creodias-new",
-            "--region",
-            "invalid-region",
-            "--auth-type",
-            "api_key",
-        ],
-    )
-
-    # Should fail with validation error
-    assert result.exit_code != 0
-    assert (
-        "Invalid value for '--region'" in result.output
-        or "invalid-region" in result.output
-    )
 
 
 def test_auth_init_invalid_auth_type(mock_open_context):
@@ -167,20 +119,20 @@ def test_auth_init_prompt_validation(mock_open_context):
     """Test auth init with invalid values in prompts"""
     runner = CliRunner(echo_stdin=True, catch_exceptions=False)
 
-    # Test invalid realm in prompt - user should be re-prompted
-    # Note: Typer automatically handles this validation and re-prompts
+    # Test that command succeeds with all required params
+    # Note: Without realm/region validation, any string values are accepted
     result = runner.invoke(
         cli,
         ["auth", "init"],
-        input="invalid-realm\nCreodias-new\ninvalid-region\nWAW4-1\ninvalid-auth\napi_key\ntest-key\n",
+        input="test-realm\ntest-region\nhttps://test.api.url\napi_key\ntest-key\n",
     )
 
-    # Should eventually succeed after valid inputs are provided
+    # Should succeed with valid inputs
     assert result.exit_code == 0
 
 
-@pytest.mark.parametrize("realm", [r.value for r in SupportedRealms])
-@pytest.mark.parametrize("region", [r.value for r in SupportedRegions])
+@pytest.mark.parametrize("realm", [r for r in ["realm1", "realm2"]])
+@pytest.mark.parametrize("region", [r for r in ["region1", "region2"]])
 @pytest.mark.parametrize("auth_type", [a.value for a in AuthType])
 def test_auth_init_all_valid_combinations(mock_open_context, realm, region, auth_type):
     """Test auth init with all valid combinations of enum values"""
@@ -197,6 +149,8 @@ def test_auth_init_all_valid_combinations(mock_open_context, realm, region, auth
             realm,
             "--region",
             region,
+            "--api-url",
+            "https://test.api.url",
             "--auth-type",
             auth_type,
         ],

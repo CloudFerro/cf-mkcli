@@ -3,7 +3,7 @@ from typing import Annotated
 
 import typer
 
-from mkcli.core.enums import AuthType, Format, SupportedRealms, SupportedRegions
+from mkcli.core.enums import AuthType, Format
 from mkcli.core.models.context import default_context, Context
 from mkcli.core.session import open_context_catalogue
 from mkcli.utils import console
@@ -73,21 +73,20 @@ def _list(
 
 @app.command()
 def add(
-    name: str,
-    client_id: Annotated[
-        str, typer.Option(prompt=True, help="Client ID for the new auth context")
-    ] = default_context.client_id,
+    name: Annotated[
+        str, typer.Option(prompt=True, help="Name for the new auth context")
+    ],
     realm: Annotated[
-        SupportedRealms,
-        typer.Option(prompt=True, help="Realm for the new auth context"),
-    ] = SupportedRealms.CREODIAS,
-    scope: Annotated[
-        str, typer.Option(prompt=True, help="Scope for the new auth context")
-    ] = default_context.scope,
+        str, typer.Option(prompt=True, help="Realm for the new auth context")
+    ],
     region: Annotated[
-        SupportedRegions,
+        str,
         typer.Option(prompt=True, help="Region for the new auth context"),
-    ] = SupportedRegions.WAW4_1,
+    ],
+    api_url: Annotated[
+        str,
+        typer.Option(prompt=True, help="MK8s API URL for the new auth context"),
+    ],
     identity_server: Annotated[
         str,
         typer.Option(prompt=True, help="Identity server URL for the new auth context"),
@@ -102,9 +101,10 @@ def add(
     console.display("[bold green]Creating a new auth context...[/bold green]")
     new_ctx = Context(
         name=name,
-        client_id=client_id,
+        client_id=default_context.client_id,
+        mk8s_api_url=api_url,
         realm=realm,
-        scope=scope,
+        scope=default_context.scope,
         region=region,
         identity_server_url=identity_server,
         auth_type=auth_type,
@@ -189,14 +189,18 @@ def edit(
         typer.Option("--client_id", help="New Client ID for the edited auth context"),
     ] = None,
     realm: Annotated[
-        SupportedRealms | None,
+        str | None,
         typer.Option("--realm", help="Realm for the edited auth context"),
+    ] = None,
+    api_url: Annotated[
+        str | None,
+        typer.Option("--api_url", help="API URL for the edited auth context"),
     ] = None,
     scope: Annotated[
         str | None, typer.Option("--scope", help="Scope for the edited auth context")
     ] = None,
     region: Annotated[
-        SupportedRegions | None,
+        str | None,
         typer.Option("--region", help="Region for the edited auth context"),
     ] = None,
     identity_server: Annotated[
@@ -231,6 +235,7 @@ def edit(
         context.region = region or context.region
         context.identity_server_url = identity_server or context.identity_server_url
         context.auth_type = auth_type or context.auth_type
+        context.mk8s_api_url = api_url or context.mk8s_api_url
 
         cat.delete(ctx)
         if is_active:

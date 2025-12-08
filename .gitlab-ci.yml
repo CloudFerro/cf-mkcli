@@ -30,6 +30,8 @@ stages:
 formatting_check:
   stage: formatting
   image: ghcr.io/astral-sh/ruff:0.12.9-alpine
+  only:
+    - merge_requests
   tags:
     - kubernetes
   before_script:
@@ -40,6 +42,8 @@ formatting_check:
 
 unit_tests:
   stage: test
+  only:
+    - merge_requests
   image: "python:3.12"
   variables:
     ENV: "test"

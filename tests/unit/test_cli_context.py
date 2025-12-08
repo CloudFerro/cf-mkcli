@@ -2,10 +2,6 @@ import json
 import pytest
 from mkcli.core.enums import AuthType
 from mkcli.core.models.context import Context
-from mkcli.settings import API_URL_MAPPING
-
-
-API_URL_MAPPING.update({"test_realm": "https://test.api.url"})
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -70,9 +66,8 @@ def test_auth_context_add(mock_open_context, make_mkcli_call):
             "Creodias-new",
             "--region",
             "WAW4-1",
-            new_ctx_name,
         ],
-        _input="test_client_id\ntest_realm\ntest_scope\nregion\nhttps://test.identity.server\nopenid\n",  # Simulate user input
+        _input=f"{new_ctx_name}\nhttps://test.api.url\nhttps://test.identity.server\nopenid\n",  # name, api-url, identity-server, auth-type
     )
 
     assert result.exit_code == 0

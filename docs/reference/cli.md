@@ -59,9 +59,9 @@ $ auth init [OPTIONS]
 
 **Options**:
 
-* `--realm [Creodias-new|CloudFerro-Cloud]`: Realm name  [default: Creodias-new]
-* `--region [WAW4-1|FRA1-2]`: Region name  [default: WAW4-1]
-* `--auth-type [openid|api_key]`: Auth type  [default: api_key]
+* `--realm TEXT`: Realm name  [required]
+* `--region TEXT`: Region name  [required]
+* `--auth-type [api_key|openid]`: Auth type  [default: api_key]
 * `--help`: Show this message and exit.
 
 ### `auth end`
@@ -206,6 +206,7 @@ $ auth key set [OPTIONS] API_KEY
 
 * `--help`: Show this message and exit.
 
+
 ### `auth context`
 
 Manage authentication contexts
@@ -267,21 +268,16 @@ Prompt for new auth context and add it to the catalogue
 **Usage**:
 
 ```console
-$ auth context add [OPTIONS] NAME
+$ auth context add [OPTIONS]
 ```
-
-**Arguments**:
-
-* `NAME`: [required]
 
 **Options**:
 
-* `--client-id TEXT`: Client ID for the new auth context  [default: managed-kubernetes]
-* `--realm [Creodias-new|CloudFerro-Cloud]`: Realm for the new auth context  [default: Creodias-new]
-* `--scope TEXT`: Scope for the new auth context  [default: email profile openid]
-* `--region [WAW4-1|FRA1-2]`: Region for the new auth context  [default: WAW4-1]
+* `--name TEXT`: Name for the new auth context  [required]
+* `--realm TEXT`: Realm for the new auth context  [required]
+* `--region TEXT`: Region for the new auth context  [required]
 * `--identity-server TEXT`: Identity server URL for the new auth context  [default: https://identity.cloudferro.com/auth/]
-* `--auth-type [openid|api_key]`: Authentication type for the new auth context  [default: openid]
+* `--auth-type [api_key|openid]`: Authentication type for the new auth context  [default: openid]
 * `--help`: Show this message and exit.
 
 #### `auth context delete`
@@ -340,11 +336,11 @@ $ auth context edit [OPTIONS] CTX
 
 * `-n, --name TEXT`: New name of the edited auth context
 * `--client_id TEXT`: New Client ID for the edited auth context
-* `--realm [Creodias-new|CloudFerro-Cloud]`: Realm for the edited auth context
+* `--realm TEXT`: Realm for the edited auth context
 * `--scope TEXT`: Scope for the edited auth context
-* `--region [WAW4-1|FRA1-2]`: Region for the edited auth context
+* `--region TEXT`: Region for the edited auth context
 * `--identity_server TEXT`: Identity server URL for the edited auth context
-* `--auth_type [openid|api_key]`: Auth type for the edited auth context
+* `--auth_type [api_key|openid]`: Auth type for the edited auth context
 * `--help`: Show this message and exit.
 
 #### `auth context switch`

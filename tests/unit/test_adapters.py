@@ -15,6 +15,7 @@ def get_context(auth_type: AuthType) -> Context:
         realm="test_realm",
         scope="test_scope",
         region="test_region",
+        mk8s_api_url="https://test.mk8s.api",
         identity_server_url="https://test.identity.server",
         auth_type=auth_type,
         api_key=None,  # type: ignore

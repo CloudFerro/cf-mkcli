@@ -57,7 +57,7 @@ def _parse_taints(value):
 def create(
     flavor_name: Annotated[str, typer.Option("--flavor", help=_HELP["flavor"])],
     cluster_id: str = typer.Argument(..., help="Cluster ID"),
-    name: str = typer.Option(help=_HELP["name"]),
+    name: Annotated[str, typer.Option(help=_HELP["name"])] = None,
     node_count: int = typer.Option(DEFAULT_NODEPOOL.size, help=_HELP["node_count"]),
     min_nodes: int = typer.Option(DEFAULT_NODEPOOL.size_min, help=_HELP["min_nodes"]),
     max_nodes: int = typer.Option(DEFAULT_NODEPOOL.size_max, help=_HELP["max_nodes"]),

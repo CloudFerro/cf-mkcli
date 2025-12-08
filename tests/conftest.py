@@ -78,7 +78,11 @@ def mock_open_context(catalogue):
     """Mock the open_context_catalogue context manager"""
     cm_mock = MagicMock()
     cm_mock.__enter__.return_value = catalogue
-    with patch("mkcli.cli.auth.context.open_context_catalogue", return_value=cm_mock):
+    with (
+        patch("mkcli.cli.auth.context.open_context_catalogue", return_value=cm_mock),
+        patch("mkcli.cli.resource.open_context_catalogue", return_value=cm_mock),
+        patch("mkcli.core.session.open_context_catalogue", return_value=cm_mock),
+    ):
         yield catalogue
 
 

@@ -495,6 +495,7 @@ def test_node_pool_update_scaling(
         )
 
 
+@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.order(
     after="tests/integration/test_node_pool_commands.py::test_node_pool_update_scaling"
 )

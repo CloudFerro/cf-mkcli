@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from mkcli.core import exceptions as exc
 from mkcli.core.models import Token
-from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS, AuthType, API_URL_MAPPING
+from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS, AuthType
 
 type key = str | None
 
@@ -30,13 +30,10 @@ class Context(BaseModel):
     scope: str
     region: str
     identity_server_url: str
+    mk8s_api_url: Optional[str] = None
     auth_type: AuthType
-    token: Optional[Token] = None  # used only for AuthType.OIDC
-    api_key: Optional[str] = None  # used only for AuthType.API_KEY
-
-    @property
-    def mk8s_api_url(self) -> str:
-        return API_URL_MAPPING[self.realm]
+    token: Optional[Token] = None  # used only for authtype = openid
+    api_key: Optional[str] = None  # used only for authtype = api_key
 
     def as_table_row(self):
         """Return a list of values to be used in a table row"""
