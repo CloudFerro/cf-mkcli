@@ -8,7 +8,6 @@ from mkcli.cli import (
     node_pool,
     kubernetes_version,
     flavors,
-    regions,
     backup,
     resource,
     dashboard,
@@ -59,14 +58,28 @@ cli.add_typer(cluster.app, name="cluster", no_args_is_help=True)
 cli.add_typer(node_pool.app, name="node-pool", no_args_is_help=True)
 cli.add_typer(kubernetes_version.app, name="kubernetes-version", no_args_is_help=True)
 cli.add_typer(flavors.app, name="flavors", no_args_is_help=True)
-cli.add_typer(regions.app, name="regions", no_args_is_help=True)
 
 if (
     APP_SETTINGS.beta_feature_flag
 ):  # export MKCLI_BETA_FEATURE_FLAG=True if you want to check it
-    cli.add_typer(backup.app, name="backup", no_args_is_help=True)
-    cli.add_typer(resource.app, name="resource-usage", no_args_is_help=True)
-    cli.add_typer(dashboard.app, name="dashboard", no_args_is_help=False)
+    cli.add_typer(
+        backup.app,
+        name="backup",
+        no_args_is_help=True,
+        help="Cluster backup management [BETA]",
+    )
+    cli.add_typer(
+        resource.app,
+        name="resource-usage",
+        no_args_is_help=True,
+        help="Resource usage monitoring [BETA]",
+    )
+    cli.add_typer(
+        dashboard.app,
+        name="dashboard",
+        no_args_is_help=False,
+        help="Live cluster dashboard [BETA]",
+    )
 
 
 @cli.callback()

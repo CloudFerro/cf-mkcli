@@ -1,16 +1,17 @@
 import json
 from typing import Annotated
-
 import typer
 
-from mkcli.core.enums import AuthType, Format
+
+from mkcli.settings import APP_SETTINGS
+from mkcli.core.enums import Format, SupportedAuthTypes
 from mkcli.core.models.context import default_context, Context
 from mkcli.core.session import open_context_catalogue
 from mkcli.utils import console
 
 
 _HELP: dict = {
-    "general": "Manage authentication contexts",
+    "general": "Manage multiple authentication sessions",
     "format": "Output format, either 'table' or 'json'",
 }
 
@@ -92,9 +93,13 @@ def add(
         typer.Option(prompt=True, help="Identity server URL for the new auth context"),
     ] = default_context.identity_server_url,
     auth_type: Annotated[
-        AuthType,
-        typer.Option(prompt=True, help="Authentication type for the new auth context"),
-    ] = AuthType.OPENID,
+        SupportedAuthTypes,
+        typer.Option(
+            prompt=True if APP_SETTINGS.beta_feature_flag else False,
+            help="Authentication type for the new auth context",
+            hidden=not APP_SETTINGS.beta_feature_flag,
+        ),
+    ] = "api_key",
 ):
     """Prompt for new auth context and add it to the catalogue"""
 
@@ -210,8 +215,12 @@ def edit(
         ),
     ] = None,
     auth_type: Annotated[
-        AuthType | None,
-        typer.Option("--auth_type", help="Auth type for the edited auth context"),
+        SupportedAuthTypes | None,  # type: ignore
+        typer.Option(
+            "--auth_type",
+            help="Auth type for the edited auth context",
+            hidden=not APP_SETTINGS.beta_feature_flag,
+        ),
     ] = None,
 ):
     """Update given auth context"""

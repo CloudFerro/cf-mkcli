@@ -6,6 +6,6 @@ class Format(str, Enum):
     JSON = "json"
 
 
-class AuthType(str, Enum):
+class SupportedAuthTypes(str, Enum):
     API_KEY = "api_key"
     OPENID = "openid"

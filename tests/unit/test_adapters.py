@@ -3,12 +3,12 @@ import os
 from unittest import mock
 import pytest
 from mkcli.core.models.context import Context, Token
-from mkcli.core.enums import AuthType
+from mkcli.core.enums import SupportedAuthTypes
 from mkcli.core.adapters import APIKeyAdapter, OpenIDAdapter
 from mkcli.core.exceptions import AuthorizationError
 
 
-def get_context(auth_type: AuthType) -> Context:
+def get_context(auth_type: SupportedAuthTypes) -> Context:
     return Context(
         name="test_ctx",
         client_id="test_client_id",
@@ -27,7 +27,7 @@ os.environ["MK8S_API_KEY"] = "test_api_key_from_env"
 
 def test_api_key_adapter_loading_key():
     # case when api key is not set in the context, but is in env vars
-    ctx = get_context(AuthType.API_KEY)
+    ctx = get_context(SupportedAuthTypes.API_KEY)
     adapter = APIKeyAdapter(ctx)
 
     assert adapter.ctx.api_key is not None
@@ -51,7 +51,7 @@ def test_api_key_adapter_loading_key():
 
 @mock.patch.dict(os.environ, {"MK8S_API_KEY": ""}, clear=True)
 def test_api_key_adapter_no_env_var():
-    ctx = get_context(AuthType.API_KEY)
+    ctx = get_context(SupportedAuthTypes.API_KEY)
     ctx.api_key = None
     adapter = APIKeyAdapter(ctx)
     assert adapter.ctx.api_key == ""
@@ -65,7 +65,7 @@ def test_openid_adapter_getting_empty_header_raises_error():
         OpenIDAdapter.renew_token = mock.Mock(return_value=None)
         OpenIDAdapter._renew_token_with_refresh_token = mock.Mock(return_value=None)
 
-        ctx = get_context(AuthType.OPENID)
+        ctx = get_context(SupportedAuthTypes.OPENID)
         adapter = OpenIDAdapter(ctx)
 
         with pytest.raises(AuthorizationError):
@@ -74,7 +74,7 @@ def test_openid_adapter_getting_empty_header_raises_error():
 
 def test_openid_adapter_with_valid_token():
     # mocked_token = mock.Mock()
-    ctx = get_context(AuthType.OPENID)
+    ctx = get_context(SupportedAuthTypes.OPENID)
     ctx.token = Token(
         access_token="test_access_token",
         refresh_token="test_refresh_token",
@@ -90,7 +90,7 @@ def test_openid_adapter_with_valid_token():
 
 def test_openid_adapter_with_refresh_token():
     # mocked_token = mock.Mock()
-    ctx = get_context(AuthType.OPENID)
+    ctx = get_context(SupportedAuthTypes.OPENID)
     ctx.token = Token(
         access_token="test_access_token",
         refresh_token="test_refresh_token",
@@ -126,7 +126,7 @@ def test_openid_adapter_with_refresh_token():
 
 def test_openid_adapter_with_expired_token():
     # mocked_token = mock.Mock()
-    ctx = get_context(AuthType.OPENID)
+    ctx = get_context(SupportedAuthTypes.OPENID)
     ctx.token = Token(
         access_token="test_access_token",
         refresh_token="test_refresh_token",

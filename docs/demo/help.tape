@@ -74,6 +74,3 @@ Sleep 2s
 Type "mkcli auth context --help"
 Enter
 Sleep 2s
-Type "mkcli auth token --help"
-Enter
-Sleep 2s

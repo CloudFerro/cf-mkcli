@@ -1,6 +1,6 @@
 import json
 import pytest
-from mkcli.core.enums import AuthType
+from mkcli.core.enums import SupportedAuthTypes
 from mkcli.core.models.context import Context
 
 
@@ -15,7 +15,7 @@ def mock_catalogue(catalogue):
             scope="test_scope",
             region="test_region",
             identity_server_url="https://test.identity.server",
-            auth_type=AuthType.OPENID,
+            auth_type=SupportedAuthTypes.OPENID,
         )
     )
 
@@ -27,7 +27,7 @@ def mock_catalogue(catalogue):
             scope="test_scope",
             region="test_region",
             identity_server_url="https://test.identity.server",
-            auth_type=AuthType.OPENID,
+            auth_type=SupportedAuthTypes.OPENID,
         )
     )
     catalogue.current = "test_ctx"

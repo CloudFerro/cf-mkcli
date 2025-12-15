@@ -55,6 +55,7 @@
 #   Hide                            Hide the subsequent commands from the output
 #   Show                            Show the subsequent commands in the output
 
+
 Output demo.gif
 
 Require echo
@@ -71,16 +72,19 @@ Sleep 2s
 Type "mkcli auth init"
 Enter
 Sleep 2s
+Type "Creodias"
 Enter
 Sleep 500ms
+Type "WAW4-1"
 Enter
 Sleep 500ms
+Type "https://managed-kubernetes.creodias.eu/api/v1"
 Enter
 Sleep 2s
 Type "supersecret-api-key"
 Enter
 Sleep 2s
-Type "mkcli auth key --help"
+Type "mkcli auth ctx list"
 Enter
 Sleep 2s
 Type "mkcli auth end"

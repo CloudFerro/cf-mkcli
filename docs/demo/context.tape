@@ -68,32 +68,26 @@ Set Height 600
 Type "mkcli auth context list"
 Enter
 Sleep 2s
-Type "mkcli auth context duplicate --name ctx-demo creodias"
+Type "mkcli auth context add"
+Enter
+Sleep 500ms
+Type new-ctx
+Enter
+Sleep 500ms
+Type Your-Realm
+Enter
+Sleep 500ms
+Type Your-Region
+Enter
+Sleep 500ms
+Type https//managed-kubernetes.com/v1/api
+Enter
+Sleep 500ms
+Type "https://identity.cloudferro.com/auth/"
 Enter
 Sleep 2s
-Type "mkcli auth context list"
+Type "mkcli auth ctx switch new-ctx"
 Enter
-Sleep 2s
-Type "mkcli auth context delete ctx-demo -y"
-Enter
-Sleep 2s
-Type "mkcli auth context add new-demo"
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Enter
-Sleep 500ms
-Sleep 2s
-Enter
-Sleep 500ms
-Sleep 2s
-Enter
-Sleep 500ms
 Sleep 2s
 Type "mkcli auth context list"
 Enter

@@ -5,7 +5,7 @@ from mkcli.core.session import get_auth_adapter, open_context_catalogue
 from mkcli.utils.layout import Dashboard
 
 
-app = typer.Typer(help="Live dashboard presenting clusters")
+app = typer.Typer(help="Live dashboard presenting clusters [BETA]")
 
 
 @app.callback(

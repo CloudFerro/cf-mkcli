@@ -1,8 +1,8 @@
 from contextlib import contextmanager
 
 from mkcli.core.models.context import ContextCatalogue, JsonStorage, Context
-from mkcli.settings import AuthType
 from mkcli.core.adapters import AuthProtocol, OpenIDAdapter, APIKeyAdapter
+from mkcli.core.enums import SupportedAuthTypes
 
 
 @contextmanager
@@ -20,10 +20,10 @@ def open_context_catalogue():
 def get_auth_adapter(ctx: Context) -> AuthProtocol:
     """Get auth adapter for given context."""
     match ctx.auth_type:
-        case AuthType.OPENID:
+        case SupportedAuthTypes.OPENID.value:
             return OpenIDAdapter(ctx)
 
-        case AuthType.API_KEY:
+        case SupportedAuthTypes.API_KEY.value:
             return APIKeyAdapter(ctx)
 
     raise ValueError(f"Unsupported auth type: {ctx.auth_type}")

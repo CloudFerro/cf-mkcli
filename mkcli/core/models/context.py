@@ -4,10 +4,9 @@ from typing import Dict, Optional, Any, ClassVar, Protocol
 from pathlib import Path
 from loguru import logger
 from pydantic import BaseModel
-
 from mkcli.core import exceptions as exc
 from mkcli.core.models import Token
-from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS, AuthType
+from mkcli.settings import APP_SETTINGS, DEFAULT_CTX_SETTINGS
 
 type key = str | None
 
@@ -31,7 +30,7 @@ class Context(BaseModel):
     region: str
     identity_server_url: str
     mk8s_api_url: Optional[str] = None
-    auth_type: AuthType
+    auth_type: str = "api_key"  # type: ignore
     token: Optional[Token] = None  # used only for authtype = openid
     api_key: Optional[str] = None  # used only for authtype = api_key
 

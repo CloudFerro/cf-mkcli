@@ -36,27 +36,13 @@ mkcli --help
 ```
 
 ## Authorization
-To start using `mkcli`, you need to authorize it with your credentials. In the simplest way this can be done by running the following command:
+To start using `mkcli`, you need to setup your connection to Managed Kubernetes. The simplest way of doint it is by command:
 ```commandline
 mkcli auth init
 ```
+The app will ask you for all needed information like region and realm on which you want to opeate. You will be asked for providing Managed Kubernetes API key for authorization. You can get one, after logging into your account at ClodFerro's Managed Kubernetes website.
 
-`mkcli` will prompt you to enter `realm` and `region` names, which are required to connect to your account. You will be also asked to choose authorization method.
-You can choose between `api_key` and `openid` methods. Default and recommended is using `api_key`.
-#### Using API Key
-If you choose using api key as an auth method, then you will be prompted to pass API key, which you can get from Managed Kubernetes GUI.
-![Auth by key](docs/demo/auth_prompt.png)
-
-You can also set, clear or preview your Api Key later, by using `mkcli auth key` command.
-If you don't provide explicite any Api Key, `mkcli` will try to load it from ENV variable `MK8S_API_KEY`. After loading your api key `mkcli` will 'remember it', so you don't need to keep it in any .rc file.
-
-![Auth init preview](docs/demo/auth_init.gif)
-
-#### Using OpenId
-When you use OpenId as an auth method, `mkcli` will open web browser window and ask you to log in to your account.
-After successful logging in, `mkcli` will "remember" your credentials and you can use it without logging in again for certain amount of time.
-
-You can also clear, show or refresh OpenId auth token by using `mkcli auth token` command.
+![Usage example](./docs/demo/auth_init.gif)
 
 #### Logging out
 If you want to log out, anc clear all saved auth session data, you can just run:
@@ -96,14 +82,13 @@ mkcli cluster create --master-count 1
 ```
 
 ### *Advanced: Auth contexts (you can skip this part of docs if you are not interested in advanced usage)*
-_*Optionally_: If you want to use `mkcli` simultaneously for different accounts, or in different realms,
-you can use "login session contexts" feature.
+_*Optionally_: If you want to use `mkcli` simultaneously for different accounts, regions or realms
+you can use "session contexts" feature.
 This allows you to create multiple contexts, each with its own credentials and settings.
 ```commandline
 mkcli auth context add {context-name}
 ```
-This command will prompt you to add all needed information, for creating a new context (e.g., realm, client ID, client secret, etc.).
-But don't worry if you are not familiar with all of them, since mkcli provides default values for most of the fields.
+This command will prompt you to add all needed information, for creating a new context (e.g., realm, region, client secret, etc.).
 You can always list, edit, duplicate or delete contexts (see help for `mkcli auth context` command).
 
 To switch between contexts, you can use:
@@ -134,16 +119,15 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `auth`: mkcli authorization and authentication...
+* `auth`: Manage authentication sessions
 * `cluster`: Manage Kubernetes clusters
 * `node-pool`: Manage Kubernetes cluster&#x27;s node pools
 * `kubernetes-version`: Manage Kubernetes versions
 * `flavors`: Manage Kubernetes machine specs (flavors)
-* `regions`: Manage regions
 
 ## `auth`
 
-mkcli authorization and authentication management
+Manage authentication sessions
 
 **Usage**:
 
@@ -159,9 +143,9 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 * `init`: Initialize authentication session
 * `end`: End authentication session and clear saved...
-* `token`: Auth OpenID token management
+* `token`: OpenID token management [BETA]
 * `key`: MK8s API key management
-* `context`: Manage authentication contexts
+* `context | ctx`: Manage multiple authentication sessions
 
 ### `auth init`
 
@@ -177,7 +161,7 @@ $ auth init [OPTIONS]
 
 * `--realm TEXT`: Realm name  [required]
 * `--region TEXT`: Region name  [required]
-* `--auth-type [api_key|openid]`: Auth type  [default: api_key]
+* `--api-url TEXT`: MK8s API URL  [required]
 * `--help`: Show this message and exit.
 
 ### `auth end`
@@ -196,7 +180,7 @@ $ auth end [OPTIONS]
 
 ### `auth token`
 
-Auth OpenID token management
+OpenID token management [BETA]
 
 **Usage**:
 
@@ -275,6 +259,7 @@ $ auth key [OPTIONS] COMMAND [ARGS]...
 * `clear`: Clear the current API key from the session...
 * `show`: Show the current API key from the session...
 * `set`: Set the current API key for the session...
+* `create`: Create a new API key
 
 #### `auth key clear`
 
@@ -322,15 +307,28 @@ $ auth key set [OPTIONS] API_KEY
 
 * `--help`: Show this message and exit.
 
+#### `auth key create`
 
-### `auth context`
-
-Manage authentication contexts
+Create a new API key
 
 **Usage**:
 
 ```console
-$ auth context [OPTIONS] COMMAND [ARGS]...
+$ auth key create [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `auth context | ctx`
+
+Manage multiple authentication sessions
+
+**Usage**:
+
+```console
+$ auth context | ctx [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -347,14 +345,14 @@ $ auth context [OPTIONS] COMMAND [ARGS]...
 * `edit`: Update given auth context
 * `switch`: Switch to a different auth context
 
-#### `auth context show`
+#### `auth context | ctx show`
 
 Show current auth context
 
 **Usage**:
 
 ```console
-$ auth context show [OPTIONS]
+$ auth context | ctx show [OPTIONS]
 ```
 
 **Options**:
@@ -362,14 +360,14 @@ $ auth context show [OPTIONS]
 * `-f, --format [table|json]`: [default: table]
 * `--help`: Show this message and exit.
 
-#### `auth context list`
+#### `auth context | ctx list`
 
 Remove given auth context from the catalogue
 
 **Usage**:
 
 ```console
-$ auth context list [OPTIONS]
+$ auth context | ctx list [OPTIONS]
 ```
 
 **Options**:
@@ -377,14 +375,14 @@ $ auth context list [OPTIONS]
 * `-f, --format [table|json]`: [default: table]
 * `--help`: Show this message and exit.
 
-#### `auth context add`
+#### `auth context | ctx add`
 
 Prompt for new auth context and add it to the catalogue
 
 **Usage**:
 
 ```console
-$ auth context add [OPTIONS]
+$ auth context | ctx add [OPTIONS]
 ```
 
 **Options**:
@@ -392,18 +390,18 @@ $ auth context add [OPTIONS]
 * `--name TEXT`: Name for the new auth context  [required]
 * `--realm TEXT`: Realm for the new auth context  [required]
 * `--region TEXT`: Region for the new auth context  [required]
+* `--api-url TEXT`: MK8s API URL for the new auth context  [required]
 * `--identity-server TEXT`: Identity server URL for the new auth context  [default: https://identity.cloudferro.com/auth/]
-* `--auth-type [api_key|openid]`: Authentication type for the new auth context  [default: openid]
 * `--help`: Show this message and exit.
 
-#### `auth context delete`
+#### `auth context | ctx delete`
 
 emove given auth context from the catalogue
 
 **Usage**:
 
 ```console
-$ auth context delete [OPTIONS] NAMES...
+$ auth context | ctx delete [OPTIONS] NAMES...
 ```
 
 **Arguments**:
@@ -415,14 +413,14 @@ $ auth context delete [OPTIONS] NAMES...
 * `-y, --confirm`
 * `--help`: Show this message and exit.
 
-#### `auth context duplicate`
+#### `auth context | ctx duplicate`
 
 Duplicate given auth context with a new name
 
 **Usage**:
 
 ```console
-$ auth context duplicate [OPTIONS] CTX
+$ auth context | ctx duplicate [OPTIONS] CTX
 ```
 
 **Arguments**:
@@ -434,14 +432,14 @@ $ auth context duplicate [OPTIONS] CTX
 * `-n, --name TEXT`: Name for the new auth context  [required]
 * `--help`: Show this message and exit.
 
-#### `auth context edit`
+#### `auth context | ctx edit`
 
 Update given auth context
 
 **Usage**:
 
 ```console
-$ auth context edit [OPTIONS] CTX
+$ auth context | ctx edit [OPTIONS] CTX
 ```
 
 **Arguments**:
@@ -453,20 +451,20 @@ $ auth context edit [OPTIONS] CTX
 * `-n, --name TEXT`: New name of the edited auth context
 * `--client_id TEXT`: New Client ID for the edited auth context
 * `--realm TEXT`: Realm for the edited auth context
+* `--api_url TEXT`: API URL for the edited auth context
 * `--scope TEXT`: Scope for the edited auth context
 * `--region TEXT`: Region for the edited auth context
 * `--identity_server TEXT`: Identity server URL for the edited auth context
-* `--auth_type [api_key|openid]`: Auth type for the edited auth context
 * `--help`: Show this message and exit.
 
-#### `auth context switch`
+#### `auth context | ctx switch`
 
 Switch to a different auth context
 
 **Usage**:
 
 ```console
-$ auth context switch [OPTIONS] CTX
+$ auth context | ctx switch [OPTIONS] CTX
 ```
 
 **Arguments**:
@@ -656,7 +654,7 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 **Options**:
 
 * `--flavor TEXT`: Machine flavor for the node pool, if None, use the default flavor  [required]
-* `--name TEXT`: Node pool name, if None, generate with petname  [required]
+* `--name TEXT`: Node pool name, if None, generate with petname
 * `--node-count INTEGER`: Number of nodes in the pool  [default: 0]
 * `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 0]
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 0]
@@ -810,39 +808,6 @@ List all available flavors
 
 ```console
 $ flavors list [OPTIONS]
-```
-
-**Options**:
-
-* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
-* `--help`: Show this message and exit.
-
-## `regions`
-
-Manage regions
-
-**Usage**:
-
-```console
-$ regions [OPTIONS] COMMAND [ARGS]...
-```
-
-**Options**:
-
-* `--help`: Show this message and exit.
-
-**Commands**:
-
-* `list`: List all available regions
-
-### `regions list`
-
-List all available regions
-
-**Usage**:
-
-```console
-$ regions list [OPTIONS]
 ```
 
 **Options**:

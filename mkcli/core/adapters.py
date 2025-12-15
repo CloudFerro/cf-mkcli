@@ -13,6 +13,8 @@ from mkcli.core.exceptions import AuthorizationError
 
 
 class AuthProtocol(Protocol):
+    def initialize(self) -> None: ...
+
     def get_auth_header(self) -> Dict[str, str | None]: ...
 
     def validate(self) -> None: ...
@@ -22,6 +24,9 @@ class APIKeyAdapter:
     def __init__(self, ctx: Context) -> None:
         self.ctx = ctx
         self.ctx.api_key = ctx.api_key or os.getenv("MK8S_API_KEY")
+
+    def initialize(self) -> None:
+        pass
 
     def get_auth_header(self) -> Dict[str, str | None]:
         self.validate()
@@ -36,6 +41,13 @@ class OpenIDAdapter:
     def __init__(self, ctx: Context):
         self._ctx = ctx  # Note(EA): I dont like that auth adapter changes smth in ctx (token attrs values)
         self._keycloak_openid: Optional[KeycloakOpenID] = None
+
+    def initialize(self) -> None:
+        self.renew_token()
+
+    def validate(self) -> None:
+        if not self.token.access_token:
+            raise AuthorizationError("Token is not set")
 
     def get_auth_header(self) -> Dict[str, str | None]:
         if not self.token.access_token:
@@ -98,7 +110,3 @@ class OpenIDAdapter:
                     redirect_uri=f"{s.base_url}/callback",
                 )
             self._ctx.token = Token.load_from_response(resp)
-
-    def validate(self) -> None:
-        if not self.token.access_token:
-            raise AuthorizationError("Token is not set")

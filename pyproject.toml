@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 python-keycloak = "^5.5.1"
-typer = "^0.16.0"
+typer = "0.20.0"
 loguru = "^0.7.3"
 pydantic = "^2.11.5"
 pydantic-settings = "^2.9.1"
@@ -36,6 +36,7 @@ markdown-include = "^0.8.1"
 mkdocs-typer = "^0.0.3"
 pytest-cov = "^7.0.0"
 coverage = "^7.10.6"
+vhs = "^1.0.0.post1"
 
 [build-system]
 requires = ["poetry-core"]

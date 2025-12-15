@@ -4,7 +4,7 @@ from mkcli.core.session import open_context_catalogue
 from mkcli.utils import console
 
 
-app = typer.Typer(no_args_is_help=True, help="Auth OpenID token management")
+app = typer.Typer(no_args_is_help=True, help="Auth OpenID token management [BETA]")
 
 
 @app.command()

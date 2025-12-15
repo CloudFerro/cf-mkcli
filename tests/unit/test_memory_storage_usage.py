@@ -32,7 +32,7 @@ def test_context_catalogue_uses_memory_storage(catalogue):
 
     # Test basic operations don't touch filesystem
     from mkcli.core.models.context import Context
-    from mkcli.core.enums import AuthType
+    from mkcli.core.enums import SupportedAuthTypes
 
     test_context = Context(
         name="test",
@@ -41,7 +41,7 @@ def test_context_catalogue_uses_memory_storage(catalogue):
         scope="test_scope",
         region="test_region",
         identity_server_url="https://test.url",
-        auth_type=AuthType.API_KEY,
+        auth_type=SupportedAuthTypes.API_KEY,
     )
 
     catalogue.add(test_context)

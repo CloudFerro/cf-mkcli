@@ -3,7 +3,7 @@ import pytest
 import json
 from mkcli.core.models.context import Context
 from mkcli.core.models.resource_usage import ResourceUsage
-from mkcli.settings import AuthType
+from mkcli.core.enums import SupportedAuthTypes
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -17,7 +17,7 @@ def mock_catalogue(catalogue):
             scope="test_scope",
             region="test_region",
             identity_server_url="https://test.identity.server",
-            auth_type=AuthType.OPENID,
+            auth_type=SupportedAuthTypes.OPENID,
             mk8s_api_url="https://test.api.url",
         )
     )

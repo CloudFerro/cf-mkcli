@@ -69,9 +69,7 @@ def test_auth_verify_session_initialized(
         )
         assert "creodias-new" in output_lower, "Expected 'Creodias-new' realm not found"
         assert "waw4-1" in output_lower, "Expected 'WAW4-1' region not found"
-        assert "authtype.api_key" in output_lower, (
-            "Expected 'api_key' auth type not found"
-        )
+        assert "api_key" in output_lower, "Expected 'api_key' auth type not found"
 
         assert result.exit_code == 0
 
@@ -205,7 +203,8 @@ def test_auth_key_set(
     scope="session",
 )
 def test_auth_context_show(
-    bdd: classmethod, command: list[str] = ["auth", "context", "show"]
+    bdd: classmethod,
+    command: list[str] = ["auth", "context", "show", "--format", "json"],
 ):
     """Test that 'mkcli auth context show' command executes successfully."""
     with bdd.given("Show auth context"):
@@ -214,13 +213,12 @@ def test_auth_context_show(
     with bdd.then("Auth context show output should contain expected fields"):
         output_lower = result.output.lower()
 
-        assert "context" in output_lower
         assert "default" in output_lower
         assert "managed-kubernetes" in output_lower
         assert "creodias-new" in output_lower
         assert "waw4-1" in output_lower
-        assert "https://managed-kubernetes.creodias.eu" in output_lower
-        assert "authtype.api_key" in output_lower
+        assert "https://managed-kubernetes.creodias.eu/api/v1" in output_lower
+        assert "api_key" in output_lower
 
         assert result.exit_code == 0
 
@@ -235,7 +233,8 @@ def test_auth_context_show(
     scope="session",
 )
 def test_authorized_auth_context_list(
-    bdd: classmethod, command: list[str] = ["auth", "context", "list"]
+    bdd: classmethod,
+    command: list[str] = ["auth", "context", "list", "--format", "json"],
 ):
     """Test that 'mkcli auth context list' command executes successfully."""
     with bdd.given("List auth contexts"):
@@ -249,8 +248,8 @@ def test_authorized_auth_context_list(
         assert "managed-kubernetes" in output_lower
         assert "creodias-new" in output_lower
         assert "waw4-1" in output_lower
-        assert "https://managed-kubernetes.creodias.eu" in output_lower
-        assert "authtype.api_key" in output_lower
+        assert "https://managed-kubernetes.creodias.eu/api/v1" in output_lower
+        assert "api_key" in output_lower
 
         assert result.exit_code == 0
 
@@ -484,7 +483,7 @@ def test_auth_context_edit(
     region: str = "waw4-1",
     identity_server_url: str = "https://identity.cloudferro.com/auth/",
     mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1",
-    auth_type: str = "<authtype.api_key: 'api_key'>",
+    auth_type: str = "api_key",
 ):
     """Test that 'mkcli auth context edit' command executes successfully."""
     with bdd.given("Edit auth context"):
@@ -520,7 +519,7 @@ def test_auth_context_edit(
             f"'region': '{region.lower()}'",
             f"'identity_server_url': '{identity_server_url}'",
             f"'mk8s_api_url': '{mk8s_api_url}'",
-            f"'auth_type': {auth_type.lower()}",
+            f"'auth_type': '{auth_type.lower()}",
         ]
 
         for field in expected_fields:
@@ -552,7 +551,9 @@ def test_auth_end(bdd: classmethod, command: list[str] = ["auth", "end"]):
 
     with bdd.then("The auth context list should be empty"):
         result_list = run_mkcli_cmd(
-            ["auth", "context", "list"], assert_success=True, show_output=True
+            ["auth", "context", "list"],
+            assert_success=True,
+            show_output=True,
         )
 
         output_list_lower = result_list.output.lower()

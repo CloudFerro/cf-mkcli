@@ -1,13 +1,14 @@
 from collections import defaultdict
 import os
-from typing import Annotated
 
 from pydantic import field_validator
 from platformdirs import user_cache_dir
 import typer
+
+from typing_extensions import Annotated
 from pydantic_settings import BaseSettings, SettingsConfigDict, NoDecode
 from pathlib import Path
-from mkcli.core.enums import Format, AuthType
+from mkcli.core.enums import Format
 
 
 ENV: str = os.getenv("MKCLI_ENV") or ""
@@ -61,6 +62,9 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="MKCLI_")
 
 
+APP_SETTINGS = AppSettings()
+
+
 class DefaultContextSettings(BaseSettings):
     name: str = "default"
     realm: str = "Creodias-new"
@@ -69,7 +73,7 @@ class DefaultContextSettings(BaseSettings):
     region: str = "WAW4-1"
     mk8s_api_url: str = "https://managed-kubernetes.creodias.eu/api/v1"
     identity_server_url: str = "https://identity.cloudferro.com/auth/"
-    auth_type: AuthType = AuthType.API_KEY
+    auth_type: str = "api_key"
 
 
 class DefaultClusterSettings(BaseSettings):
@@ -79,4 +83,3 @@ class DefaultClusterSettings(BaseSettings):
 
 
 DEFAULT_CTX_SETTINGS = DefaultContextSettings()
-APP_SETTINGS = AppSettings()

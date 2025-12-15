@@ -18,16 +18,15 @@ $ [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `auth`: mkcli authorization and authentication...
+* `auth`: Manage authentication sessions
 * `cluster`: Manage Kubernetes clusters
 * `node-pool`: Manage Kubernetes cluster&#x27;s node pools
 * `kubernetes-version`: Manage Kubernetes versions
 * `flavors`: Manage Kubernetes machine specs (flavors)
-* `regions`: Manage regions
 
 ## `auth`
 
-mkcli authorization and authentication management
+Manage authentication sessions
 
 **Usage**:
 
@@ -43,9 +42,9 @@ $ auth [OPTIONS] COMMAND [ARGS]...
 
 * `init`: Initialize authentication session
 * `end`: End authentication session and clear saved...
-* `token`: Auth OpenID token management
+* `token`: OpenID token management [BETA]
 * `key`: MK8s API key management
-* `context`: Manage authentication contexts
+* `context | ctx`: Manage multiple authentication sessions
 
 ### `auth init`
 
@@ -61,7 +60,7 @@ $ auth init [OPTIONS]
 
 * `--realm TEXT`: Realm name  [required]
 * `--region TEXT`: Region name  [required]
-* `--auth-type [api_key|openid]`: Auth type  [default: api_key]
+* `--api-url TEXT`: MK8s API URL  [required]
 * `--help`: Show this message and exit.
 
 ### `auth end`
@@ -80,7 +79,7 @@ $ auth end [OPTIONS]
 
 ### `auth token`
 
-Auth OpenID token management
+OpenID token management [BETA]
 
 **Usage**:
 
@@ -159,6 +158,7 @@ $ auth key [OPTIONS] COMMAND [ARGS]...
 * `clear`: Clear the current API key from the session...
 * `show`: Show the current API key from the session...
 * `set`: Set the current API key for the session...
+* `create`: Create a new API key
 
 #### `auth key clear`
 
@@ -206,15 +206,28 @@ $ auth key set [OPTIONS] API_KEY
 
 * `--help`: Show this message and exit.
 
+#### `auth key create`
 
-### `auth context`
-
-Manage authentication contexts
+Create a new API key
 
 **Usage**:
 
 ```console
-$ auth context [OPTIONS] COMMAND [ARGS]...
+$ auth key create [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+### `auth context | ctx`
+
+Manage multiple authentication sessions
+
+**Usage**:
+
+```console
+$ auth context | ctx [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -231,14 +244,14 @@ $ auth context [OPTIONS] COMMAND [ARGS]...
 * `edit`: Update given auth context
 * `switch`: Switch to a different auth context
 
-#### `auth context show`
+#### `auth context | ctx show`
 
 Show current auth context
 
 **Usage**:
 
 ```console
-$ auth context show [OPTIONS]
+$ auth context | ctx show [OPTIONS]
 ```
 
 **Options**:
@@ -246,14 +259,14 @@ $ auth context show [OPTIONS]
 * `-f, --format [table|json]`: [default: table]
 * `--help`: Show this message and exit.
 
-#### `auth context list`
+#### `auth context | ctx list`
 
 Remove given auth context from the catalogue
 
 **Usage**:
 
 ```console
-$ auth context list [OPTIONS]
+$ auth context | ctx list [OPTIONS]
 ```
 
 **Options**:
@@ -261,14 +274,14 @@ $ auth context list [OPTIONS]
 * `-f, --format [table|json]`: [default: table]
 * `--help`: Show this message and exit.
 
-#### `auth context add`
+#### `auth context | ctx add`
 
 Prompt for new auth context and add it to the catalogue
 
 **Usage**:
 
 ```console
-$ auth context add [OPTIONS]
+$ auth context | ctx add [OPTIONS]
 ```
 
 **Options**:
@@ -276,18 +289,18 @@ $ auth context add [OPTIONS]
 * `--name TEXT`: Name for the new auth context  [required]
 * `--realm TEXT`: Realm for the new auth context  [required]
 * `--region TEXT`: Region for the new auth context  [required]
+* `--api-url TEXT`: MK8s API URL for the new auth context  [required]
 * `--identity-server TEXT`: Identity server URL for the new auth context  [default: https://identity.cloudferro.com/auth/]
-* `--auth-type [api_key|openid]`: Authentication type for the new auth context  [default: openid]
 * `--help`: Show this message and exit.
 
-#### `auth context delete`
+#### `auth context | ctx delete`
 
 emove given auth context from the catalogue
 
 **Usage**:
 
 ```console
-$ auth context delete [OPTIONS] NAMES...
+$ auth context | ctx delete [OPTIONS] NAMES...
 ```
 
 **Arguments**:
@@ -299,14 +312,14 @@ $ auth context delete [OPTIONS] NAMES...
 * `-y, --confirm`
 * `--help`: Show this message and exit.
 
-#### `auth context duplicate`
+#### `auth context | ctx duplicate`
 
 Duplicate given auth context with a new name
 
 **Usage**:
 
 ```console
-$ auth context duplicate [OPTIONS] CTX
+$ auth context | ctx duplicate [OPTIONS] CTX
 ```
 
 **Arguments**:
@@ -318,14 +331,14 @@ $ auth context duplicate [OPTIONS] CTX
 * `-n, --name TEXT`: Name for the new auth context  [required]
 * `--help`: Show this message and exit.
 
-#### `auth context edit`
+#### `auth context | ctx edit`
 
 Update given auth context
 
 **Usage**:
 
 ```console
-$ auth context edit [OPTIONS] CTX
+$ auth context | ctx edit [OPTIONS] CTX
 ```
 
 **Arguments**:
@@ -337,20 +350,20 @@ $ auth context edit [OPTIONS] CTX
 * `-n, --name TEXT`: New name of the edited auth context
 * `--client_id TEXT`: New Client ID for the edited auth context
 * `--realm TEXT`: Realm for the edited auth context
+* `--api_url TEXT`: API URL for the edited auth context
 * `--scope TEXT`: Scope for the edited auth context
 * `--region TEXT`: Region for the edited auth context
 * `--identity_server TEXT`: Identity server URL for the edited auth context
-* `--auth_type [api_key|openid]`: Auth type for the edited auth context
 * `--help`: Show this message and exit.
 
-#### `auth context switch`
+#### `auth context | ctx switch`
 
 Switch to a different auth context
 
 **Usage**:
 
 ```console
-$ auth context switch [OPTIONS] CTX
+$ auth context | ctx switch [OPTIONS] CTX
 ```
 
 **Arguments**:
@@ -540,7 +553,7 @@ $ node-pool create [OPTIONS] CLUSTER_ID
 **Options**:
 
 * `--flavor TEXT`: Machine flavor for the node pool, if None, use the default flavor  [required]
-* `--name TEXT`: Node pool name, if None, generate with petname  [required]
+* `--name TEXT`: Node pool name, if None, generate with petname
 * `--node-count INTEGER`: Number of nodes in the pool  [default: 0]
 * `--min-nodes INTEGER`: Minimum number of nodes in the pool  [default: 0]
 * `--max-nodes INTEGER`: Maximum number of nodes in the pool  [default: 0]
@@ -694,39 +707,6 @@ List all available flavors
 
 ```console
 $ flavors list [OPTIONS]
-```
-
-**Options**:
-
-* `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
-* `--help`: Show this message and exit.
-
-## `regions`
-
-Manage regions
-
-**Usage**:
-
-```console
-$ regions [OPTIONS] COMMAND [ARGS]...
-```
-
-**Options**:
-
-* `--help`: Show this message and exit.
-
-**Commands**:
-
-* `list`: List all available regions
-
-### `regions list`
-
-List all available regions
-
-**Usage**:
-
-```console
-$ regions list [OPTIONS]
 ```
 
 **Options**:

@@ -1,23 +1,26 @@
-from typing import Annotated
-
 import typer
+from typing_extensions import Annotated
+
+from mkcli.cli.extension import AliasGroup
 from mkcli.core.session import open_context_catalogue
-from mkcli.core.enums import AuthType
 from mkcli.utils import console
+from mkcli.core import adapters
 from mkcli.core.models.context import (
     default_context,
     Context,
 )
+from mkcli.settings import APP_SETTINGS
+from mkcli.core.enums import SupportedAuthTypes
 
 
 _HELP: dict = {
-    "general": "mkcli authorization and authentication management",
+    "general": "Manage authentication sessions",
     "init": "Initialize authentication session",
     "end": "End authentication session and clear saved tokens",
 }
 
 
-app = typer.Typer(no_args_is_help=True, help=_HELP["general"])
+app = typer.Typer(cls=AliasGroup, no_args_is_help=True, help=_HELP["general"])
 
 
 @app.command(name="init", help=_HELP["init"])
@@ -26,8 +29,13 @@ def init(
     region: Annotated[str, typer.Option(prompt=True, help="Region name")],
     api_url: Annotated[str, typer.Option(prompt=True, help="MK8s API URL")],
     auth_type: Annotated[
-        AuthType, typer.Option(prompt=True, help="Auth type")
-    ] = AuthType.API_KEY,
+        SupportedAuthTypes,
+        typer.Option(
+            prompt=True if APP_SETTINGS.beta_feature_flag else False,
+            help="Auth type [BETA]",
+            hidden=not APP_SETTINGS.beta_feature_flag,
+        ),
+    ] = "api_key",
 ):
     """
     Initialize your first auth context (with default attribute values).
@@ -46,9 +54,12 @@ def init(
         scope=default_context.scope,
     )
 
-    if auth_type == AuthType.API_KEY:
-        api_key = typer.prompt("Enter your API key", hide_input=False, default="")
-        new_ctx.api_key = api_key
+    match auth_type:
+        case SupportedAuthTypes.API_KEY.value:
+            api_key = typer.prompt("Enter your API key", hide_input=False, default="")
+            new_ctx.api_key = api_key
+        case SupportedAuthTypes.OPENID.value:
+            adapters.OpenIDAdapter(new_ctx).initialize()
 
     with open_context_catalogue() as cat:
         cat.add(new_ctx)
