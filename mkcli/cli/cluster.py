@@ -19,7 +19,7 @@ default_cluster = DefaultClusterSettings()
 _HELP: dict = {
     "general": "Manage Kubernetes clusters",
     "create": "Create a new k8s cluster",
-    "update": "Update the cluster with given id",
+    "upgrade": "Upgrade the cluster with given id",
     "delete": "Delete the cluster with given id",
     "list": "List all clusters",
     "show": "Show cluster details",
@@ -110,31 +110,21 @@ def create(
             console.display(json.dumps(_out, indent=2))
 
 
-@app.command(help=_HELP["update"])
-def update(
+@app.command(help=_HELP["upgrade"])
+def upgrade(
     cluster_id: Annotated[str, typer.Argument(help="Cluster ID")],
-    kubernetes_version: str = typer.Option(None, help=_HELP["kubernetes_version"]),
-    master_count: int = typer.Option(
-        None, help=_HELP["master_count"]
-    ),  # TODO(EA): maybe control-plane count?
-    master_flavor: str = typer.Option(None, help=_HELP["master_flavor"]),
+    kubernetes_version: Annotated[
+        str, typer.Argument(help=_HELP["kubernetes_version"])
+    ],
     dry_run: Annotated[bool, typer.Option("--dry-run", help=_HELP["dry_run"])] = False,
 ):
-    """Update the cluster with given id"""
-    if not kubernetes_version and not master_count and not master_flavor:
-        console.display(
-            "[bold red]No options provided to update the cluster![/bold red]"
-        )
-        raise typer.Exit()
+    """Upgrade the cluster with given id"""
 
     with open_context_catalogue() as cat:
         ctx = cat.current_context
         client = MK8SClient(get_auth_adapter(ctx), ctx.mk8s_api_url)
         k8sv_map = mappings.get_kubernetes_versions_mapping(client)
 
-        region_map = mappings.get_regions_mapping(client)
-        region = region_map[ctx.region]
-        flavor_map = mappings.get_machine_spec_mapping(client, region.id)
         cluster = client.get_cluster(cluster_id)
 
         if kubernetes_version is not None:
@@ -145,15 +135,6 @@ def update(
                     version=kubernetes_version,
                     available_versions=list(k8sv_map.keys()),
                 )
-
-        if master_flavor is not None:
-            try:
-                cluster.control_plane.custom.machine_spec = flavor_map[master_flavor]
-            except KeyError:
-                raise FlavorNotFound(
-                    flavor_name=master_flavor, available_flavors=list(flavor_map.keys())
-                )
-
         if dry_run:
             console.display(
                 f"[bold yellow]Dry run mode:[/bold yellow] would update cluster {cluster_id}"
@@ -161,12 +142,11 @@ def update(
             console.display_json(cluster.model_dump_json())
             return
 
-        console.display(f"Updating cluster {cluster_id} ({cluster.name}) with:")
         payload = cluster.model_dump()
-        out = client.update_cluster(cluster_id, payload)
-        console.display_json(json.dumps(payload, indent=2))
-        console.display(f"Cluster {cluster_id} updated:")
-        console.display_json(json.dumps(out, indent=2))
+        client.update_cluster(cluster_id, payload)
+        console.display(
+            f"Updating cluster {cluster_id} [bold cyan]({cluster.name})[/bold cyan] to k8s version {kubernetes_version}"
+        )
 
 
 @app.command(help=_HELP["delete"])

@@ -414,12 +414,12 @@ def test_cluster_get_kubeconfig(
     depends=["tests/integration/test_cluster_commands.py::test_cluster_create"],
     scope="session",
 )
-def test_cluster_update_kubernetes_version(
+def test_cluster_upgrade_kubernetes_version(
     bdd: classmethod,
     created_cluster_id: dict,
     tmp_path: str,
     new_kubernetes_version: str = "1.31.10",
-    update_cluster_timeout: int = 60 * 30,
+    upgrade_cluster_timeout: int = 60 * 30,
 ):
     """Test that 'mkcli cluster update' command works and cluster reaches running state with updated version."""
 
@@ -437,32 +437,31 @@ def test_cluster_update_kubernetes_version(
         result = run_mkcli_cmd(
             [
                 "cluster",
-                "update",
-                "--kubernetes-version",
-                new_kubernetes_version,
+                "upgrade",
                 cluster_id,
+                new_kubernetes_version,
             ],
             assert_success=True,
             show_output=True,
         )
         assert cluster_id in result.output
-        log.info("Cluster update command executed successfully", cluster_id=cluster_id)
+        log.info("Cluster upgrade command executed successfully", cluster_id=cluster_id)
 
         final_cluster_data = wait_for_cluster_state(
             cluster_id=cluster_id,
             desired_state="running",
-            timeout_seconds=update_cluster_timeout,
+            timeout_seconds=upgrade_cluster_timeout,
             check_interval=30,
         )
         assert final_cluster_data["status"].lower() == "running"
-        log.info("Cluster is running after update", cluster_id=cluster_id)
+        log.info("Cluster is running after upgrade", cluster_id=cluster_id)
 
     with bdd.then(
-        "All worker nodes should be ready with the updated kubernetes version"
+        "All worker nodes should be ready with the upgraded kubernetes version"
     ):
         kubeconfig_path, env = ensure_kubeconfig_exists(cluster_id, str(tmp_path))
         verify_nodes_with_version(cluster_id, new_kubernetes_version, env)
-        log.info("Cluster update test completed successfully")
+        log.info("Cluster upgrade test completed successfully")
 
 
 @pytest.mark.flaky(retries=3, delay=60)

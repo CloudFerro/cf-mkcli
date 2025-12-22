@@ -121,6 +121,6 @@ versioning:
     - echo 'Publishing package version ${CI_COMMIT_TAG}'
     - git checkout -b v${CI_COMMIT_TAG}
     - just bump-version ${CI_COMMIT_TAG}
-    - echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > _version.py
+    - echo "__version__ = '$(cat pyproject.toml | grep version | cut -d ' ' -f 3 | tr -d '\"')'" > mkcli/_version.py
     - git add pyproject.toml _version.py && git commit -m "update version to ${CI_COMMIT_TAG}"
     - git push origin v${CI_COMMIT_TAG}

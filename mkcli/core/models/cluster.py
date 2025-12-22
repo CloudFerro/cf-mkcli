@@ -95,3 +95,9 @@ class Cluster(BaseResourceModel):
         ):
             return "N/A"
         return self.control_plane.custom.machine_spec.name
+
+    @property
+    def kubernetes_version(self) -> str:
+        if self.version is None:
+            return "N/A"
+        return self.version.version

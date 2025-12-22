@@ -74,11 +74,12 @@ class MK8SClient:
                 msg = response.content.decode()
             elif isinstance(response.content, str):
                 msg: str = response.content
+
             if WAF_ERROR_MSG in msg:  # noqa
                 msg = msg.replace("[Go Back]", "")
                 raise WAFException(
                     f"Request blocked by Web Application Firewall. Please contact your administrator.\n{remove_html_tags(msg)}"
-                ) from e
+                )
             raise APIResponseFormattingError(
                 f"Failed to parse API JSON response: {e}"
             ) from e
@@ -116,7 +117,7 @@ class MK8SClient:
     def update_cluster(self, cluster_id: str, cluster_data: dict) -> dict:
         resp = self.api.put(f"/cluster/{cluster_id}", json=cluster_data)
         self._verify(resp)
-        return resp.json()
+        return self._format_response(resp)
 
     def delete_cluster(self, cluster_id: str) -> None:
         resp = self.api.delete(f"cluster/{cluster_id}")

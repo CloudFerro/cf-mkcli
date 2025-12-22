@@ -28,6 +28,7 @@ class StatusHighlighter(RegexHighlighter):
         r"(?P<running>\bRunning\b)",
         r"(?P<creating>\bCreating\b)",
         r"(?P<configuring>\bConfiguring\b)",
+        r"(?P<upgrading>\bUpgrading\b)",
         r"(?P<deleting>\bDeleting\b)",
         r"(?P<error>\bError\b)",
     ]
@@ -38,11 +39,11 @@ theme = Theme(
         "status.running": "bold green",
         "status.creating": "bold yellow",
         "status.configuring": "bold yellow",
+        "status.upgrading": "bold cyan",
         "status.deleting": Style(color="black", dim=True, bold=True),
         "status.error": "bold red",
     }
 )
-# console = Console(highlighter=StatusHighlighter(), theme=theme)
 
 
 def get_console() -> Console:

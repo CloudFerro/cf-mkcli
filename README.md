@@ -492,7 +492,7 @@ $ cluster [OPTIONS] COMMAND [ARGS]...
 **Commands**:
 
 * `create`: Create a new k8s cluster
-* `update`: Update the cluster with given id
+* `upgrade`: Upgrade the cluster with given id
 * `delete`: Delete the cluster with given id
 * `list`: List all clusters
 * `show`: Show cluster details
@@ -519,25 +519,23 @@ $ cluster create [OPTIONS]
 * `--format [table|json]`: Output format, either &#x27;table&#x27; or &#x27;json&#x27;  [default: table]
 * `--help`: Show this message and exit.
 
-### `cluster update`
+### `cluster upgrade`
 
-Update the cluster with given id
+Upgrade the cluster with given id
 
 **Usage**:
 
 ```console
-$ cluster update [OPTIONS] CLUSTER_ID
+$ cluster upgrade [OPTIONS] CLUSTER_ID KUBERNETES_VERSION
 ```
 
 **Arguments**:
 
 * `CLUSTER_ID`: Cluster ID  [required]
+* `KUBERNETES_VERSION`: Kubernetes version, if None, use default  [required]
 
 **Options**:
 
-* `--kubernetes-version TEXT`: Kubernetes version, if None, use default
-* `--master-count INTEGER`: Number of master nodes, if None, use default
-* `--master-flavor TEXT`: Master node flavor name, if None, use default
 * `--dry-run`: If True, do not perform any actions, just print the payload
 * `--help`: Show this message and exit.
 
